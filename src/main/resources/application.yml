@@ -1,0 +1,16 @@
+server:
+  port: 8080
+
+spring:
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}   # 기본 설정, 추후 배포시 환경변수로 변경 가능
+  datasource:
+    hikari:
+      maximum-pool-size: 50 # HikariCP 연결 풀 크기 설정
+
+
+# TRACE(상세) > DEBUG(디버깅) > INFO(정보) > WARN(경고) > ERROR(에러) > FATAL(치명적 에러) > OFF(끄기)
+logging:
+  level:
+    root: INFO  # 기본 로그 레벨
+    org.springframework: INFO
