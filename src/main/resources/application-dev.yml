@@ -1,17 +1,16 @@
 spring:
   datasource:
-    url: #
-    username: #
-    password: #
-    driver-class-name: #
+    url: jdbc:mysql://${DANJITALK_DATABASE_HOST}:${DANJITALK_DATABASE_PORT}/${DANJITALK_DATABASE_NAME}?serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8&logger=Slf4JLogger&tinyInt1isBit=false&profileSQL=true&maxQuerySizeToLog=999999&rewriteBatchedStatements=true
+    username: ${DANJITALK_DATABASE_USERNAME}
+    password: ${DANJITALK_DATABASE_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
   # JPA 기본 설정, 운영 시 update 나 none 설정
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MariaDBDialect
         format_sql: false
         show_sql: false
 
