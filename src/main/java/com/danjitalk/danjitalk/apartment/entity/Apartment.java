@@ -2,10 +2,13 @@ package com.danjitalk.danjitalk.apartment.entity;
 
 import com.danjitalk.danjitalk.apartment.enums.ApartmentType;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Apartment {
 
     @Id

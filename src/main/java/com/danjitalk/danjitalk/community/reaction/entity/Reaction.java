@@ -4,10 +4,13 @@ import com.danjitalk.danjitalk.common.util.CommonUtil;
 import com.danjitalk.danjitalk.community.feed.entity.Feed;
 import com.danjitalk.danjitalk.community.reaction.enums.ReactionType;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Reaction {
 
     @Id
