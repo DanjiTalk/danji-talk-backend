@@ -28,8 +28,6 @@ public class Feed extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String contents;
 
-    private String postType;
-
     private Integer commentCount;
 
     private Integer reactionCount;
