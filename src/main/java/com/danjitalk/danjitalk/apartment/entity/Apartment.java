@@ -2,15 +2,17 @@ package com.danjitalk.danjitalk.apartment.entity;
 
 import com.danjitalk.danjitalk.apartment.enums.ApartmentType;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Apartment {
 
-    @Id
-    @Column(length = 32, nullable = false, unique = true)
-    private String id;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private String name;                    // 아파트 이름
 

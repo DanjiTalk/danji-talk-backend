@@ -1,7 +1,6 @@
 package com.danjitalk.danjitalk.community.comment.entity;
 
 import com.danjitalk.danjitalk.common.entity.BaseEntity;
-import com.danjitalk.danjitalk.common.util.CommonUtil;
 import com.danjitalk.danjitalk.community.feed.entity.Feed;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -16,9 +15,8 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Comment extends BaseEntity {
 
-    @Id
-    @Column(length = 32, nullable = false, unique = true)
-    private String id;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
@@ -33,8 +31,4 @@ public class Comment extends BaseEntity {
     @JoinColumn(name = "feed_id")
     private Feed feed;
 
-    @PrePersist
-    public void prePersist() {
-        if(this.id == null) this.id = CommonUtil.generatedUUID();
-    }
 }
