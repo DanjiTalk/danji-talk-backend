@@ -1,8 +1,7 @@
 package com.danjitalk.danjitalk.community.feed.entity;
 
-import com.danjitalk.danjitalk.community.comment.entity.Comment;
 import com.danjitalk.danjitalk.common.entity.BaseEntity;
-import com.danjitalk.danjitalk.common.util.CommonUtil;
+import com.danjitalk.danjitalk.community.comment.entity.Comment;
 import com.danjitalk.danjitalk.community.reaction.entity.Reaction;
 import com.danjitalk.danjitalk.user.user.entity.Member;
 import jakarta.persistence.*;
@@ -18,9 +17,8 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Feed extends BaseEntity {
 
-    @Id
-    @Column(length = 32, nullable = false, unique = true)
-    private String id;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private String title;
 
@@ -40,10 +38,5 @@ public class Feed extends BaseEntity {
 
     @OneToMany(mappedBy = "feed")
     private List<Comment> commentList = new ArrayList<>();
-
-    @PrePersist
-    public void prePersist() {
-        if(this.id == null) this.id = CommonUtil.generatedUUID();
-    }
 
 }

@@ -2,7 +2,6 @@ package com.danjitalk.danjitalk.user.user.entity;
 
 import com.danjitalk.danjitalk.chat.entity.ChatroomMemberMapping;
 import com.danjitalk.danjitalk.common.entity.BaseEntity;
-import com.danjitalk.danjitalk.common.util.CommonUtil;
 import com.danjitalk.danjitalk.community.feed.entity.Feed;
 import com.danjitalk.danjitalk.user.report.entity.Report;
 import com.danjitalk.danjitalk.user.user.enums.Gender;
@@ -21,9 +20,8 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseEntity {
 
-    @Id
-    @Column(length = 32, nullable = false, unique = true)
-    private String id;                                // ID
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private String email;                                   // 이메일
 
@@ -58,8 +56,4 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member")
     private List<ChatroomMemberMapping> chatroomMemberList = new ArrayList<>();
 
-    @PrePersist
-    public void prePersist() {
-        if(this.id == null) this.id = CommonUtil.generatedUUID();
-    }
 }

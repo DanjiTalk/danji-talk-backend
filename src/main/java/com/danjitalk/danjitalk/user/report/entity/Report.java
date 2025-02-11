@@ -1,7 +1,6 @@
 package com.danjitalk.danjitalk.user.report.entity;
 
 import com.danjitalk.danjitalk.common.entity.BaseEntity;
-import com.danjitalk.danjitalk.common.util.CommonUtil;
 import com.danjitalk.danjitalk.user.report.enums.ReportType;
 import com.danjitalk.danjitalk.user.user.entity.Member;
 import jakarta.persistence.*;
@@ -14,8 +13,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Report extends BaseEntity {
 
-    @Id
-    private String id;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "target_member_id")
@@ -30,8 +29,4 @@ public class Report extends BaseEntity {
 
     private String reportContents;
 
-    @PrePersist
-    public void prePersist() {
-        if(this.id == null) this.id = CommonUtil.generatedUUID();
-    }
 }
