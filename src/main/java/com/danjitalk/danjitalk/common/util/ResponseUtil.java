@@ -1,4 +1,4 @@
-package com.danjitalk.danjitalk.common.response;
+package com.danjitalk.danjitalk.common.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
