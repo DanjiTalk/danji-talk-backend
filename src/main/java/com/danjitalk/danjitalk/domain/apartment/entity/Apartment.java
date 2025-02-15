@@ -1,7 +1,9 @@
 package com.danjitalk.danjitalk.domain.apartment.entity;
 
-import com.danjitalk.danjitalk.domain.apartment.enums.ApartmentType;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,8 +25,5 @@ public class Apartment {
     private Integer totalUnit;              // 총 세대 수
 
     private Integer parkingCapacity;        // 주차 가능 대수
-
-    @Enumerated(EnumType.STRING)
-    private ApartmentType aptType;                // 아파트 타입
 
 }
