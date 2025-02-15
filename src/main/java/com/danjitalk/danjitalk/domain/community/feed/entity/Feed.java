@@ -30,6 +30,8 @@ public class Feed extends BaseEntity {
 
     private Integer reactionCount;
 
+    private String fileUrl;
+
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
