@@ -7,10 +7,11 @@ import org.springframework.http.HttpStatus;
 
 public class ResponseUtil {
 
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+
     private ResponseUtil() {}
 
     public static void createResponseBody(HttpServletResponse response, HttpStatus status, Object object) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
         String jsonResponse = objectMapper.writeValueAsString(object);
 
         response.setContentType("application/json");
