@@ -11,4 +11,9 @@ public class BaseException extends RuntimeException {
         super(message);
         this.code = code;
     }
+
+    @Override
+    public synchronized Throwable fillInStackTrace() {
+        return this;
+    }
 }
