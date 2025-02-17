@@ -46,4 +46,12 @@ public class GlobalExceptionHandler {
             .body(ApiResponse.fail(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
     }
 
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiResponse<Void>> handleException(Exception e) {
+        log.error("Exception: {}", e.getMessage());
+        return ResponseEntity
+            .internalServerError()
+            .body(ApiResponse.fail(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+    }
+
 }
