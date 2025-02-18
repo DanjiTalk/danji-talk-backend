@@ -40,8 +40,16 @@ public class SecurityConfig {
             .sessionManagement(config -> config.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         http
+            .logout(logout -> logout
+                .logoutUrl("/api/logout")
+                .logoutSuccessUrl("/api") // 호출할 api 있어야 No static resource api 오류안남
+                .deleteCookies("refresh", "access") // 쿠키삭제 핸들러 추가 코드
+            );
+
+        http
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.POST, "/api/login").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/logout").permitAll()
                 .requestMatchers("/api/**").permitAll()
             );
 
