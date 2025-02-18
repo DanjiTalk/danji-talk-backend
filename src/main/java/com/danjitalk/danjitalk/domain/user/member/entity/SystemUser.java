@@ -18,6 +18,9 @@ public class SystemUser extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long systemUserId;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    private Member member;
+
     private String loginId;
 
     private String password;
