@@ -13,4 +13,11 @@ spring:
 logging:
   level:
     root: INFO  # 기본 로그 레벨
-    org.springframework: INFO
+    org.springframework: DEBUG
+
+
+aws:
+  region:
+  access-key:
+  secret-key:
+  bucket-name:

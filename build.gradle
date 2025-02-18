@@ -36,8 +36,15 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.kafka:spring-kafka-test'
 	testImplementation 'org.springframework.security:spring-security-test'
+	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	runtimeOnly 'com.h2database:h2'
+
+	// AWS SDK (v2) 의존성
+	implementation platform('software.amazon.awssdk:bom:2.20.132') // BOM 사용
+	implementation 'software.amazon.awssdk:s3'                    // S3 클라이언트
+	implementation 'software.amazon.awssdk:auth'                  // 인증 모듈
+	implementation 'software.amazon.awssdk:regions'
 }
 
 tasks.named('test') {

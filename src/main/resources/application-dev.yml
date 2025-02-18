@@ -17,3 +17,9 @@ spring:
 logging:
   level:
     root: WARN
+
+aws:
+  region:
+  access-key:
+  secret-key:
+  bucket-name:
