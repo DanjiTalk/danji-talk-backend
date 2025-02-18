@@ -7,6 +7,7 @@ import com.danjitalk.danjitalk.domain.user.report.entity.Report;
 import com.danjitalk.danjitalk.domain.user.member.enums.Gender;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -56,4 +57,19 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member")
     private List<ChatroomMemberMapping> chatroomMemberList = new ArrayList<>();
 
+    @Builder
+    public Member(String email, String name, LocalDate birthDate, Integer age, String phoneNumber,
+        Boolean notificationEnabled, Boolean isRestricted, LocalDateTime restrictionTime, String fileId,
+        Gender gender) {
+        this.email = email;
+        this.name = name;
+        this.birthDate = birthDate;
+        this.age = age;
+        this.phoneNumber = phoneNumber;
+        this.notificationEnabled = notificationEnabled;
+        this.isRestricted = isRestricted;
+        this.restrictionTime = restrictionTime;
+        this.fileId = fileId;
+        this.gender = gender;
+    }
 }
