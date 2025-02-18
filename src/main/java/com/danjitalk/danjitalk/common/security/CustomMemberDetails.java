@@ -4,11 +4,13 @@ import com.danjitalk.danjitalk.domain.user.member.entity.SystemUser;
 import com.danjitalk.danjitalk.domain.user.member.enums.Role;
 import java.util.ArrayList;
 import java.util.Collection;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+@Getter
 @RequiredArgsConstructor
 public class CustomMemberDetails implements UserDetails {
 
