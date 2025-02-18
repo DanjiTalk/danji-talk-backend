@@ -19,7 +19,8 @@ logging:
     root: WARN
 
 aws:
-  region:
-  access-key:
-  secret-key:
-  bucket-name:
+  s3:
+    region: test
+    access-key: test
+    secret-key: test
+    bucket-name: test

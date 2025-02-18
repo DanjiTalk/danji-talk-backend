@@ -1,30 +1,21 @@
-package com.danjitalk.danjitalk.config;
+package com.danjitalk.danjitalk.config.properties;
 
-import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
-import software.amazon.awssdk.regions.Region;
 
 @Getter
 @Setter
-@ConfigurationProperties(prefix = "aws")
+@ConfigurationProperties(prefix = "aws.s3")
 @Configuration
-public class S3Config {
+public class S3ConfigProperties {
 
     private String region;
-
-    private Region regionEnum;
 
     private String bucketName;
 
     private String accessKey;
 
     private String secretKey;
-
-    @PostConstruct
-    public void init() {
-        this.regionEnum = Region.of(region);
-    }
 }
