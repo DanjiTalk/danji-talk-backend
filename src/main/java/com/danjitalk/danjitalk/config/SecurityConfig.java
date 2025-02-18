@@ -3,6 +3,8 @@ package com.danjitalk.danjitalk.config;
 import com.danjitalk.danjitalk.common.security.CustomMemberDetailsService;
 import com.danjitalk.danjitalk.common.security.JwtAuthenticationFilter;
 import com.danjitalk.danjitalk.common.security.JwtAuthenticationProvider;
+import com.danjitalk.danjitalk.common.security.JwtAuthorizationFilter;
+import com.danjitalk.danjitalk.infrastructure.repository.user.member.SystemUserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,11 +29,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final CustomMemberDetailsService customMemberDetailsService;
+    private final SystemUserRepository systemUserRepository;
     private final ObjectMapper objectMapper;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(authenticationManager(), objectMapper);
+        JwtAuthorizationFilter jwtAuthorizationFilter = new JwtAuthorizationFilter(systemUserRepository);
 
         http
             .csrf(AbstractHttpConfigurer::disable)
@@ -54,7 +58,8 @@ public class SecurityConfig {
             );
 
         http
-            .addFilterAfter(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+            .addFilterAfter(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+            .addFilterAfter(jwtAuthorizationFilter, JwtAuthenticationFilter.class);
 
         return http.build();
     }
