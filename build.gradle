@@ -45,6 +45,10 @@ dependencies {
 	implementation 'software.amazon.awssdk:s3'                    // S3 클라이언트
 	implementation 'software.amazon.awssdk:auth'                  // 인증 모듈
 	implementation 'software.amazon.awssdk:regions'
+
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.3'
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.3'
 }
 
 tasks.named('test') {
