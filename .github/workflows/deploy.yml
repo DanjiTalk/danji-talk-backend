@@ -30,12 +30,18 @@ jobs:
       - name: Gradle execute permission for gradlew
         run: chmod +x ./gradlew
 
-      - name: Set Environment Variables
-        run: |
-          echo "AWS_REGION=${{ secrets.AWS_REGION }}" >> $GITHUB_ENV
-          echo "AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}" >> $GITHUB_ENV
-          echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
-          echo "AWS_BUCKET_NAME=${{ secrets.AWS_BUCKET_NAME }}" >> $GITHUB_ENV
+      - name: Set Environment Variables on EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            echo "export AWS_REGION=${{ secrets.AWS_REGION }}" >> /etc/environment
+            echo "export AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}" >> /etc/environment
+            echo "export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> /etc/environment
+            echo "export AWS_BUCKET_NAME=${{ secrets.AWS_BUCKET_NAME }}" >> /etc/environment
+      
 
       - name: Build with Gradle
         run: ./gradlew build
