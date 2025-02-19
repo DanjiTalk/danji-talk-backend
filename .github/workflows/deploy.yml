@@ -30,20 +30,19 @@ jobs:
       - name: Gradle execute permission for gradlew
         run: chmod +x ./gradlew
 
-      - name: Set Environment Variables on EC2
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            echo "AWS_REGION=${{ secrets.AWS_REGION }}" | sudo tee -a /etc/environment
-            echo "AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}" | sudo tee -a /etc/environment
-            echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" | sudo tee -a /etc/environment
-            echo "AWS_BUCKET_NAME=${{ secrets.AWS_BUCKET_NAME }}" | sudo tee -a /etc/environment
-            source /etc/environment
-      
-      
+##       git action secret -> EC2 환경변수 설정 -> 이후 application.yml 에서 사용
+#      - name: Set Environment Variables on EC2
+#        uses: appleboy/ssh-action@master
+#        with:
+#          host: ${{ secrets.EC2_HOST }}
+#          username: ${{ secrets.EC2_USERNAME }}
+#          key: ${{ secrets.EC2_SSH_KEY }}
+#          script: |
+#            echo "AWS_REGION=${{ secrets.AWS_REGION }}" | sudo tee -a /etc/environment
+#            echo "AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}" | sudo tee -a /etc/environment
+#            echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" | sudo tee -a /etc/environment
+#            echo "AWS_BUCKET_NAME=${{ secrets.AWS_BUCKET_NAME }}" | sudo tee -a /etc/environment
+#            source /etc/environment
 
       - name: Build with Gradle
         run: ./gradlew build

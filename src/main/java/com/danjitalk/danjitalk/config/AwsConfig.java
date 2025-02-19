@@ -1,6 +1,7 @@
 package com.danjitalk.danjitalk.config;
 
 import com.danjitalk.danjitalk.config.properties.S3ConfigProperties;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -30,5 +31,12 @@ public class AwsConfig {
                 ))
                 .endpointOverride(URI.create("https://s3.ap-northeast-2.amazonaws.com"))    // 리전이 서울이면
                 .build();
+    }
+
+    @PostConstruct
+    public void init() {
+        log.info("Initializing AWS SDK");
+        log.info(s3ConfigProperties.getAccessKey());
+        log.info(s3ConfigProperties.getRegion());
     }
 }
