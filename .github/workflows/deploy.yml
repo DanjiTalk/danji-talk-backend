@@ -30,16 +30,15 @@ jobs:
       - name: Gradle execute permission for gradlew
         run: chmod +x ./gradlew
 
-      - name: Build with Gradle
-        run: ./gradlew build
-          
       - name: Set Environment Variables
         run: |
-          echo "AWS_REGION=1111" >> $GITHUB_ENV
-          echo "AWS_ACCESS_KEY=2222" >> $GITHUB_ENV
-          echo "AWS_SECRET_ACCESS_KEY=33333" >> $GITHUB_ENV
-          echo "AWS_BUCKET_NAME=4444" >> $GITHUB_ENV
+          echo "AWS_REGION=${{ secrets.AWS_REGION }}" >> $GITHUB_ENV
+          echo "AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}" >> $GITHUB_ENV
+          echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
+          echo "AWS_BUCKET_NAME=${{ secrets.AWS_BUCKET_NAME }}" >> $GITHUB_ENV
 
+      - name: Build with Gradle
+        run: ./gradlew build
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
