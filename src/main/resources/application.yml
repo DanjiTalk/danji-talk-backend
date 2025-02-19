@@ -3,7 +3,7 @@ server:
 
 spring:
   profiles:
-    active: dev   # 기본 설정, 추후 배포시 환경변수로 변경 가능
+    active: local   # 기본 설정, 추후 배포시 환경변수로 변경 가능
   datasource:
     hikari:
       maximum-pool-size: 50 # HikariCP 연결 풀 크기 설정
@@ -18,7 +18,7 @@ logging:
 
 aws:
   s3:
-    region: ${AWS_REGION:test}
+    region: ${AWS_REGION:ap-northeast-2}
     access-key: ${AWS_ACCESS_KEY:test}
     secret-key: ${AWS_SECRET_ACCESS_KEY:test}
     bucket-name: ${AWS_BUCKET_NAME:test}
