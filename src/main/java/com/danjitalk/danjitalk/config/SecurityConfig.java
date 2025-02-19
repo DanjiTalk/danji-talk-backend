@@ -55,6 +55,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.POST, "/api/login").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/logout").permitAll()
+                .requestMatchers(HttpMethod.DELETE, "/api/member").authenticated()
                 .requestMatchers("/api/**").permitAll()
             );
 
