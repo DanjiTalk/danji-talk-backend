@@ -17,3 +17,11 @@ spring:
 logging:
   level:
     root: WARN
+
+aws:
+  s3:
+    region: ${AWS_REGION:ap-northeast-2}
+    access-key: ${AWS_ACCESS_KEY:test}
+    secret-key: ${AWS_SECRET_ACCESS_KEY:test}
+    bucket-name: ${AWS_BUCKET_NAME:test}
+

@@ -8,3 +8,13 @@ spring:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: update
+
+  main:
+    allow-bean-definition-overriding: true
+
+aws:
+  s3:
+    region: test
+    secret-key: test
+    access-key: tesst
+    bucket-name: test

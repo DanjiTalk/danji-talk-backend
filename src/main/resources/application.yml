@@ -12,5 +12,14 @@ spring:
 # TRACE(상세) > DEBUG(디버깅) > INFO(정보) > WARN(경고) > ERROR(에러) > FATAL(치명적 에러) > OFF(끄기)
 logging:
   level:
-    root: INFO  # 기본 로그 레벨
-    org.springframework: INFO
+    root: info  # 기본 로그 레벨
+    org.springframework: info
+
+
+aws:
+  s3:
+    region: ${AWS_REGION:ap-northeast-2}
+    access-key: ${AWS_ACCESS_KEY:test}
+    secret-key: ${AWS_SECRET_ACCESS_KEY:test}
+    bucket-name: ${AWS_BUCKET_NAME:test}
+
