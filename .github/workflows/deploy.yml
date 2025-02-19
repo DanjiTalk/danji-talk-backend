@@ -37,10 +37,12 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            echo "export AWS_REGION=${{ secrets.AWS_REGION }}" >> /etc/environment
-            echo "export AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}" >> /etc/environment
-            echo "export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> /etc/environment
-            echo "export AWS_BUCKET_NAME=${{ secrets.AWS_BUCKET_NAME }}" >> /etc/environment
+            echo "AWS_REGION=${{ secrets.AWS_REGION }}" | sudo tee -a /etc/environment
+            echo "AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}" | sudo tee -a /etc/environment
+            echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" | sudo tee -a /etc/environment
+            echo "AWS_BUCKET_NAME=${{ secrets.AWS_BUCKET_NAME }}" | sudo tee -a /etc/environment
+            source /etc/environment
+      
       
 
       - name: Build with Gradle
