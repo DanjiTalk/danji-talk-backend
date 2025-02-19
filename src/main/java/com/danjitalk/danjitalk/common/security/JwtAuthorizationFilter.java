@@ -3,9 +3,12 @@ package com.danjitalk.danjitalk.common.security;
 import static com.danjitalk.danjitalk.common.util.AccessTokenUtil.extractAccessTokenFromCookies;
 import static com.danjitalk.danjitalk.common.util.AccessTokenUtil.getClaimsFromAccessToken;
 import static com.danjitalk.danjitalk.common.util.JwtUtil.createAccessToken;
+import static com.danjitalk.danjitalk.common.util.JwtUtil.createRefreshToken;
 import static com.danjitalk.danjitalk.common.util.JwtUtil.generateAccessTokenCookie;
+import static com.danjitalk.danjitalk.common.util.JwtUtil.generateRefreshTokenCookie;
 import static com.danjitalk.danjitalk.common.util.RefreshTokenUtil.checkIfRefreshTokenValid;
 import static com.danjitalk.danjitalk.common.util.RefreshTokenUtil.extractRefreshTokenFromCookies;
+import static com.danjitalk.danjitalk.common.util.RefreshTokenUtil.getClaimsFromRefreshToken;
 
 import com.danjitalk.danjitalk.common.exception.DataNotFoundException;
 import com.danjitalk.danjitalk.common.util.ResponseUtil;
@@ -57,7 +60,34 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
         String accessToken = extractAccessTokenFromCookies(request);
 
-        if (accessToken == null) {
+        if (accessToken == null) { // 엑세스 쿠키 x == 엑세스 토큰 x
+            // 리프레시 토큰 찾기
+            String refreshToken = extractRefreshTokenFromCookies(request);
+
+            // 리프레시도 없으면
+            if(refreshToken == null) {
+                // 둘다 없으면 재로그인 예외 던지기
+                ResponseUtil.createResponseBody(response, HttpStatus.UNAUTHORIZED, "access-token, refresh-token expired");
+                return;
+            }
+
+            // 리프레시는 있다면 유효성 검사 하고
+            if (!checkIfRefreshTokenValid(refreshToken)) {
+                ResponseUtil.createResponseBody(response, HttpStatus.UNAUTHORIZED, "access-token expired, refresh-token is invalid");
+                return;
+            }
+            // 엑세스 없고, 리프레시는 정상
+            // 유효성 성공 -> 리프레시 토큰 정보로 엑세스 및 리프레시 재발급
+            Claims claims = getClaimsFromRefreshToken(refreshToken);
+
+            String email = (String) claims.get("memberEmail");
+            SystemUser systemUser = systemUserRepository.findByLoginId(email).orElseThrow(DataNotFoundException::new);
+
+            reissueAccessToken(systemUser, response);
+            reissueRefreshToken(systemUser, response);
+
+            this.saveAuthenticationToSecurityContextHolder(systemUser);
+
             filterChain.doFilter(request, response);
             return;
         }
@@ -71,8 +101,14 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             // 엑세스 토큰이 만료되었을 때 리프레시 토큰이 유효하다면, 엑세스 토큰을 새로 발급해줍니다.
             String refreshToken = extractRefreshTokenFromCookies(request);
 
+            // 리프레시 없으면
+            if(refreshToken == null) {
+                ResponseUtil.createResponseBody(response, HttpStatus.UNAUTHORIZED, "access-token is invalid, refresh-token expired");
+                return;
+            }
+
             if (!checkIfRefreshTokenValid(refreshToken)) {
-                ResponseUtil.createResponseBody(response, HttpStatus.UNAUTHORIZED, "access-token expired, refresh-token is invalid");
+                ResponseUtil.createResponseBody(response, HttpStatus.UNAUTHORIZED, "access-token is invalid, refresh-token is invalid");
                 return;
             }
 
@@ -81,10 +117,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             Long memberId = ((Integer) claims.get("memberId")).longValue();
             systemUser = systemUserRepository.findById(memberId).orElseThrow(DataNotFoundException::new);
 
-            String newAccessToken = createAccessToken(systemUser);
-
-            ResponseCookie newAccessTokenCookie = generateAccessTokenCookie(newAccessToken);
-            response.addHeader(HttpHeaders.SET_COOKIE, newAccessTokenCookie.toString());
+            reissueAccessToken(systemUser, response);
+            reissueRefreshToken(systemUser, response);
         }
 
         if(systemUser == null) {
@@ -95,6 +129,19 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
+
+    private void reissueAccessToken(SystemUser systemUser, HttpServletResponse response) {
+        String newAccessToken = createAccessToken(systemUser);
+        ResponseCookie newAccessTokenCookie = generateAccessTokenCookie(newAccessToken);
+        response.addHeader(HttpHeaders.SET_COOKIE, newAccessTokenCookie.toString());
+    }
+
+    private void reissueRefreshToken(SystemUser systemUser, HttpServletResponse response) {
+        String newRefreshToken = createRefreshToken(systemUser);
+        ResponseCookie newRefreshTokenCookie = generateRefreshTokenCookie(newRefreshToken);
+        response.addHeader(HttpHeaders.SET_COOKIE, newRefreshTokenCookie.toString());
+    }
+
 
     private SystemUser findMemberFromAccessTokenClaims(Claims claims) {
         return systemUserRepository.findByLoginId(claims.get("memberEmail").toString()).orElseThrow(DataNotFoundException::new);
