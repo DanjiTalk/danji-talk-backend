@@ -1,6 +1,9 @@
 package com.danjitalk.danjitalk.application.user.member;
 
+import static com.danjitalk.danjitalk.common.util.SecurityContextHolderUtil.getSystemUser;
+
 import com.danjitalk.danjitalk.common.exception.ConflictException;
+import com.danjitalk.danjitalk.domain.user.member.dto.request.DeleteAccountRequest;
 import com.danjitalk.danjitalk.domain.user.member.dto.request.SignUpRequest;
 import com.danjitalk.danjitalk.domain.user.member.entity.Member;
 import com.danjitalk.danjitalk.domain.user.member.entity.SystemUser;
@@ -12,6 +15,7 @@ import com.danjitalk.danjitalk.infrastructure.repository.user.member.SystemUserR
 import java.time.LocalDateTime;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,5 +75,17 @@ public class MemberService {
                 .build();
 
         systemUserRepository.save(systemUser);
+    }
+
+    @Transactional
+    public void deleteMember(DeleteAccountRequest request) {
+        SystemUser systemUser = getSystemUser(); //  현재 로그인 정보 == 지우려는 로그인정보
+
+        if (!passwordEncoder.matches(request.password(), systemUser.getPassword())) {
+            throw new BadCredentialsException("비밀번호가 일치하지 않습니다.");
+        }
+
+        memberRepository.delete(systemUser.getMember());
+        systemUserRepository.delete(systemUser);
     }
 }
