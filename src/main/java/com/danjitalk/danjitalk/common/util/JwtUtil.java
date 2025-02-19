@@ -21,6 +21,9 @@ public class JwtUtil {
     private static final long ACCESS_TOKEN_VALIDITY_TIME = 15 * MINUTE; // 15분
     private static final long REFRESH_TOKEN_VALIDITY_TIME = 12 * HOUR;  // 12시간
 
+    private static final long ACCESS_TOKEN_COOKIE_VALIDITY_TIME = ACCESS_TOKEN_VALIDITY_TIME / 1000;
+    private static final long REFRESH_TOKEN_COOKIE_VALIDITY_TIME = REFRESH_TOKEN_VALIDITY_TIME / 1000;
+
     public static String createAccessToken(SystemUser user) {
         return Jwts.builder()
             .subject("accessToken")
@@ -45,7 +48,7 @@ public class JwtUtil {
             .sameSite("None")
             .secure(true)
             .path("/")
-            .maxAge(ACCESS_TOKEN_VALIDITY_TIME)
+            .maxAge(ACCESS_TOKEN_COOKIE_VALIDITY_TIME)
             .build();
     }
 
@@ -55,7 +58,7 @@ public class JwtUtil {
             .sameSite("None")
             .secure(true)
             .path("/")
-            .maxAge(REFRESH_TOKEN_VALIDITY_TIME)
+            .maxAge(REFRESH_TOKEN_COOKIE_VALIDITY_TIME)
             .build();
     }
 
