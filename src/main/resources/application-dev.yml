@@ -20,7 +20,8 @@ logging:
 
 aws:
   s3:
-    region: ap-northeast-2
-    access-key: test
-    secret-key: test
-    bucket-name: test
+    region: ${AWS_REGION}
+    access-key: ${AWS_ACCESS_KEY}
+    secret-key: ${AWS_SECRET_ACCESS_KEY}
+    bucket-name: ${AWS_BUCKET_NAME}
+
