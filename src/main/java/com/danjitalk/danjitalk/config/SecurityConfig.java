@@ -17,6 +17,7 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -75,5 +76,13 @@ public class SecurityConfig {
         authenticationProviders.add(new JwtAuthenticationProvider(customMemberDetailsService, passwordEncoder()));
 
         return new ProviderManager(authenticationProviders);
+    }
+
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return web -> {
+            web.ignoring()
+                .requestMatchers(HttpMethod.POST, "/api/member/signup"); // 시큐리티와 관련 없는(인증/인가 필요 없는) 필터를 타면 안되는 경로
+        };
     }
 }
