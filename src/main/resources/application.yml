@@ -13,12 +13,12 @@ spring:
 logging:
   level:
     root: info  # 기본 로그 레벨
-    org.springframework: debug
+    org.springframework: info
 
 
 aws:
   s3:
-    region: ${AWS_REGION}
+    region: ${AWS_REGION:ap-northeast-2}
     access-key: ${AWS_ACCESS_KEY}
     secret-key: ${AWS_SECRET_ACCESS_KEY}
     bucket-name: ${AWS_BUCKET_NAME}
