@@ -85,7 +85,8 @@ public class SecurityConfig {
             web.ignoring()
                 .requestMatchers(HttpMethod.POST, "/api/member/signup")
                 .requestMatchers(HttpMethod.POST, "/api/member/check-email-duplication")
-                .requestMatchers(HttpMethod.POST, "/api/mail/certification-code/send"); // 시큐리티와 관련 없는(인증/인가 필요 없는) 필터를 타면 안되는 경로
+                .requestMatchers(HttpMethod.POST, "/api/mail/certification-code/send")
+                .requestMatchers(HttpMethod.POST, "/api/mail/certification-code/verify"); // 시큐리티와 관련 없는(인증/인가 필요 없는) 필터를 타면 안되는 경로
         };
     }
 }
