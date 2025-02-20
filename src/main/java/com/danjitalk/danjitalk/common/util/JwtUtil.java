@@ -10,8 +10,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.http.ResponseCookie;
+import org.springframework.stereotype.Component;
 
+@Component
 public class JwtUtil {
+
+    private JwtSecretKeys jwtSecretKeys;
 
     private static final long SECOND = 1000;
     private static final long MINUTE = SECOND * 60;
@@ -24,25 +28,25 @@ public class JwtUtil {
     private static final long ACCESS_TOKEN_COOKIE_VALIDITY_TIME = ACCESS_TOKEN_VALIDITY_TIME / 1000;
     private static final long REFRESH_TOKEN_COOKIE_VALIDITY_TIME = REFRESH_TOKEN_VALIDITY_TIME / 1000;
 
-    public static String createAccessToken(SystemUser user) {
+    public String createAccessToken(SystemUser user) {
         return Jwts.builder()
             .subject("accessToken")
             .claims(createAccessTokenClaims(user))
             .expiration(createTokenExpiration(ACCESS_TOKEN_VALIDITY_TIME))
-            .signWith(createSigningKey(JwtSecretKeys.getAccessSecret()))
+            .signWith(createSigningKey(jwtSecretKeys.getAccessSecret()))
             .compact();
     }
 
-    public static String createRefreshToken(SystemUser user) {
+    public String createRefreshToken(SystemUser user) {
         return Jwts.builder()
             .subject("refreshToken")
             .claims(createRefreshTokenClaims(user))
             .expiration(createTokenExpiration(REFRESH_TOKEN_VALIDITY_TIME))
-            .signWith(createSigningKey(JwtSecretKeys.getRefreshSecret()))
+            .signWith(createSigningKey(jwtSecretKeys.getRefreshSecret()))
             .compact();
     }
 
-    public static ResponseCookie generateAccessTokenCookie(String accessToken) {
+    public ResponseCookie generateAccessTokenCookie(String accessToken) {
         return ResponseCookie.from("access", accessToken)
             .httpOnly(true)
             .sameSite("None")
@@ -52,7 +56,7 @@ public class JwtUtil {
             .build();
     }
 
-    public static ResponseCookie generateRefreshTokenCookie(String refreshToken) {
+    public ResponseCookie generateRefreshTokenCookie(String refreshToken) {
         return ResponseCookie.from("refresh", refreshToken)
             .httpOnly(true)
             .sameSite("None")
@@ -63,18 +67,18 @@ public class JwtUtil {
     }
 
 
-    private static Date createTokenExpiration(long expirationTime) {
+    private Date createTokenExpiration(long expirationTime) {
         return new Date(System.currentTimeMillis() + expirationTime);
     }
 
     // BASE64로 인코딩된 문자열을 디코딩하여 대칭키를 생성한다. 이 키는 JWT 서명 과정에서 사용된다.
-    public static Key createSigningKey(String base64EncodedSecretKey) {
+    public Key createSigningKey(String base64EncodedSecretKey) {
         // 입력된 tokenSecret은 BASE64로 인코딩되어 있으므로, 먼저 디코딩하여 원래의 바이트 배열 형태로 복원한다.
         byte[] keyBytes = Decoders.BASE64.decode(base64EncodedSecretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    private static Map<String, Object> createAccessTokenClaims(SystemUser user) {
+    private Map<String, Object> createAccessTokenClaims(SystemUser user) {
         Map<String, Object> map = new HashMap<>();
         map.put("memberId", user.getSystemUserId());
         map.put("memberEmail", user.getLoginId());
@@ -82,7 +86,7 @@ public class JwtUtil {
         return map;
     }
 
-    private static Map<String, Object> createRefreshTokenClaims(SystemUser user) {
+    private Map<String, Object> createRefreshTokenClaims(SystemUser user) {
         Map<String, Object> map = new HashMap<>();
         map.put("memberEmail", user.getLoginId());
         return map;

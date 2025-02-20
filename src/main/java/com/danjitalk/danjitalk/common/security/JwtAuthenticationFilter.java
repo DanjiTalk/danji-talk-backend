@@ -1,11 +1,7 @@
 package com.danjitalk.danjitalk.common.security;
 
-import static com.danjitalk.danjitalk.common.util.JwtUtil.createAccessToken;
-import static com.danjitalk.danjitalk.common.util.JwtUtil.createRefreshToken;
-import static com.danjitalk.danjitalk.common.util.JwtUtil.generateAccessTokenCookie;
-import static com.danjitalk.danjitalk.common.util.JwtUtil.generateRefreshTokenCookie;
-
 import com.danjitalk.danjitalk.common.response.ApiResponse;
+import com.danjitalk.danjitalk.common.util.JwtUtil;
 import com.danjitalk.danjitalk.common.util.ResponseUtil;
 import com.danjitalk.danjitalk.domain.user.member.entity.SystemUser;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,10 +25,12 @@ import org.springframework.security.web.authentication.AbstractAuthenticationPro
 public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFilter  {
 
     private final ObjectMapper objectMapper;
+    private final JwtUtil jwtUtil;
 
-    public JwtAuthenticationFilter(AuthenticationManager authenticationManager, ObjectMapper objectMapper) {
+    public JwtAuthenticationFilter(AuthenticationManager authenticationManager, ObjectMapper objectMapper, JwtUtil jwtUtil) {
         super("/api/login", authenticationManager);
         this.objectMapper = objectMapper;
+        this.jwtUtil = jwtUtil;
     }
 
     @Override
@@ -67,14 +65,14 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
         // 1. 로그인 성공된 유저 조회
         SystemUser systemUser = ((CustomMemberDetails) authResult.getPrincipal()).getUser();
 
-        String refreshToken = createRefreshToken(systemUser);
+        String refreshToken = jwtUtil.createRefreshToken(systemUser);
 
-        ResponseCookie refreshTokenCookie = generateRefreshTokenCookie(refreshToken);
+        ResponseCookie refreshTokenCookie = jwtUtil.generateRefreshTokenCookie(refreshToken);
         response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
 
-        String accessToken = createAccessToken(systemUser);
+        String accessToken = jwtUtil.createAccessToken(systemUser);
 
-        ResponseCookie accessTokenCookie = generateAccessTokenCookie(accessToken);
+        ResponseCookie accessTokenCookie = jwtUtil.generateAccessTokenCookie(accessToken);
         response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
 
         ResponseUtil.createResponseBody(response, HttpStatus.OK);

@@ -4,6 +4,9 @@ import com.danjitalk.danjitalk.common.security.CustomMemberDetailsService;
 import com.danjitalk.danjitalk.common.security.JwtAuthenticationFilter;
 import com.danjitalk.danjitalk.common.security.JwtAuthenticationProvider;
 import com.danjitalk.danjitalk.common.security.JwtAuthorizationFilter;
+import com.danjitalk.danjitalk.common.util.AccessTokenUtil;
+import com.danjitalk.danjitalk.common.util.JwtUtil;
+import com.danjitalk.danjitalk.common.util.RefreshTokenUtil;
 import com.danjitalk.danjitalk.infrastructure.repository.user.member.SystemUserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
@@ -32,11 +35,14 @@ public class SecurityConfig {
     private final CustomMemberDetailsService customMemberDetailsService;
     private final SystemUserRepository systemUserRepository;
     private final ObjectMapper objectMapper;
+    private final JwtUtil jwtUtil;
+    private final RefreshTokenUtil refreshTokenUtil;
+    private final AccessTokenUtil accessTokenUtil;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(authenticationManager(), objectMapper);
-        JwtAuthorizationFilter jwtAuthorizationFilter = new JwtAuthorizationFilter(systemUserRepository);
+        JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(authenticationManager(), objectMapper, jwtUtil);
+        JwtAuthorizationFilter jwtAuthorizationFilter = new JwtAuthorizationFilter(systemUserRepository, jwtUtil, accessTokenUtil, refreshTokenUtil);
 
         http
             .csrf(AbstractHttpConfigurer::disable)

@@ -1,16 +1,12 @@
 package com.danjitalk.danjitalk.common.security;
 
 import static com.danjitalk.danjitalk.common.util.AccessTokenUtil.extractAccessTokenFromCookies;
-import static com.danjitalk.danjitalk.common.util.AccessTokenUtil.getClaimsFromAccessToken;
-import static com.danjitalk.danjitalk.common.util.JwtUtil.createAccessToken;
-import static com.danjitalk.danjitalk.common.util.JwtUtil.createRefreshToken;
-import static com.danjitalk.danjitalk.common.util.JwtUtil.generateAccessTokenCookie;
-import static com.danjitalk.danjitalk.common.util.JwtUtil.generateRefreshTokenCookie;
-import static com.danjitalk.danjitalk.common.util.RefreshTokenUtil.checkIfRefreshTokenValid;
 import static com.danjitalk.danjitalk.common.util.RefreshTokenUtil.extractRefreshTokenFromCookies;
-import static com.danjitalk.danjitalk.common.util.RefreshTokenUtil.getClaimsFromRefreshToken;
 
 import com.danjitalk.danjitalk.common.exception.DataNotFoundException;
+import com.danjitalk.danjitalk.common.util.AccessTokenUtil;
+import com.danjitalk.danjitalk.common.util.JwtUtil;
+import com.danjitalk.danjitalk.common.util.RefreshTokenUtil;
 import com.danjitalk.danjitalk.common.util.ResponseUtil;
 import com.danjitalk.danjitalk.domain.user.member.entity.SystemUser;
 import com.danjitalk.danjitalk.infrastructure.repository.user.member.SystemUserRepository;
@@ -37,9 +33,15 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private final SystemUserRepository systemUserRepository;
+    private final JwtUtil jwtUtil;
+    private final RefreshTokenUtil refreshTokenUtil;
+    private final AccessTokenUtil accessTokenUtil;
 
-    public JwtAuthorizationFilter(SystemUserRepository systemUserRepository) {
+    public JwtAuthorizationFilter(SystemUserRepository systemUserRepository, JwtUtil jwtUtil, AccessTokenUtil accessTokenUtil, RefreshTokenUtil refreshTokenUtil) {
         this.systemUserRepository = systemUserRepository;
+        this.jwtUtil = jwtUtil;
+        this.accessTokenUtil = accessTokenUtil;
+        this.refreshTokenUtil = refreshTokenUtil;
     }
 
     // 1. RequestHeader 안의 엑세스 토큰 확인
@@ -72,13 +74,13 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             }
 
             // 리프레시는 있다면 유효성 검사 하고
-            if (!checkIfRefreshTokenValid(refreshToken)) {
+            if (!refreshTokenUtil.checkIfRefreshTokenValid(refreshToken)) {
                 ResponseUtil.createResponseBody(response, HttpStatus.UNAUTHORIZED, "access-token expired, refresh-token is invalid");
                 return;
             }
             // 엑세스 없고, 리프레시는 정상
             // 유효성 성공 -> 리프레시 토큰 정보로 엑세스 및 리프레시 재발급
-            Claims claims = getClaimsFromRefreshToken(refreshToken);
+            Claims claims = refreshTokenUtil.getClaimsFromRefreshToken(refreshToken);
 
             String email = (String) claims.get("memberEmail");
             SystemUser systemUser = systemUserRepository.findByLoginId(email).orElseThrow(DataNotFoundException::new);
@@ -96,7 +98,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         SystemUser systemUser = null;
 
         try {
-            claims = getClaimsFromAccessToken(accessToken);
+            claims = accessTokenUtil.getClaimsFromAccessToken(accessToken);
         } catch (ExpiredJwtException e) {
             // 엑세스 토큰이 만료되었을 때 리프레시 토큰이 유효하다면, 엑세스 토큰을 새로 발급해줍니다.
             String refreshToken = extractRefreshTokenFromCookies(request);
@@ -107,7 +109,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 return;
             }
 
-            if (!checkIfRefreshTokenValid(refreshToken)) {
+            if (!refreshTokenUtil.checkIfRefreshTokenValid(refreshToken)) {
                 ResponseUtil.createResponseBody(response, HttpStatus.UNAUTHORIZED, "access-token is invalid, refresh-token is invalid");
                 return;
             }
@@ -131,14 +133,14 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     }
 
     private void reissueAccessToken(SystemUser systemUser, HttpServletResponse response) {
-        String newAccessToken = createAccessToken(systemUser);
-        ResponseCookie newAccessTokenCookie = generateAccessTokenCookie(newAccessToken);
+        String newAccessToken = jwtUtil.createAccessToken(systemUser);
+        ResponseCookie newAccessTokenCookie = jwtUtil.generateAccessTokenCookie(newAccessToken);
         response.addHeader(HttpHeaders.SET_COOKIE, newAccessTokenCookie.toString());
     }
 
     private void reissueRefreshToken(SystemUser systemUser, HttpServletResponse response) {
-        String newRefreshToken = createRefreshToken(systemUser);
-        ResponseCookie newRefreshTokenCookie = generateRefreshTokenCookie(newRefreshToken);
+        String newRefreshToken = jwtUtil.createRefreshToken(systemUser);
+        ResponseCookie newRefreshTokenCookie = jwtUtil.generateRefreshTokenCookie(newRefreshToken);
         response.addHeader(HttpHeaders.SET_COOKIE, newRefreshTokenCookie.toString());
     }
 

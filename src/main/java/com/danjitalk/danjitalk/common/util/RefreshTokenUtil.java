@@ -1,6 +1,5 @@
 package com.danjitalk.danjitalk.common.util;
 
-import static com.danjitalk.danjitalk.common.util.JwtUtil.createSigningKey;
 
 import com.danjitalk.danjitalk.common.security.JwtSecretKeys;
 import io.jsonwebtoken.Claims;
@@ -11,11 +10,18 @@ import io.jsonwebtoken.MalformedJwtException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import javax.crypto.SecretKey;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
+@Component
+@RequiredArgsConstructor
 public class RefreshTokenUtil {
 
-    public static Claims getClaimsFromRefreshToken(String refreshToken) {
-        return Jwts.parser().verifyWith((SecretKey) createSigningKey(JwtSecretKeys.getRefreshSecret())).build().parseSignedClaims(refreshToken).getPayload();
+    private final JwtSecretKeys jwtSecretKeys;
+    private final JwtUtil jwtUtil;
+
+    public Claims getClaimsFromRefreshToken(String refreshToken) {
+        return Jwts.parser().verifyWith((SecretKey) jwtUtil.createSigningKey(jwtSecretKeys.getRefreshSecret())).build().parseSignedClaims(refreshToken).getPayload();
     }
 
     public static String extractRefreshTokenFromCookies(HttpServletRequest request) {
@@ -31,7 +37,7 @@ public class RefreshTokenUtil {
         return null;
     }
 
-    public static boolean checkIfRefreshTokenValid(String refreshToken) {
+    public boolean checkIfRefreshTokenValid(String refreshToken) {
         Claims claims = null;
 
         try {
