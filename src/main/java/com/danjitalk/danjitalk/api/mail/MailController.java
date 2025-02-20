@@ -21,4 +21,14 @@ public class MailController {
         mailService.sendVerificationEmail(mail);
         return ResponseEntity.ok().build();
     }
+
+    // 인증번호 일치여부 확인
+    @PostMapping("/certification-code/verify")
+    public ResponseEntity<Boolean> checkCertificationCode(
+        @RequestParam String email,
+        @RequestParam("code") String validationCode
+    ) {
+        mailService.validateEmailAuthCode(email, validationCode);
+        return ResponseEntity.ok().build();
+    }
 }

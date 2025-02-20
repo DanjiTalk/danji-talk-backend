@@ -2,6 +2,7 @@ package com.danjitalk.danjitalk.application.mail;
 
 import static com.danjitalk.danjitalk.common.util.RandomCodeGeneratorUtil.generateRandomNumber;
 
+import com.danjitalk.danjitalk.common.exception.BadRequestException;
 import com.danjitalk.danjitalk.common.exception.ConflictException;
 import com.danjitalk.danjitalk.infrastructure.repository.mail.RedisRepository;
 import com.danjitalk.danjitalk.infrastructure.repository.user.member.MemberRepository;
@@ -10,6 +11,7 @@ import jakarta.mail.internet.MimeMessage;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.MailException;
@@ -69,5 +71,17 @@ public class MailService {
         Context context = new Context();
         map.forEach(context::setVariable);
         return templateEngine.process("mail", context);
+    }
+
+    public void validateEmailAuthCode(String mail, String code) {
+        String issuedCode = redisRepository.getValues(mail);
+        if (issuedCode == null) {
+            throw new BadRequestException("해당 이메일에 대해 발급된 인증 코드가 없거나 만료되었습니다.");
+        }
+
+        boolean isMatch = Objects.equals(issuedCode, code);
+        if(!isMatch) {
+            throw new BadRequestException("인증에 실패하였습니다. 올바른 인증 코드를 입력하세요.");
+        }
     }
 }
