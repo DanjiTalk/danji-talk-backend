@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "`system_user`")
 public class SystemUser extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
