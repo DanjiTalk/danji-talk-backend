@@ -8,6 +8,22 @@ spring:
     hikari:
       maximum-pool-size: 50 # HikariCP 연결 풀 크기 설정
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          timeout: 5000
+          connectiontimeout: 5000
+          writetimeout: 5000
+          starttls:
+            enable: true
+            required: true
+    auth-code-expiration-millis: 1800000  # 30 * 60 * 1000 == 30분
 
 # TRACE(상세) > DEBUG(디버깅) > INFO(정보) > WARN(경고) > ERROR(에러) > FATAL(치명적 에러) > OFF(끄기)
 logging:
