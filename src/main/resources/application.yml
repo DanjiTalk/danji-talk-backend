@@ -25,6 +25,12 @@ spring:
             required: true
     auth-code-expiration-millis: 1800000  # 30 * 60 * 1000 == 30분
 
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: ${REDIS_PASSWORD}
+
 # TRACE(상세) > DEBUG(디버깅) > INFO(정보) > WARN(경고) > ERROR(에러) > FATAL(치명적 에러) > OFF(끄기)
 logging:
   level:
