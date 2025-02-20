@@ -3,6 +3,7 @@ package com.danjitalk.danjitalk.application.user.member;
 import static com.danjitalk.danjitalk.common.util.SecurityContextHolderUtil.getSystemUser;
 
 import com.danjitalk.danjitalk.common.exception.ConflictException;
+import com.danjitalk.danjitalk.domain.user.member.dto.request.CheckEmailDuplicationRequest;
 import com.danjitalk.danjitalk.domain.user.member.dto.request.DeleteAccountRequest;
 import com.danjitalk.danjitalk.domain.user.member.dto.request.SignUpRequest;
 import com.danjitalk.danjitalk.domain.user.member.entity.Member;
@@ -75,6 +76,14 @@ public class MemberService {
                 .build();
 
         systemUserRepository.save(systemUser);
+    }
+
+    @Transactional(readOnly = true)
+    public void isEmailAvailable(CheckEmailDuplicationRequest request) {
+        boolean isEmailExist = memberRepository.existsByEmail(request.email());
+        if(isEmailExist){
+            throw new ConflictException("이미 등록된 이메일 입니다.");
+        }
     }
 
     @Transactional

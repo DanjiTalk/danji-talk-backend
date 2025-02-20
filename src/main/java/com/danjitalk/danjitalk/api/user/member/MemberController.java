@@ -1,6 +1,7 @@
 package com.danjitalk.danjitalk.api.user.member;
 
 import com.danjitalk.danjitalk.application.user.member.MemberService;
+import com.danjitalk.danjitalk.domain.user.member.dto.request.CheckEmailDuplicationRequest;
 import com.danjitalk.danjitalk.domain.user.member.dto.request.DeleteAccountRequest;
 import com.danjitalk.danjitalk.domain.user.member.dto.request.SignUpRequest;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,12 @@ public class MemberController {
     @PostMapping("/signup")
     public ResponseEntity<Void> signUp(@RequestBody SignUpRequest request) {
         memberService.signUp(request);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/check-email-duplication")
+    public ResponseEntity<Void> checkEmailDuplication(@RequestBody CheckEmailDuplicationRequest request) {
+        memberService.isEmailAvailable(request);
         return ResponseEntity.ok().build();
     }
 
