@@ -1,20 +1,52 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:testdb   # 메모리에서 실행 (데이터 사라짐)
+    url: jdbc:h2:mem:testdb;MODE=LEGACY   # 메모리에서 실행 (데이터 사라짐)
     driver-class-name: org.h2.Driver
     username: sa
     password:
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
 
   main:
     allow-bean-definition-overriding: true
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          timeout: 5000
+          connectiontimeout: 5000
+          writetimeout: 5000
+          starttls:
+            enable: true
+            required: true
+    auth-code-expiration-millis: 1800000  # 30 * 60 * 1000 == 30분
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: ${REDIS_PASSWORD:test}
+
 aws:
   s3:
-    region: test
-    secret-key: test
-    access-key: tesst
-    bucket-name: test
+    region: ${AWS_REGION:test}
+    access-key: ${AWS_ACCESS_KEY:test}
+    secret-key: ${AWS_SECRET_ACCESS_KEY:test}
+    bucket-name: ${AWS_BUCKET_NAME:test}
+
+jwt:
+  secret:
+    access: ${ACCESS_SECRET:test}
+    refresh: ${REFRESH_SECRET:test}
