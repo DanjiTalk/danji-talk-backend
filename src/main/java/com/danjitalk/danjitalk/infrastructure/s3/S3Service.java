@@ -31,12 +31,12 @@ public class S3Service {
 
     /**
      * S3 파일 업로드
-     * @param multipartFileList 멀티파트파일
      * @param id ID값
      * @param fileType feed, MemberImg 등 파일 형식
+     * @param multipartFileList 멀티파트파일
      * @return String {fileType}/{id}
      * */
-    public String uploadFile(List<MultipartFile> multipartFileList, Long id, String fileType) {
+    public String uploadFile(Long id, String fileType, List<MultipartFile> multipartFileList) {
 
         String urlKey = String.format("%s/%d", fileType, id);
 
