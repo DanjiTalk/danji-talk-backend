@@ -1,6 +1,7 @@
 package com.danjitalk.danjitalk.infrastructure.s3;
 
 import com.danjitalk.danjitalk.common.util.FileSignatureValidator;
+import com.danjitalk.danjitalk.domain.s3.dto.response.S3ObjectResponseDto;
 import com.danjitalk.danjitalk.infrastructure.s3.properties.S3ConfigProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -85,8 +86,9 @@ public class S3Service {
     /**
      * 조회
      * @param url String {fileType}/{id}
+     * @return List<S3ObjectResponseDto>
      * */
-    public void getS3Object(String url) {
+    public List<S3ObjectResponseDto> getS3Object(String url) {
         ListObjectsV2Request s3Request = ListObjectsV2Request.builder()
                 .bucket(s3ConfigProperties.getBucketName())
                 .prefix(url)
@@ -94,11 +96,9 @@ public class S3Service {
 
         ListObjectsV2Response listObjectsV2Response = s3Client.listObjectsV2(s3Request);
 
-        List<String> urlList = listObjectsV2Response.contents().stream().map(data ->
-                String.format("https://s3.%s.amazonaws.com/%s/%s", s3ConfigProperties.getRegion(), s3ConfigProperties.getBucketName(), data.key())
+        return listObjectsV2Response.contents().stream().map(data ->
+                new S3ObjectResponseDto(String.format("https://s3.%s.amazonaws.com/%s/%s", s3ConfigProperties.getRegion(), s3ConfigProperties.getBucketName(), data.key()))
         ).toList();
-
-        // TODO::return DTO
     }
 
     /**
