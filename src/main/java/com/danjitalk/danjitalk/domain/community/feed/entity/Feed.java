@@ -2,12 +2,14 @@ package com.danjitalk.danjitalk.domain.community.feed.entity;
 
 import com.danjitalk.danjitalk.domain.common.entity.BaseEntity;
 import com.danjitalk.danjitalk.domain.community.comment.entity.Comment;
+import com.danjitalk.danjitalk.domain.community.feed.enums.FeedType;
 import com.danjitalk.danjitalk.domain.community.reaction.entity.Reaction;
 import com.danjitalk.danjitalk.domain.user.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +24,12 @@ public class Feed extends BaseEntity {
 
     private String title;
 
+    @Setter
+    private String fileUrl;
+
+    @Enumerated(EnumType.STRING)
+    private FeedType feedType;
+
     @Lob
     @Column(columnDefinition = "TEXT")
     private String contents;
@@ -29,8 +37,6 @@ public class Feed extends BaseEntity {
     private Integer commentCount;
 
     private Integer reactionCount;
-
-    private String fileUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
@@ -40,5 +46,11 @@ public class Feed extends BaseEntity {
 
     @OneToMany(mappedBy = "feed")
     private List<Comment> commentList = new ArrayList<>();
+
+    public Feed(String title, String contents, FeedType feedType) {
+                this.title = title;
+                this.contents = contents;
+                this.feedType = feedType;
+    }
 
 }
