@@ -2,15 +2,11 @@ package com.danjitalk.danjitalk.domain.community.feed.dto.request;
 
 import com.danjitalk.danjitalk.domain.community.feed.entity.Feed;
 import com.danjitalk.danjitalk.domain.community.feed.enums.FeedType;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 public record CreateFeedRequestDto(
         String title,
         String contents,
-        FeedType feedType,
-        List<MultipartFile> multipartFileList
+        FeedType feedType
 ) {
 
     /**

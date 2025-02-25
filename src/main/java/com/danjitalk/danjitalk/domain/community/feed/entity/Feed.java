@@ -53,4 +53,12 @@ public class Feed extends BaseEntity {
                 this.feedType = feedType;
     }
 
+    /**
+     * 연관관계 세팅
+     * */
+    public void setMember(Member member) {
+        this.member = member;
+        member.getFeedList().add(this);
+    }
+
 }
