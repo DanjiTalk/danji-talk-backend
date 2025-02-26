@@ -113,6 +113,8 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/member/check-email-duplication")
                 .requestMatchers(HttpMethod.POST, "/api/mail/certification-code/send")
                 .requestMatchers(HttpMethod.GET, "/api/mail/certification-code/verify")
+                .requestMatchers(HttpMethod.POST, "/api/mail/certification-code/verify")
+                .requestMatchers(HttpMethod.POST, "/api/member/find-id")
                 .requestMatchers(HttpMethod.GET,"/social-login")  // TODO: social-login, favicon 삭제
                 .requestMatchers(HttpMethod.GET, "/favicon.ico")
                 .requestMatchers("/error");

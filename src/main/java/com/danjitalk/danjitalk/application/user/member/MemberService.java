@@ -3,8 +3,10 @@ package com.danjitalk.danjitalk.application.user.member;
 import static com.danjitalk.danjitalk.common.util.SecurityContextHolderUtil.getSystemUser;
 
 import com.danjitalk.danjitalk.common.exception.ConflictException;
+import com.danjitalk.danjitalk.common.exception.DataNotFoundException;
 import com.danjitalk.danjitalk.domain.user.member.dto.request.CheckEmailDuplicationRequest;
 import com.danjitalk.danjitalk.domain.user.member.dto.request.DeleteAccountRequest;
+import com.danjitalk.danjitalk.domain.user.member.dto.request.FindIdRequest;
 import com.danjitalk.danjitalk.domain.user.member.dto.request.SignUpRequest;
 import com.danjitalk.danjitalk.domain.user.member.entity.Member;
 import com.danjitalk.danjitalk.domain.user.member.entity.SystemUser;
@@ -95,5 +97,11 @@ public class MemberService {
 
         memberRepository.delete(systemUser.getMember());
         systemUserRepository.delete(systemUser);
+    }
+
+    public String findMemberId(FindIdRequest request) {
+        return memberRepository.findByNameAndPhoneNumber(request.name(), request.phoneNumber())
+            .orElseThrow(DataNotFoundException::new)
+            .getEmail();
     }
 }
