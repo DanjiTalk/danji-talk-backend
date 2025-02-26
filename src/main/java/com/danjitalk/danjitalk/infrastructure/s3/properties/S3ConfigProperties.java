@@ -1,4 +1,4 @@
-package com.danjitalk.danjitalk.config.properties;
+package com.danjitalk.danjitalk.infrastructure.s3.properties;
 
 import lombok.Getter;
 import lombok.Setter;

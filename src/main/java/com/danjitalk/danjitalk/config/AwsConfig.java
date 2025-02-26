@@ -1,6 +1,6 @@
 package com.danjitalk.danjitalk.config;
 
-import com.danjitalk.danjitalk.config.properties.S3ConfigProperties;
+import com.danjitalk.danjitalk.infrastructure.s3.properties.S3ConfigProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
