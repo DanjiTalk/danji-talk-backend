@@ -45,4 +45,8 @@ public class SystemUser extends BaseEntity {
         this.loginId = loginId;
         this.member = member;
     }
+
+    public void updatePassword(String password) {
+        this.password = password;
+    }
 }

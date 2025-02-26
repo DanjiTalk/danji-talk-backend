@@ -5,6 +5,7 @@ import com.danjitalk.danjitalk.common.response.ApiResponse;
 import com.danjitalk.danjitalk.domain.user.member.dto.request.CheckEmailDuplicationRequest;
 import com.danjitalk.danjitalk.domain.user.member.dto.request.DeleteAccountRequest;
 import com.danjitalk.danjitalk.domain.user.member.dto.request.FindIdRequest;
+import com.danjitalk.danjitalk.domain.user.member.dto.request.ResetPasswordRequest;
 import com.danjitalk.danjitalk.domain.user.member.dto.request.SignUpRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -44,5 +45,11 @@ public class MemberController {
     public ResponseEntity<ApiResponse<String>> findAccount(@RequestBody FindIdRequest request) {
         String id = memberService.findMemberId(request);
         return ResponseEntity.ok().body(ApiResponse.success(HttpStatus.OK.value(), "아이디 찾음", id));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<Void> resetPassword(@RequestBody ResetPasswordRequest request) {
+        memberService.resetPassword(request);
+        return ResponseEntity.ok().build();
     }
 }

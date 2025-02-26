@@ -115,6 +115,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/mail/certification-code/verify")
                 .requestMatchers(HttpMethod.POST, "/api/mail/certification-code/verify")
                 .requestMatchers(HttpMethod.POST, "/api/member/find-id")
+                .requestMatchers(HttpMethod.POST, "/api/member/reset-password")
                 .requestMatchers(HttpMethod.GET,"/social-login")  // TODO: social-login, favicon 삭제
                 .requestMatchers(HttpMethod.GET, "/favicon.ico")
                 .requestMatchers("/error");
