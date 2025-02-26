@@ -49,6 +49,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     // TODO: OncePerRequestFilter:shouldNotFilter 로 수정
     private static final List<RequestMatcher> excludedUrlPatterns = List.of( // 필터 적용 안할 url 지정
         new AntPathRequestMatcher("/api/login", "POST")
+        new AntPathRequestMatcher("/api/login", "POST"),
+        new AntPathRequestMatcher("/oauth2/authorization/*")
     );
 
     @Override
@@ -58,7 +60,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response); // 필터 스킵, 다음 필터 실행.
             return;
         }
-        log.info("AuthorizationFilter");
+        log.info("JwtAuthorizationFilter#doFilterInternal");
 
         String accessToken = extractAccessTokenFromCookies(request);
 
@@ -69,7 +71,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             // 리프레시도 없으면
             if(refreshToken == null) {
                 // 둘다 없으면 재로그인 예외 던지기
-                ResponseUtil.createResponseBody(response, HttpStatus.UNAUTHORIZED, "access-token, refresh-token expired"); //TODO: getWriter() has already been called for this response
+                ResponseUtil.createResponseBody(response, HttpStatus.UNAUTHORIZED/*, "access-token, refresh-token expired"*/); //TODO: getWriter() has already been called for this response
                 filterChain.doFilter(request, response);
                 return;
             }

@@ -1,5 +1,6 @@
 package com.danjitalk.danjitalk.config;
 
+import com.danjitalk.danjitalk.application.oauth.PrincipalOauth2UserService;
 import com.danjitalk.danjitalk.common.security.CustomMemberDetailsService;
 import com.danjitalk.danjitalk.common.security.JwtAuthenticationFilter;
 import com.danjitalk.danjitalk.common.security.JwtAuthenticationProvider;
@@ -41,6 +42,7 @@ public class SecurityConfig {
     private final JwtUtil jwtUtil;
     private final RefreshTokenUtil refreshTokenUtil;
     private final AccessTokenUtil accessTokenUtil;
+    private final PrincipalOauth2UserService principalOauth2UserService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -70,6 +72,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/login").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/logout").permitAll()
                 .requestMatchers(HttpMethod.DELETE, "/api/member").authenticated()
+                .requestMatchers(HttpMethod.GET, "/oauth2/authorization/*").permitAll()
                 .requestMatchers("/api/**").permitAll()
                 .anyRequest().denyAll()
             );
@@ -77,6 +80,14 @@ public class SecurityConfig {
         http
             .addFilterAfter(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
             .addFilterAfter(jwtAuthorizationFilter, JwtAuthenticationFilter.class);
+
+        http
+            .oauth2Login(oauth2 -> oauth2
+            .userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint
+                .userService(principalOauth2UserService)
+            )
+                    .defaultSuccessUrl("/api/success/oauth")
+        );
 
         return http.build();
     }
