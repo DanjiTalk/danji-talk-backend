@@ -15,6 +15,7 @@ import com.danjitalk.danjitalk.infrastructure.repository.user.member.MemberRepos
 import com.danjitalk.danjitalk.infrastructure.repository.user.member.SystemUserRepository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -65,7 +66,8 @@ public class MemberService {
     }
 
     private LocalDate parseDateFromString(String stringDate) {
-        return LocalDate.parse(stringDate);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        return LocalDate.parse(stringDate, formatter);
     }
 
     private void saveSystemUser(SignUpRequest request, Member member) {
