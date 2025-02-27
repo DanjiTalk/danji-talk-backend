@@ -68,8 +68,6 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
             Member member = Member.builder()
                 .email(userProfile.email())
                 .name(userProfile.username())
-                .birthDate(null)
-                .age(null)
                 .phoneNumber(null)
                 .notificationEnabled(null)
                 .isRestricted(false)
