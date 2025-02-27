@@ -151,7 +151,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
 
     private SystemUser findMemberFromAccessTokenClaims(Claims claims) {
-        return systemUserRepository.findByLoginId(claims.get("memberEmail").toString()).orElseThrow(DataNotFoundException::new);
+        return systemUserRepository.findById(((Integer) claims.get("memberId")).longValue()).orElseThrow(DataNotFoundException::new);
     }
 
     private void saveAuthenticationToSecurityContextHolder(SystemUser systemUser) {
