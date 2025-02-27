@@ -28,6 +28,8 @@ public class Member extends BaseEntity {
 
     private String name;                                    // 이름
 
+    private String nickname;                                // 닉네임
+
     private LocalDate birthDate;                            // 생년월일
 
     private Integer age;                                    // 나이
@@ -60,9 +62,10 @@ public class Member extends BaseEntity {
     @Builder
     public Member(String email, String name, LocalDate birthDate, Integer age, String phoneNumber,
         Boolean notificationEnabled, Boolean isRestricted, LocalDateTime restrictionTime, String fileId,
-        Gender gender) {
+        Gender gender, String nickname) {
         this.email = email;
         this.name = name;
+        this.nickname = nickname;
         this.birthDate = birthDate;
         this.age = age;
         this.phoneNumber = phoneNumber;
