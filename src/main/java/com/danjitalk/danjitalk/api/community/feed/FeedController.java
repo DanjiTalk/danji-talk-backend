@@ -5,7 +5,6 @@ import com.danjitalk.danjitalk.common.response.ApiResponse;
 import com.danjitalk.danjitalk.domain.community.feed.dto.request.CreateFeedRequestDto;
 import com.danjitalk.danjitalk.domain.community.feed.dto.response.CreateFeedResponseDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,11 +27,11 @@ public class FeedController {
      * @param multipartFileList 업로드할 파일 목록 (선택사항)
      * @return 생성된 정보와 상태코드 반환
      * */
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping
     public ResponseEntity<ApiResponse<CreateFeedResponseDto>> createFeed(
             @RequestPart("requestDto") CreateFeedRequestDto requestDto,
             @RequestPart(value = "multipartFileList", required = false) List<MultipartFile> multipartFileList
-    ) {
+            ) {
         return ResponseEntity.ok(ApiResponse.success(200, null, feedService.save(requestDto, multipartFileList)));
     }
 }

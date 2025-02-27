@@ -1,9 +1,10 @@
 package com.danjitalk.danjitalk.application.community.feed;
 
+import com.danjitalk.danjitalk.common.util.SecurityContextHolderUtil;
 import com.danjitalk.danjitalk.domain.community.feed.dto.request.CreateFeedRequestDto;
 import com.danjitalk.danjitalk.domain.community.feed.dto.response.CreateFeedResponseDto;
 import com.danjitalk.danjitalk.domain.community.feed.entity.Feed;
-import com.danjitalk.danjitalk.domain.community.feed.service.FeedDomainService;
+import com.danjitalk.danjitalk.domain.user.member.entity.Member;
 import com.danjitalk.danjitalk.infrastructure.repository.community.feed.FeedRepository;
 import com.danjitalk.danjitalk.infrastructure.repository.user.member.MemberRepository;
 import com.danjitalk.danjitalk.infrastructure.s3.S3Service;
@@ -20,7 +21,6 @@ import java.util.UUID;
 public class FeedService {
 
     private final FeedRepository feedRepository;
-    private final FeedDomainService feedDomainService;
     private final S3Service s3Service;
     private final MemberRepository memberRepository;
 
@@ -45,10 +45,10 @@ public class FeedService {
             fileUrl = s3Service.uploadFile(randomUUID, createFeedRequestDto.feedType(), multipartFileList);
         }
 
-        // TODO :: 헤더 토큰에서 jwt 토큰 뽑기, 뽑고 엔티티 조회 후 연관관계 넣어야함
-        memberRepository.findById(1L).orElseThrow(() -> new IllegalArgumentException("111"));
+        Member member = memberRepository.findById(SecurityContextHolderUtil.getMemberId()).orElseThrow(() -> new IllegalArgumentException("Member not found"));
 
         Feed feed = new Feed(createFeedRequestDto.title(), createFeedRequestDto.contents(), createFeedRequestDto.feedType());
+        feed.setMember(member);
         feed.setFileUrl(fileUrl);
         feedRepository.save(feed);
 
