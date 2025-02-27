@@ -3,6 +3,7 @@ package com.danjitalk.danjitalk.api.mail;
 import com.danjitalk.danjitalk.application.mail.MailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,7 +24,7 @@ public class MailController {
     }
 
     // 인증번호 일치여부 확인
-    @PostMapping("/certification-code/verify")
+    @GetMapping("/certification-code/verify")
     public ResponseEntity<Boolean> checkCertificationCode(
         @RequestParam String email,
         @RequestParam("code") String validationCode
