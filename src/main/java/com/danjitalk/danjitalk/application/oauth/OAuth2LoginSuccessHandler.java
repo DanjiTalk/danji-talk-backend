@@ -29,6 +29,9 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
         issueAccessTokenCookie(customMemberDetails.getUser(), response);
         issueRefreshTokenCookie(customMemberDetails.getUser(), response);
+
+        // 성공 후 리다이렉트 SecurityConfig에 .defaultSuccessUrl("/api/success/oauth")는 쿠키설정이 안됨
+        getRedirectStrategy().sendRedirect(request, response, "/api/success/oauth");
     }
 
     private void issueAccessTokenCookie(SystemUser systemUser, HttpServletResponse response) {

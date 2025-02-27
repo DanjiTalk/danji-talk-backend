@@ -87,7 +87,6 @@ public class SecurityConfig {
                 .userService(principalOauth2UserService)
             )
             .successHandler(oAuth2LoginSuccessHandler)
-            .defaultSuccessUrl("/api/success/oauth")
         );
 
         return http.build();
