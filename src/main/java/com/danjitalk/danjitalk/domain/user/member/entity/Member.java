@@ -11,7 +11,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,9 +27,7 @@ public class Member extends BaseEntity {
 
     private String name;                                    // 이름
 
-    private LocalDate birthDate;                            // 생년월일
-
-    private Integer age;                                    // 나이
+    private String nickname;                                // 닉네임
 
     private String phoneNumber;                             // 휴대폰 번호
 
@@ -58,13 +55,12 @@ public class Member extends BaseEntity {
     private List<ChatroomMemberMapping> chatroomMemberList = new ArrayList<>();
 
     @Builder
-    public Member(String email, String name, LocalDate birthDate, Integer age, String phoneNumber,
+    public Member(String email, String name, String phoneNumber,
         Boolean notificationEnabled, Boolean isRestricted, LocalDateTime restrictionTime, String fileId,
-        Gender gender) {
+        Gender gender, String nickname) {
         this.email = email;
         this.name = name;
-        this.birthDate = birthDate;
-        this.age = age;
+        this.nickname = nickname;
         this.phoneNumber = phoneNumber;
         this.notificationEnabled = notificationEnabled;
         this.isRestricted = isRestricted;

@@ -46,19 +46,20 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     // 1. RequestHeader 안의 엑세스 토큰 확인
     // 2. 액세스토큰이 유효하다면 -> 인증된 객체 저장하고 doFilter 수행
-    // TODO: OncePerRequestFilter:shouldNotFilter
+    // TODO: OncePerRequestFilter:shouldNotFilter 로 수정
     private static final List<RequestMatcher> excludedUrlPatterns = List.of( // 필터 적용 안할 url 지정
-        new AntPathRequestMatcher("/api/login", "POST")
+        new AntPathRequestMatcher("/api/login", "POST"),
+        new AntPathRequestMatcher("/oauth2/authorization/*")
     );
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
         throws ServletException, IOException {
-        log.info("AuthorizationFilter");
         if (isExcludedUrl(request)) {
             filterChain.doFilter(request, response); // 필터 스킵, 다음 필터 실행.
             return;
         }
+        log.info("JwtAuthorizationFilter#doFilterInternal");
 
         String accessToken = extractAccessTokenFromCookies(request);
 
@@ -69,13 +70,15 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             // 리프레시도 없으면
             if(refreshToken == null) {
                 // 둘다 없으면 재로그인 예외 던지기
-                ResponseUtil.createResponseBody(response, HttpStatus.UNAUTHORIZED, "access-token, refresh-token expired");
+                ResponseUtil.createResponseBody(response, HttpStatus.UNAUTHORIZED/*, "access-token, refresh-token expired"*/); //TODO: getWriter() has already been called for this response
+                filterChain.doFilter(request, response);
                 return;
             }
 
             // 리프레시는 있다면 유효성 검사 하고
             if (!refreshTokenUtil.checkIfRefreshTokenValid(refreshToken)) {
                 ResponseUtil.createResponseBody(response, HttpStatus.UNAUTHORIZED, "access-token expired, refresh-token is invalid");
+                filterChain.doFilter(request, response);
                 return;
             }
             // 엑세스 없고, 리프레시는 정상
@@ -106,11 +109,13 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             // 리프레시 없으면
             if(refreshToken == null) {
                 ResponseUtil.createResponseBody(response, HttpStatus.UNAUTHORIZED, "access-token is invalid, refresh-token expired");
+                filterChain.doFilter(request, response);
                 return;
             }
 
             if (!refreshTokenUtil.checkIfRefreshTokenValid(refreshToken)) {
                 ResponseUtil.createResponseBody(response, HttpStatus.UNAUTHORIZED, "access-token is invalid, refresh-token is invalid");
+                filterChain.doFilter(request, response);
                 return;
             }
 
@@ -146,7 +151,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
 
     private SystemUser findMemberFromAccessTokenClaims(Claims claims) {
-        return systemUserRepository.findByLoginId(claims.get("memberEmail").toString()).orElseThrow(DataNotFoundException::new);
+        return systemUserRepository.findById(((Integer) claims.get("memberId")).longValue()).orElseThrow(DataNotFoundException::new);
     }
 
     private void saveAuthenticationToSecurityContextHolder(SystemUser systemUser) {
@@ -161,6 +166,11 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private boolean isExcludedUrl(HttpServletRequest request) {
         return excludedUrlPatterns.stream().anyMatch(pattern -> pattern.matches(request));
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        return super.shouldNotFilter(request);
     }
 }
 

@@ -9,13 +9,15 @@ import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class JwtUtil {
 
-    private JwtSecretKeys jwtSecretKeys;
+    private final JwtSecretKeys jwtSecretKeys;
 
     private static final long SECOND = 1000;
     private static final long MINUTE = SECOND * 60;

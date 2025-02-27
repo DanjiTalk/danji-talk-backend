@@ -1,10 +1,7 @@
 package com.danjitalk.danjitalk.domain.user.member.dto.request;
 
-public record SignUpRequest(
-    String email,
-    String password,
+public record FindIdRequest(
     String name,
-    String nickname,
     String phoneNumber
 ) {
 
