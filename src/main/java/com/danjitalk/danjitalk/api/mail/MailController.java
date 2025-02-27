@@ -1,10 +1,12 @@
 package com.danjitalk.danjitalk.api.mail;
 
 import com.danjitalk.danjitalk.application.mail.MailService;
+import com.danjitalk.danjitalk.domain.mail.dto.MailRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,8 +20,8 @@ public class MailController {
 
     // 인증 이메일 전송
     @PostMapping("/certification-code/send")
-    public ResponseEntity<Void> sendCertificationCode(@RequestParam String mail) {
-        mailService.sendVerificationEmail(mail);
+    public ResponseEntity<Void> sendCertificationCode(@RequestBody MailRequest request) {
+        mailService.sendVerificationEmail(request);
         return ResponseEntity.ok().build();
     }
 

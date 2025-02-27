@@ -4,6 +4,7 @@ import static com.danjitalk.danjitalk.common.util.RandomCodeGeneratorUtil.genera
 
 import com.danjitalk.danjitalk.common.exception.BadRequestException;
 import com.danjitalk.danjitalk.common.exception.ConflictException;
+import com.danjitalk.danjitalk.domain.mail.dto.MailRequest;
 import com.danjitalk.danjitalk.infrastructure.repository.mail.RedisRepository;
 import com.danjitalk.danjitalk.infrastructure.repository.user.member.MemberRepository;
 import jakarta.mail.MessagingException;
@@ -36,17 +37,17 @@ public class MailService {
     // 1. 인증번호 받기 버튼을 누른다.
     // 2. 인증번호를 생성하고 redis에 저장한다.
     // 3. redis에 저장된 번호를 보낸다.
-    public void sendVerificationEmail(String mail) {
+    public void sendVerificationEmail(MailRequest request) {
 
         // 메일중복 시 메소드 예외
-        if (memberRepository.existsByEmail(mail)) {
-            throw new ConflictException("이미 가입된 메일입니다. : " + mail);
+        if (memberRepository.existsByEmail(request.mail())) {
+            throw new ConflictException("이미 가입된 메일입니다. : " + request.mail());
         }
 
         // 랜덤번호 생성
         int numberCode = generateRandomNumber(NUMBER_CODE_LENGTH);
         // 레디스에 저장
-        redisRepository.setValues(mail, String.valueOf(numberCode), Duration.ofMinutes(3));
+        redisRepository.setValues(request.mail(), String.valueOf(numberCode), Duration.ofMinutes(3));
 
         MimeMessage message = mailSender.createMimeMessage();
         Map<String, String> map = new HashMap<>();
@@ -54,7 +55,7 @@ public class MailService {
 
         try {
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(message, false, "UTF-8");
-            mimeMessageHelper.setTo(mail); // 메일 수신자
+            mimeMessageHelper.setTo(request.mail()); // 메일 수신자
             mimeMessageHelper.setSubject("이메일 인증"); // 메일 제목
             mimeMessageHelper.setText(setContext(map), true); // 메일 본문 내용, HTML 여부
             mailSender.send(message);
