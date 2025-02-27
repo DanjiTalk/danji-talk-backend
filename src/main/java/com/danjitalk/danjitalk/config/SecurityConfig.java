@@ -1,5 +1,7 @@
 package com.danjitalk.danjitalk.config;
 
+import com.danjitalk.danjitalk.application.oauth.OAuth2LoginSuccessHandler;
+import com.danjitalk.danjitalk.application.oauth.PrincipalOauth2UserService;
 import com.danjitalk.danjitalk.common.security.CustomMemberDetailsService;
 import com.danjitalk.danjitalk.common.security.JwtAuthenticationFilter;
 import com.danjitalk.danjitalk.common.security.JwtAuthenticationProvider;
@@ -7,6 +9,7 @@ import com.danjitalk.danjitalk.common.security.JwtAuthorizationFilter;
 import com.danjitalk.danjitalk.common.util.AccessTokenUtil;
 import com.danjitalk.danjitalk.common.util.JwtUtil;
 import com.danjitalk.danjitalk.common.util.RefreshTokenUtil;
+import com.danjitalk.danjitalk.common.security.CustomAuthenticationEntryPoint;
 import com.danjitalk.danjitalk.infrastructure.repository.user.member.SystemUserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
@@ -28,7 +31,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
-@EnableWebSecurity
+@EnableWebSecurity(debug = true)
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -38,6 +41,8 @@ public class SecurityConfig {
     private final JwtUtil jwtUtil;
     private final RefreshTokenUtil refreshTokenUtil;
     private final AccessTokenUtil accessTokenUtil;
+    private final PrincipalOauth2UserService principalOauth2UserService;
+    private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -51,6 +56,11 @@ public class SecurityConfig {
             .sessionManagement(config -> config.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         http
+            .exceptionHandling(handler->handler
+                .authenticationEntryPoint(new CustomAuthenticationEntryPoint()) // 401
+            ); //AccessDeniedHandler 403
+
+        http
             .logout(logout -> logout
                 .logoutUrl("/api/logout")
                 .logoutSuccessUrl("/api") // 호출할 api 있어야 No static resource api 오류안남
@@ -62,12 +72,22 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/login").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/logout").permitAll()
                 .requestMatchers(HttpMethod.DELETE, "/api/member").authenticated()
+                .requestMatchers(HttpMethod.GET, "/oauth2/authorization/*").permitAll()
                 .requestMatchers("/api/**").permitAll()
+                .anyRequest().denyAll()
             );
 
         http
             .addFilterAfter(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
             .addFilterAfter(jwtAuthorizationFilter, JwtAuthenticationFilter.class);
+
+        http
+            .oauth2Login(oauth2 -> oauth2
+            .userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint
+                .userService(principalOauth2UserService)
+            )
+            .successHandler(oAuth2LoginSuccessHandler)
+        );
 
         return http.build();
     }
@@ -86,13 +106,16 @@ public class SecurityConfig {
     }
 
     @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
+    public WebSecurityCustomizer webSecurityCustomizer() { // 시큐리티와 관련 없는(인증/인가 필요 없는) 필터를 타면 안되는 경로
         return web -> {
             web.ignoring()
                 .requestMatchers(HttpMethod.POST, "/api/member/signup")
                 .requestMatchers(HttpMethod.POST, "/api/member/check-email-duplication")
                 .requestMatchers(HttpMethod.POST, "/api/mail/certification-code/send")
-                .requestMatchers(HttpMethod.POST, "/api/mail/certification-code/verify"); // 시큐리티와 관련 없는(인증/인가 필요 없는) 필터를 타면 안되는 경로
+                .requestMatchers(HttpMethod.GET, "/api/mail/certification-code/verify")
+                .requestMatchers(HttpMethod.GET,"/social-login")  // TODO: social-login, favicon 삭제
+                .requestMatchers(HttpMethod.GET, "/favicon.ico")
+                .requestMatchers("/error");
         };
     }
 }

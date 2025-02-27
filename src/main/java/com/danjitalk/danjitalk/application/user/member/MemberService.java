@@ -13,9 +13,7 @@ import com.danjitalk.danjitalk.domain.user.member.enums.Role;
 import com.danjitalk.danjitalk.domain.user.member.service.MemberDomainService;
 import com.danjitalk.danjitalk.infrastructure.repository.user.member.MemberRepository;
 import com.danjitalk.danjitalk.infrastructure.repository.user.member.SystemUserRepository;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -54,7 +52,6 @@ public class MemberService {
                 .email(request.email())
                 .name(request.name())
                 .nickname(request.nickname())
-                .birthDate(parseDateFromString(request.birthDate()))
                 .phoneNumber(request.phoneNumber())
                 .notificationEnabled(null)
                 .isRestricted(false)
@@ -63,11 +60,6 @@ public class MemberService {
                 .build();
 
         return memberRepository.save(member);
-    }
-
-    private LocalDate parseDateFromString(String stringDate) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-        return LocalDate.parse(stringDate, formatter);
     }
 
     private void saveSystemUser(SignUpRequest request, Member member) {
