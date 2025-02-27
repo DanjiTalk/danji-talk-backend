@@ -34,7 +34,7 @@ public enum OAuthAttributes {
         return UserProfile.builder()
             .email((String) account.get("email"))
             .username(profile.get("nickname"))
-            .profile(profile.get("profile"))
+            .profile(profile.get("profile_image_url")) // 640*640, thumbnail_image_url 110*110
             .provider("kakao")
             .build();
     });
