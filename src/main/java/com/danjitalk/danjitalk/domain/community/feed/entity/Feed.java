@@ -61,4 +61,15 @@ public class Feed extends BaseEntity {
         member.getFeedList().add(this);
     }
 
+    /**
+     * 엔티티 변경 메소드
+     * */
+    public void changeTitle(String title) {
+        this.title = title;
+    }
+
+    public void changeContents(String contents) {
+        this.contents = contents;
+    }
+
 }
