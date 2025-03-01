@@ -19,7 +19,7 @@ public class FeedCustomRepositoryImpl implements FeedCustomRepository {
     public Optional<Feed> findFeedFetchJoinMemberByFeedId(Long feedId) {
         return Optional.ofNullable(queryFactory
                 .selectFrom(feed)
-                .join(member).fetchJoin()
+                .join(feed.member, member).fetchJoin()
                 .where(feed.id.eq(feedId))
                 .fetchOne()
         );
