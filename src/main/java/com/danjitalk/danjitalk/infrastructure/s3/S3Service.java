@@ -1,6 +1,7 @@
 package com.danjitalk.danjitalk.infrastructure.s3;
 
 import com.danjitalk.danjitalk.common.util.FileSignatureValidator;
+import com.danjitalk.danjitalk.domain.community.feed.enums.FeedType;
 import com.danjitalk.danjitalk.domain.s3.dto.response.S3ObjectResponseDto;
 import com.danjitalk.danjitalk.infrastructure.s3.properties.S3ConfigProperties;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,7 @@ import java.util.UUID;
 @Slf4j
 public class S3Service {
 
-    private static final List<String> ALLOWED_IMAGE_TYPES = List.of("image/jpeg", "image/png");
+    private static final List<String> ALLOWED_IMAGE_TYPES = List.of(".jpeg", ".png", ".jpg");
 
     private final S3ConfigProperties s3ConfigProperties;
     private final S3Client s3Client;
@@ -36,9 +37,9 @@ public class S3Service {
      * @param multipartFileList 멀티파트파일
      * @return String {fileType}/{id}
      * */
-    public String uploadFile(Long id, String fileType, List<MultipartFile> multipartFileList) {
+    public String uploadFile(String id, FeedType fileType, List<MultipartFile> multipartFileList) {
 
-        String urlKey = String.format("%s/%d", fileType, id);
+        String urlKey = String.format("%s/%s", fileType.toString().toLowerCase(), id);
 
         multipartFileList.forEach(
                 (file) -> {
@@ -47,19 +48,17 @@ public class S3Service {
                         byte[] bytes = file.getBytes();
                         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
 
+                        String fileExtension = this.getFileExtension(file);
 
-                        String contentType = file.getContentType();
-                        if (contentType == null || !ALLOWED_IMAGE_TYPES.contains(contentType)) {
-                            throw new IllegalArgumentException("Unsupported content type: " + contentType);
+                        if (fileExtension == null || !ALLOWED_IMAGE_TYPES.contains(fileExtension)) {
+                            throw new IllegalArgumentException("Unsupported content type: " + fileExtension);
                         }
 
-                        if (FileSignatureValidator.isImageSignature(byteArrayInputStream)) {
+                        if (!FileSignatureValidator.isImageSignature(byteArrayInputStream)) {
                             throw new IllegalArgumentException("Not allowed image signature, Only JPG, JPEG and PNG");
                         }
 
-                        String extensionByMimeType = this.getExtensionByMimeType(contentType);
-
-                        String formattedKey = String.format("feed/%d/%s%s", id, UUID.randomUUID(), extensionByMimeType);
+                        String formattedKey = String.format("feed/%s/%s%s", id, UUID.randomUUID(), fileExtension);
 
                         try ( ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes)) {
                             s3Client.putObject(
@@ -123,18 +122,18 @@ public class S3Service {
         });
     }
 
-
     /**
-     * MIME 타입 기반 확장자 추출
-     * @param mimeType MIME 타입
+     * 파일 확장자명 추출
+     * @param file 파일
      * @return String 확장자 타입
      * */
-    private String getExtensionByMimeType(String mimeType) {
-        return switch (mimeType) {
-            case "image/jpeg" -> ".jpg";
-            case "image/png" -> ".png";
-            default -> throw new IllegalArgumentException("Unsupported mime type: " + mimeType);
-        };
+    private String getFileExtension(MultipartFile file) {
+        String fileName = file.getOriginalFilename();
+        if(fileName == null || fileName.isEmpty()) {
+            return null;
+        }
+
+        return fileName.substring(fileName.lastIndexOf("."));
     }
 
 }

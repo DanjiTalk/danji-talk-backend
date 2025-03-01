@@ -2,18 +2,12 @@ package com.danjitalk.danjitalk.config;
 
 import com.danjitalk.danjitalk.application.oauth.OAuth2LoginSuccessHandler;
 import com.danjitalk.danjitalk.application.oauth.PrincipalOauth2UserService;
-import com.danjitalk.danjitalk.common.security.CustomMemberDetailsService;
-import com.danjitalk.danjitalk.common.security.JwtAuthenticationFilter;
-import com.danjitalk.danjitalk.common.security.JwtAuthenticationProvider;
-import com.danjitalk.danjitalk.common.security.JwtAuthorizationFilter;
+import com.danjitalk.danjitalk.common.security.*;
 import com.danjitalk.danjitalk.common.util.AccessTokenUtil;
 import com.danjitalk.danjitalk.common.util.JwtUtil;
 import com.danjitalk.danjitalk.common.util.RefreshTokenUtil;
-import com.danjitalk.danjitalk.common.security.CustomAuthenticationEntryPoint;
 import com.danjitalk.danjitalk.infrastructure.repository.user.member.SystemUserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,6 +23,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity(debug = true)
@@ -68,14 +65,17 @@ public class SecurityConfig {
             );
 
         http
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers(HttpMethod.POST, "/api/login").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/logout").permitAll()
-                .requestMatchers(HttpMethod.DELETE, "/api/member").authenticated()
-                .requestMatchers(HttpMethod.GET, "/oauth2/authorization/*").permitAll()
-                .requestMatchers("/api/**").permitAll()
-                .anyRequest().denyAll()
-            );
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.POST, "/api/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/logout").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/member").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/community/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/community/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/community/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/oauth2/authorization/*").permitAll()
+                        .requestMatchers("/api/**").permitAll()
+                        .anyRequest().denyAll()
+                );
 
         http
             .addFilterAfter(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

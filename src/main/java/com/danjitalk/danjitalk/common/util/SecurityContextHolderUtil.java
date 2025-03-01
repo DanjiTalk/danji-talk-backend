@@ -7,7 +7,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 public class SecurityContextHolderUtil {
 
-    public static Long getMemberId() {
+    public static Long getSystemUserId() {
         CustomMemberDetails principal = getCustomMemberDetails();
         return principal.getUser().getSystemUserId();
     }
@@ -15,6 +15,11 @@ public class SecurityContextHolderUtil {
     public static SystemUser getSystemUser() {
         CustomMemberDetails principal = getCustomMemberDetails();
         return principal.getUser();
+    }
+
+    public static Long getMemberId() {
+        CustomMemberDetails principal = getCustomMemberDetails();
+        return principal.getUser().getMember().getId();
     }
 
     private static CustomMemberDetails getCustomMemberDetails() {
