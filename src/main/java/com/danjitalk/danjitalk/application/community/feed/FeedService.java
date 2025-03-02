@@ -119,11 +119,12 @@ public class FeedService {
             throw new IllegalArgumentException("FeedId cannot be null");
         }
 
-        if(!feedId.equals(loginUserId)) {
-            throw new BadRequestException("BadRequest, only can update own feeds");
-        }
 
         Feed feed = feedRepository.findById(feedId).orElseThrow(DataNotFoundException::new);
+
+        if(!loginUserId.equals(feed.getMember().getId())) {
+            throw new BadRequestException("BadRequest, only can update own feeds");
+        }
 
         // TODO :: 최적화 필요, 매 요청마다 S3 접근 -> 삭제 -> 업로드 진행
         if(!Objects.isEmpty(deleteFileUrls)) {
@@ -160,6 +161,12 @@ public class FeedService {
     public void deleteFeed(Long feedId) {
 
         Feed feed = feedRepository.findById(feedId).orElseThrow(DataNotFoundException::new);
+
+        Long loginUserId = SecurityContextHolderUtil.getMemberId();
+
+        if(!loginUserId.equals(feed.getMember().getId())) {
+            throw new BadRequestException("BadRequest, only can delete own feeds");
+        }
 
         if(feed.getFileUrl() != null) {
             s3Service.deleteS3Object(feed.getFileUrl());
