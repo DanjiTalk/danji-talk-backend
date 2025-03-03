@@ -15,6 +15,7 @@ spring:
           google:
             client-id: ${GOOGLE_CLIENT_ID} # 발급 받은 Client ID
             client-secret: ${GOOGLE_CLIENT_SECRET} # 발급 받은 Client Secret
+            redirect-uri: ${REDIRECT_URI:http://localhost:8080}/login/oauth2/code/google
             scope: # 기본 값 openid,profile,email => profile, email 로 설정 변경
               - profile
               - email
