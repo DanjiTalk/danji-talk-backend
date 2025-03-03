@@ -26,6 +26,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 @Configuration
 @EnableWebSecurity(debug = true)
@@ -40,6 +41,7 @@ public class SecurityConfig {
     private final AccessTokenUtil accessTokenUtil;
     private final PrincipalOauth2UserService principalOauth2UserService;
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
+    private final RequestMappingHandlerMapping handlerMapping;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -54,7 +56,7 @@ public class SecurityConfig {
 
         http
             .exceptionHandling(handler->handler
-                .authenticationEntryPoint(new CustomAuthenticationEntryPoint()) // 401
+                .authenticationEntryPoint(new CustomAuthenticationEntryPoint(handlerMapping)) // 401
             ); //AccessDeniedHandler 403
 
         http
