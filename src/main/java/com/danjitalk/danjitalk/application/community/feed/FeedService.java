@@ -5,9 +5,9 @@ import com.danjitalk.danjitalk.common.exception.DataNotFoundException;
 import com.danjitalk.danjitalk.common.util.SecurityContextHolderUtil;
 import com.danjitalk.danjitalk.domain.apartment.entity.Apartment;
 import com.danjitalk.danjitalk.domain.community.feed.dto.request.CreateFeedRequestDto;
+import com.danjitalk.danjitalk.domain.community.feed.dto.request.GetFeedListRequestDto;
 import com.danjitalk.danjitalk.domain.community.feed.dto.request.UpdateFeedRequestDto;
-import com.danjitalk.danjitalk.domain.community.feed.dto.response.CreateFeedResponseDto;
-import com.danjitalk.danjitalk.domain.community.feed.dto.response.FeedDetailResponseDto;
+import com.danjitalk.danjitalk.domain.community.feed.dto.response.*;
 import com.danjitalk.danjitalk.domain.community.feed.entity.Feed;
 import com.danjitalk.danjitalk.domain.s3.dto.response.S3ObjectResponseDto;
 import com.danjitalk.danjitalk.domain.user.member.dto.response.FeedMemberResponseDto;
@@ -35,6 +35,33 @@ public class FeedService {
     private final S3Service s3Service;
     private final MemberRepository memberRepository;
     private final ApartmentRepository apartmentRepository;
+
+    /**
+     * 피드 상세 조회
+     * */
+    public FeedListDto getFeedList(GetFeedListRequestDto requestDto) {
+
+        List<ProjectionFeedDto> projectionFeedList = feedRepository.getProjectionFeedList(requestDto).orElseThrow(() -> new IllegalArgumentException("No feeds found"));
+
+        ProjectionFeedDto lastIndexFeedDto = projectionFeedList.get(projectionFeedList.size() - 1);
+
+        List<FeedDto> list = projectionFeedList.stream().map(projectionFeedDto ->
+                new FeedDto(
+                        projectionFeedDto.feedId(),
+                        projectionFeedDto.memberId(),
+                        projectionFeedDto.nickName(),
+                        projectionFeedDto.title(),
+                        projectionFeedDto.contents(),
+                        projectionFeedDto.localDateTime(),
+                        projectionFeedDto.reactionCount(),
+                        projectionFeedDto.commentCount(),
+                        // TODO :: File URL 반환 생각해보기, 매번 S3 접근은 많은 비용
+                        null
+                )
+        ).toList();
+
+        return new FeedListDto(list, lastIndexFeedDto.localDateTime());
+    }
 
     /**
      * 피드 상세 조회
