@@ -1,6 +1,5 @@
 package com.danjitalk.danjitalk.api.community.feed;
 
-import com.danjitalk.danjitalk.application.community.Test;
 import com.danjitalk.danjitalk.application.community.feed.FeedService;
 import com.danjitalk.danjitalk.common.response.ApiResponse;
 import com.danjitalk.danjitalk.domain.community.feed.dto.request.CreateFeedRequestDto;
@@ -22,7 +21,6 @@ import java.util.List;
 public class FeedController {
 
     private final FeedService feedService;
-    private final Test test;
 
     /**
      * 피드 상세 조회 API
