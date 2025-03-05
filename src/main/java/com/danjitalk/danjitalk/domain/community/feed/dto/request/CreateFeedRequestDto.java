@@ -6,7 +6,8 @@ import com.danjitalk.danjitalk.domain.community.feed.enums.FeedType;
 public record CreateFeedRequestDto(
         String title,
         String contents,
-        FeedType feedType
+        FeedType feedType,
+        Long apartmentId
 ) {
 
     /**
@@ -15,6 +16,6 @@ public record CreateFeedRequestDto(
      * @return Feed - 게시글 entity
      * */
     public Feed toFeed(CreateFeedRequestDto createFeedRequestDto) {
-        return new Feed(createFeedRequestDto.title, createFeedRequestDto.contents, createFeedRequestDto.feedType);
+        return new Feed(createFeedRequestDto.title, createFeedRequestDto.contents, createFeedRequestDto.feedType, null, null, null);
     }
 }

@@ -3,6 +3,7 @@ package com.danjitalk.danjitalk.application.community.feed;
 import com.danjitalk.danjitalk.common.exception.BadRequestException;
 import com.danjitalk.danjitalk.common.exception.DataNotFoundException;
 import com.danjitalk.danjitalk.common.util.SecurityContextHolderUtil;
+import com.danjitalk.danjitalk.domain.apartment.entity.Apartment;
 import com.danjitalk.danjitalk.domain.community.feed.dto.request.CreateFeedRequestDto;
 import com.danjitalk.danjitalk.domain.community.feed.dto.request.UpdateFeedRequestDto;
 import com.danjitalk.danjitalk.domain.community.feed.dto.response.CreateFeedResponseDto;
@@ -11,6 +12,7 @@ import com.danjitalk.danjitalk.domain.community.feed.entity.Feed;
 import com.danjitalk.danjitalk.domain.s3.dto.response.S3ObjectResponseDto;
 import com.danjitalk.danjitalk.domain.user.member.dto.response.FeedMemberResponseDto;
 import com.danjitalk.danjitalk.domain.user.member.entity.Member;
+import com.danjitalk.danjitalk.infrastructure.repository.apartment.ApartmentRepository;
 import com.danjitalk.danjitalk.infrastructure.repository.community.feed.FeedRepository;
 import com.danjitalk.danjitalk.infrastructure.repository.user.member.MemberRepository;
 import com.danjitalk.danjitalk.infrastructure.s3.S3Service;
@@ -32,6 +34,7 @@ public class FeedService {
     private final FeedRepository feedRepository;
     private final S3Service s3Service;
     private final MemberRepository memberRepository;
+    private final ApartmentRepository apartmentRepository;
 
     /**
      * 피드 상세 조회
@@ -88,11 +91,18 @@ public class FeedService {
             fileUrl = s3Service.uploadFiles(randomUUID, createFeedRequestDto.feedType(), multipartFileList);
         }
 
-        Member member = memberRepository.findById(SecurityContextHolderUtil.getMemberId()).orElseThrow(() -> new IllegalArgumentException("Member not found"));
+        Member member = memberRepository.findById(SecurityContextHolderUtil.getMemberId()).orElseThrow(() -> new DataNotFoundException());
+        Apartment apartment = apartmentRepository.findById(createFeedRequestDto.apartmentId()).orElseThrow(() -> new DataNotFoundException());
 
-        Feed feed = new Feed(createFeedRequestDto.title(), createFeedRequestDto.contents(), createFeedRequestDto.feedType());
-        feed.setMember(member);
-        feed.setFileUrl(fileUrl);
+        Feed feed = Feed.builder()
+                .title(createFeedRequestDto.title())
+                .contents(createFeedRequestDto.contents())
+                .feedType(createFeedRequestDto.feedType())
+                .fileUrl(fileUrl)
+                .member(member)
+                .apartment(apartment)
+                .build();
+
         feedRepository.save(feed);
 
         return new CreateFeedResponseDto(
