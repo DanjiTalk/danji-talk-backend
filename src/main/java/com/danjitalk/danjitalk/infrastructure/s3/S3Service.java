@@ -2,6 +2,7 @@ package com.danjitalk.danjitalk.infrastructure.s3;
 
 import com.danjitalk.danjitalk.common.util.FileSignatureValidator;
 import com.danjitalk.danjitalk.domain.community.feed.enums.FeedType;
+import com.danjitalk.danjitalk.domain.s3.dto.response.S3FileUrlResponseDto;
 import com.danjitalk.danjitalk.domain.s3.dto.response.S3ObjectResponseDto;
 import com.danjitalk.danjitalk.infrastructure.s3.properties.S3ConfigProperties;
 import io.jsonwebtoken.lang.Objects;
@@ -15,6 +16,7 @@ import software.amazon.awssdk.services.s3.model.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -80,9 +82,10 @@ public class S3Service {
      * @param multipartFileList 멀티파트파일
      * @return String {fileType}/{id}
      * */
-    public String uploadFiles(String id, FeedType fileType, List<MultipartFile> multipartFileList) {
+    public S3FileUrlResponseDto uploadFiles(String id, FeedType fileType, List<MultipartFile> multipartFileList) {
 
         String urlKey = String.format("%s/%s", fileType.toString().toLowerCase(), id);
+        List<String> fileUrls = new ArrayList<>();
 
         multipartFileList.forEach(
                 (file) -> {
@@ -102,6 +105,7 @@ public class S3Service {
                         }
 
                         String formattedKey = String.format("feed/%s/%s%s", id, UUID.randomUUID(), fileExtension);
+                        fileUrls.add(formattedKey);
 
                         try ( ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes)) {
                             s3Client.putObject(
@@ -118,10 +122,9 @@ public class S3Service {
                         throw new RuntimeException("Failed to upload file: ", ioException);
                     }
 
-                }
-        );
+                });
 
-        return urlKey;
+        return new S3FileUrlResponseDto(urlKey, fileUrls.get(0));
 
     }
 

@@ -1,11 +1,14 @@
 package com.danjitalk.danjitalk.api.community.feed;
 
+import com.danjitalk.danjitalk.application.community.Test;
 import com.danjitalk.danjitalk.application.community.feed.FeedService;
 import com.danjitalk.danjitalk.common.response.ApiResponse;
 import com.danjitalk.danjitalk.domain.community.feed.dto.request.CreateFeedRequestDto;
+import com.danjitalk.danjitalk.domain.community.feed.dto.request.GetFeedListRequestDto;
 import com.danjitalk.danjitalk.domain.community.feed.dto.request.UpdateFeedRequestDto;
 import com.danjitalk.danjitalk.domain.community.feed.dto.response.CreateFeedResponseDto;
 import com.danjitalk.danjitalk.domain.community.feed.dto.response.FeedDetailResponseDto;
+import com.danjitalk.danjitalk.domain.community.feed.dto.response.FeedListDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +22,7 @@ import java.util.List;
 public class FeedController {
 
     private final FeedService feedService;
+    private final Test test;
 
     /**
      * 피드 상세 조회 API
@@ -71,4 +75,10 @@ public class FeedController {
         feedService.deleteFeed(feedId);
         return ResponseEntity.ok(ApiResponse.success(200, null, null));
     }
+
+    @GetMapping
+    public ResponseEntity<ApiResponse<FeedListDto>> getFeedList(@RequestBody GetFeedListRequestDto requestDto) {
+        return ResponseEntity.ok(ApiResponse.success(200, null, feedService.getFeedList(requestDto)));
+    }
+
 }

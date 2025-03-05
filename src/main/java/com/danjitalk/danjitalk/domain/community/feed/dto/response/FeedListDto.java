@@ -5,6 +5,7 @@ import java.util.List;
 
 public record FeedListDto(
         List<FeedDto> feedDtoList,
-        LocalDateTime cursorDate
+        LocalDateTime cursorDate,
+        Integer listSize
 ) {
 }

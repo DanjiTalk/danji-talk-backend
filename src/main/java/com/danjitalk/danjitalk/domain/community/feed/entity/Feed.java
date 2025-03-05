@@ -25,6 +25,9 @@ public class Feed extends BaseEntity {
     @Setter
     private String fileUrl;
 
+    @Setter
+    private String thumbnailFileUrl;
+
     @Enumerated(EnumType.STRING)
     private FeedType feedType;
 
@@ -50,11 +53,12 @@ public class Feed extends BaseEntity {
 
     // entity save 에서 사용
     @Builder
-    public Feed(String title, String contents, FeedType feedType, String fileUrl, Member member, Apartment apartment) {
+    public Feed(String title, String contents, FeedType feedType, String fileUrl, String thumbnailFileUrl, Member member, Apartment apartment) {
                 this.title = title;
                 this.contents = contents;
                 this.feedType = feedType;
                 this.fileUrl = fileUrl;
+                this.thumbnailFileUrl = thumbnailFileUrl;
                 this.associateMember(member);
                 this.associateApartment(apartment);
     }

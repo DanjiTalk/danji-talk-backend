@@ -1,12 +1,12 @@
 package com.danjitalk.danjitalk.infrastructure.repository.community.feed.impl;
 
+import com.danjitalk.danjitalk.common.exception.BadRequestException;
 import com.danjitalk.danjitalk.domain.community.feed.dto.request.GetFeedListRequestDto;
 import com.danjitalk.danjitalk.domain.community.feed.dto.response.ProjectionFeedDto;
-import com.danjitalk.danjitalk.domain.community.feed.dto.response.QProjectionFeedListResponseDto;
+import com.danjitalk.danjitalk.domain.community.feed.dto.response.QProjectionFeedDto;
 import com.danjitalk.danjitalk.domain.community.feed.entity.Feed;
 import com.danjitalk.danjitalk.infrastructure.repository.community.feed.FeedCustomRepository;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 
@@ -36,7 +36,7 @@ public class FeedCustomRepositoryImpl implements FeedCustomRepository {
     public Optional<List<ProjectionFeedDto>> getProjectionFeedList(GetFeedListRequestDto requestDto) {
 
         return Optional.ofNullable(queryFactory.select(
-                new QProjectionFeedListResponseDto(
+                new QProjectionFeedDto(
                         feed.id.as("feedId"),
                         member.id.as("memberId"),
                         member.nickname.as("nickName"),
@@ -45,7 +45,7 @@ public class FeedCustomRepositoryImpl implements FeedCustomRepository {
                         feed.createdAt.as("localDateTime"),
                         feed.reactionCount.as("reactionCount"),
                         feed.commentCount.as("commentCount"),
-                        Expressions.nullExpression()
+                        feed.thumbnailFileUrl.as("thumbnailFileUrl")
                 ))
                 .from(feed)
                 .leftJoin(feed.member, member)
@@ -59,10 +59,13 @@ public class FeedCustomRepositoryImpl implements FeedCustomRepository {
     }
 
     private BooleanExpression apartmentIdEq(Long apartmentId) {
-        return apartmentId != null ? feed.apartment.id.eq(apartmentId) : null;
+        if( apartmentId == null ) {
+            throw new BadRequestException("Apartment id is required");
+        }
+        return feed.apartment.id.eq(apartmentId);
     }
 
     private BooleanExpression cursorDateGt(LocalDateTime cursorDate) {
-        return cursorDate != null ? feed.createdAt.lt(cursorDate) : null;
+        return cursorDate != null ? feed.createdAt.loe(cursorDate) : null;
     }
 }

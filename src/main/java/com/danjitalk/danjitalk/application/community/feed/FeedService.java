@@ -9,6 +9,7 @@ import com.danjitalk.danjitalk.domain.community.feed.dto.request.GetFeedListRequ
 import com.danjitalk.danjitalk.domain.community.feed.dto.request.UpdateFeedRequestDto;
 import com.danjitalk.danjitalk.domain.community.feed.dto.response.*;
 import com.danjitalk.danjitalk.domain.community.feed.entity.Feed;
+import com.danjitalk.danjitalk.domain.s3.dto.response.S3FileUrlResponseDto;
 import com.danjitalk.danjitalk.domain.s3.dto.response.S3ObjectResponseDto;
 import com.danjitalk.danjitalk.domain.user.member.dto.response.FeedMemberResponseDto;
 import com.danjitalk.danjitalk.domain.user.member.entity.Member;
@@ -16,6 +17,7 @@ import com.danjitalk.danjitalk.infrastructure.repository.apartment.ApartmentRepo
 import com.danjitalk.danjitalk.infrastructure.repository.community.feed.FeedRepository;
 import com.danjitalk.danjitalk.infrastructure.repository.user.member.MemberRepository;
 import com.danjitalk.danjitalk.infrastructure.s3.S3Service;
+import com.danjitalk.danjitalk.infrastructure.s3.properties.S3ConfigProperties;
 import io.jsonwebtoken.lang.Objects;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -35,9 +37,11 @@ public class FeedService {
     private final S3Service s3Service;
     private final MemberRepository memberRepository;
     private final ApartmentRepository apartmentRepository;
+    private final S3ConfigProperties s3ConfigProperties;
 
     /**
-     * 피드 상세 조회
+     * 피드 목록 조회
+     * limit 15, cursorDate 필요
      * */
     public FeedListDto getFeedList(GetFeedListRequestDto requestDto) {
 
@@ -45,8 +49,15 @@ public class FeedService {
 
         ProjectionFeedDto lastIndexFeedDto = projectionFeedList.get(projectionFeedList.size() - 1);
 
-        List<FeedDto> list = projectionFeedList.stream().map(projectionFeedDto ->
-                new FeedDto(
+        List<FeedDto> list = projectionFeedList.stream().map(projectionFeedDto -> {
+                String thumbnailFileUrl = null;
+
+                // 썸네일이 있으면 반환
+                if(projectionFeedDto.thumbnailFileUrl() != null){
+                    thumbnailFileUrl = "https://s3." + s3ConfigProperties.getRegion() + ".amazonaws.com/" + s3ConfigProperties.getBucketName() + "/" + projectionFeedDto.thumbnailFileUrl();
+                }
+
+                return new FeedDto(
                         projectionFeedDto.feedId(),
                         projectionFeedDto.memberId(),
                         projectionFeedDto.nickName(),
@@ -55,12 +66,12 @@ public class FeedService {
                         projectionFeedDto.localDateTime(),
                         projectionFeedDto.reactionCount(),
                         projectionFeedDto.commentCount(),
-                        // TODO :: File URL 반환 생각해보기, 매번 S3 접근은 많은 비용
-                        null
-                )
+                        thumbnailFileUrl
+                );
+            }
         ).toList();
 
-        return new FeedListDto(list, lastIndexFeedDto.localDateTime());
+        return new FeedListDto(list, lastIndexFeedDto.localDateTime(), projectionFeedList.size());
     }
 
     /**
@@ -110,12 +121,12 @@ public class FeedService {
             throw new IllegalArgumentException("More than 10 Files");
         }
 
-        String fileUrl = null;
+        S3FileUrlResponseDto s3FileUrlResponseDto = null;
 
         // 파일이 있으면 S3에 업로드
         if(multipartFileList != null && !multipartFileList.isEmpty()) {
             String randomUUID = UUID.randomUUID().toString();
-            fileUrl = s3Service.uploadFiles(randomUUID, createFeedRequestDto.feedType(), multipartFileList);
+            s3FileUrlResponseDto = s3Service.uploadFiles(randomUUID, createFeedRequestDto.feedType(), multipartFileList);
         }
 
         Member member = memberRepository.findById(SecurityContextHolderUtil.getMemberId()).orElseThrow(() -> new DataNotFoundException());
@@ -125,7 +136,8 @@ public class FeedService {
                 .title(createFeedRequestDto.title())
                 .contents(createFeedRequestDto.contents())
                 .feedType(createFeedRequestDto.feedType())
-                .fileUrl(fileUrl)
+                .fileUrl(s3FileUrlResponseDto != null ? s3FileUrlResponseDto.fileUrl() : null)
+                .thumbnailFileUrl(s3FileUrlResponseDto != null ? s3FileUrlResponseDto.thumbnailFileUrl() : null)
                 .member(member)
                 .apartment(apartment)
                 .build();
@@ -170,14 +182,19 @@ public class FeedService {
             // s3 스토리지에 이미지가 남아있는지 확인
             if(Objects.isEmpty(s3Service.getS3Object(feed.getFileUrl()))) {
                 feed.setFileUrl(null);
+                feed.setThumbnailFileUrl(null);
             }
         }
 
         if(!Objects.isEmpty(multipartFileList)) {
             // S3 스토리지에 남은 데이터가 없으면 새로 업데이트 + feed entity 에 설정, 있으면 파일만 추가
             if(feed.getFileUrl() == null) {
-                String fileUrl = s3Service.uploadFiles(UUID.randomUUID().toString(), feed.getFeedType(), multipartFileList);
-                feed.setFileUrl(fileUrl);
+                S3FileUrlResponseDto s3FileUrlResponseDto = s3Service.uploadFiles(UUID.randomUUID().toString(), feed.getFeedType(), multipartFileList);
+
+                if(s3FileUrlResponseDto != null) {
+                    feed.setFileUrl(s3FileUrlResponseDto.fileUrl());
+                    feed.setThumbnailFileUrl(s3FileUrlResponseDto.thumbnailFileUrl());
+                }
             } else {
                 s3Service.addUploadFiles(feed.getFileUrl(), multipartFileList);
             }
