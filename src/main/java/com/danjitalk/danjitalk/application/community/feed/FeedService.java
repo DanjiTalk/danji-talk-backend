@@ -118,8 +118,8 @@ public class FeedService {
             fileUrl = s3Service.uploadFiles(randomUUID, createFeedRequestDto.feedType(), multipartFileList);
         }
 
-        Member member = memberRepository.findById(SecurityContextHolderUtil.getMemberId()).orElseThrow(() -> new IllegalArgumentException("Member not found"));
-        Apartment apartment = apartmentRepository.findById(createFeedRequestDto.apartmentId()).orElseThrow(() -> new IllegalArgumentException("Apartment not found"));
+        Member member = memberRepository.findById(SecurityContextHolderUtil.getMemberId()).orElseThrow(() -> new DataNotFoundException());
+        Apartment apartment = apartmentRepository.findById(createFeedRequestDto.apartmentId()).orElseThrow(() -> new DataNotFoundException());
 
         Feed feed = Feed.builder()
                 .title(createFeedRequestDto.title())
