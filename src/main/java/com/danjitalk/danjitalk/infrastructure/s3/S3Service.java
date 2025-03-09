@@ -129,6 +129,59 @@ public class S3Service {
     }
 
     /**
+     * S3 파일 멀티 업로드(아파트 단지등록)
+     * @param multipartFileList 멀티파트파일
+     * @return S3FileUrlResponseDto
+     */
+    public S3FileUrlResponseDto uploadFiles(List<MultipartFile> multipartFileList) {
+        String id = UUID.randomUUID().toString();
+        String fileType = "apartment-complex";
+
+        String urlKey = String.format("%s/%s", fileType, id);
+        List<String> fileUrls = new ArrayList<>();
+
+        multipartFileList.forEach(
+            (file) -> {
+
+                try {
+                    byte[] bytes = file.getBytes();
+                    ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
+
+                    String fileExtension = this.getFileExtension(file);
+
+                    if (fileExtension == null || !ALLOWED_IMAGE_TYPES.contains(fileExtension)) {
+                        throw new IllegalArgumentException("Unsupported content type: " + fileExtension);
+                    }
+
+                    if (!FileSignatureValidator.isImageSignature(byteArrayInputStream)) {
+                        throw new IllegalArgumentException("Not allowed image signature, Only JPG, JPEG and PNG");
+                    }
+
+                    String formattedKey = String.format("%s/%s/%s%s", fileType, id, UUID.randomUUID(), fileExtension);
+                    fileUrls.add(formattedKey);
+
+                    try ( ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes)) {
+                        s3Client.putObject(
+                            PutObjectRequest.builder()
+                                .key(formattedKey)
+                                .bucket(s3ConfigProperties.getBucketName())
+                                .contentType(getFileMimeType(fileExtension))
+                                .build(),
+                            RequestBody.fromInputStream(inputStream, bytes.length)
+                        );
+                    }
+
+                } catch (IOException ioException) {
+                    throw new RuntimeException("Failed to upload file: ", ioException);
+                }
+
+            });
+
+        return new S3FileUrlResponseDto(urlKey, fileUrls.get(0));
+
+    }
+
+    /**
      * 조회
      * @param url String {fileType}/{id}
      * @return List<S3ObjectResponseDto>
