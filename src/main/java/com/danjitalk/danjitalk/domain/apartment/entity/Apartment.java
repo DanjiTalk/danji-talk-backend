@@ -3,6 +3,7 @@ package com.danjitalk.danjitalk.domain.apartment.entity;
 import com.danjitalk.danjitalk.domain.community.feed.entity.Feed;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -27,7 +28,28 @@ public class Apartment {
 
     private Integer parkingCapacity;        // 주차 가능 대수
 
+    private Integer buildingCount;          // 동 수
+
+    private String buildingRange;           // 동 범위
+
+    private String fileUrl;
+
+    private String thumbnailFileUrl;
+
     @OneToMany(mappedBy = "apartment")
     private List<Feed> feedList = new ArrayList<>();
 
+    @Builder
+    public Apartment(String name, String region, String location, Integer totalUnit, Integer parkingCapacity,
+        Integer buildingCount, String buildingRange, String fileUrl, String thumbnailFileUrl) {
+        this.name = name;
+        this.region = region;
+        this.location = location;
+        this.totalUnit = totalUnit;
+        this.parkingCapacity = parkingCapacity;
+        this.buildingCount = buildingCount;
+        this.buildingRange = buildingRange;
+        this.fileUrl = fileUrl;
+        this.thumbnailFileUrl = thumbnailFileUrl;
+    }
 }
