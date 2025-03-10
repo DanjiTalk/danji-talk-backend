@@ -52,11 +52,4 @@ public class Apartment {
         this.fileUrl = fileUrl;
         this.thumbnailFileUrl = thumbnailFileUrl;
     }
-
-    public void convertBuildingRangeToNumbers(String buildingRange) {
-        String[] parts = buildingRange.split("\\s*~\\s*");
-        int a = Integer.parseInt(parts[0].replaceAll("\\D", ""));
-        int b = Integer.parseInt(parts[1].replaceAll("\\D", ""));
-        this.buildingCount = Math.abs(a - b) + 1;
-    }
 }
