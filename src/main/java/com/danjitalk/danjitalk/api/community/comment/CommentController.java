@@ -3,7 +3,10 @@ package com.danjitalk.danjitalk.api.community.comment;
 import com.danjitalk.danjitalk.application.community.comment.CommentService;
 import com.danjitalk.danjitalk.common.response.ApiResponse;
 import com.danjitalk.danjitalk.domain.community.comment.dto.request.CreateCommentRequestDto;
+import com.danjitalk.danjitalk.domain.community.comment.dto.request.GetCommentRequestDto;
 import com.danjitalk.danjitalk.domain.community.comment.dto.request.UpdateCommentRequestDto;
+import com.danjitalk.danjitalk.domain.community.comment.dto.response.GetCommentResponseDto;
+import com.danjitalk.danjitalk.domain.community.comment.dto.response.PageResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +17,11 @@ import org.springframework.web.bind.annotation.*;
 public class CommentController {
 
     private final CommentService commentService;
+
+    @GetMapping
+    public ResponseEntity<ApiResponse<PageResponseDto<GetCommentResponseDto>>> getComments(@RequestBody GetCommentRequestDto getCommentRequestDto) {
+        return ResponseEntity.ok().body(ApiResponse.success(200, null, commentService.getComments(getCommentRequestDto)));
+    }
 
     @PostMapping
     public ResponseEntity<ApiResponse<Void>> createComment(@RequestBody CreateCommentRequestDto createCommentRequestDto) {

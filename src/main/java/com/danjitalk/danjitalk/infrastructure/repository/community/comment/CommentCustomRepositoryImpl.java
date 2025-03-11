@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.danjitalk.danjitalk.domain.community.comment.entity.QComment.comment;
-import static com.danjitalk.danjitalk.domain.community.feed.entity.QFeed.feed;
 import static com.danjitalk.danjitalk.domain.user.member.entity.QMember.member;
 
 @RequiredArgsConstructor
@@ -27,9 +26,8 @@ public class CommentCustomRepositoryImpl implements CommentCustomRepository {
 
         // 부모 댓글만 가져옴
         List<Comment> fetch = queryFactory.selectFrom(comment)
-                .join(comment.feed, feed).fetchJoin()
                 .join(comment.member, member).fetchJoin()
-                .leftJoin(comment.childrenList, childComment).fetchJoin()
+                .leftJoin(comment.childrenList, childComment)
                 .where(comment.feed.id.eq(feedId).and(comment.parent.isNull()))
                 .offset(pageRequest.getOffset())
                 .limit(pageRequest.getPageSize())
