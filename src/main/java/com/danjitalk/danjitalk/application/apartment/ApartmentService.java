@@ -4,6 +4,7 @@ import com.danjitalk.danjitalk.domain.apartment.dto.ApartmentRegisterRequest;
 import com.danjitalk.danjitalk.domain.apartment.dto.ApartmentRegisterResponse;
 import com.danjitalk.danjitalk.domain.apartment.entity.Apartment;
 import com.danjitalk.danjitalk.domain.s3.dto.response.S3FileUrlResponseDto;
+import com.danjitalk.danjitalk.domain.s3.enums.FileType;
 import com.danjitalk.danjitalk.infrastructure.repository.apartment.ApartmentRepository;
 import com.danjitalk.danjitalk.infrastructure.s3.S3Service;
 import java.util.List;
@@ -31,7 +32,7 @@ public class ApartmentService {
 
         // 파일이 있으면 S3에 업로드
         if(multipartFileList != null && !multipartFileList.isEmpty()) {
-            s3FileUrlResponseDto = s3Service.uploadFiles(multipartFileList);
+            s3FileUrlResponseDto = s3Service.uploadFiles(FileType.APARTMENT, multipartFileList);
         }
 
         // 동 범위, 동 수 분리

@@ -1,9 +1,9 @@
 package com.danjitalk.danjitalk.infrastructure.s3;
 
 import com.danjitalk.danjitalk.common.util.FileSignatureValidator;
-import com.danjitalk.danjitalk.domain.community.feed.enums.FeedType;
 import com.danjitalk.danjitalk.domain.s3.dto.response.S3FileUrlResponseDto;
 import com.danjitalk.danjitalk.domain.s3.dto.response.S3ObjectResponseDto;
+import com.danjitalk.danjitalk.domain.s3.enums.FileType;
 import com.danjitalk.danjitalk.infrastructure.s3.properties.S3ConfigProperties;
 import io.jsonwebtoken.lang.Objects;
 import lombok.RequiredArgsConstructor;
@@ -77,13 +77,12 @@ public class S3Service {
 
     /**
      * S3 파일 멀티 업로드
-     * @param id ID값
      * @param fileType feed, MemberImg 등 파일 형식
      * @param multipartFileList 멀티파트파일
      * @return String {fileType}/{id}
      * */
-    public S3FileUrlResponseDto uploadFiles(String id, FeedType fileType, List<MultipartFile> multipartFileList) {
-
+    public S3FileUrlResponseDto uploadFiles(FileType fileType, List<MultipartFile> multipartFileList) {
+        String id = UUID.randomUUID().toString();
         String urlKey = String.format("%s/%s", fileType.toString().toLowerCase(), id);
         List<String> fileUrls = new ArrayList<>();
 
@@ -123,59 +122,6 @@ public class S3Service {
                     }
 
                 });
-
-        return new S3FileUrlResponseDto(urlKey, fileUrls.get(0));
-
-    }
-
-    /**
-     * S3 파일 멀티 업로드(아파트 단지등록)
-     * @param multipartFileList 멀티파트파일
-     * @return S3FileUrlResponseDto
-     */
-    public S3FileUrlResponseDto uploadFiles(List<MultipartFile> multipartFileList) {
-        String id = UUID.randomUUID().toString();
-        String fileType = "apartment-complex";
-
-        String urlKey = String.format("%s/%s", fileType, id);
-        List<String> fileUrls = new ArrayList<>();
-
-        multipartFileList.forEach(
-            (file) -> {
-
-                try {
-                    byte[] bytes = file.getBytes();
-                    ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
-
-                    String fileExtension = this.getFileExtension(file);
-
-                    if (fileExtension == null || !ALLOWED_IMAGE_TYPES.contains(fileExtension)) {
-                        throw new IllegalArgumentException("Unsupported content type: " + fileExtension);
-                    }
-
-                    if (!FileSignatureValidator.isImageSignature(byteArrayInputStream)) {
-                        throw new IllegalArgumentException("Not allowed image signature, Only JPG, JPEG and PNG");
-                    }
-
-                    String formattedKey = String.format("%s/%s/%s%s", fileType, id, UUID.randomUUID(), fileExtension);
-                    fileUrls.add(formattedKey);
-
-                    try ( ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes)) {
-                        s3Client.putObject(
-                            PutObjectRequest.builder()
-                                .key(formattedKey)
-                                .bucket(s3ConfigProperties.getBucketName())
-                                .contentType(getFileMimeType(fileExtension))
-                                .build(),
-                            RequestBody.fromInputStream(inputStream, bytes.length)
-                        );
-                    }
-
-                } catch (IOException ioException) {
-                    throw new RuntimeException("Failed to upload file: ", ioException);
-                }
-
-            });
 
         return new S3FileUrlResponseDto(urlKey, fileUrls.get(0));
 
