@@ -6,7 +6,6 @@ import com.danjitalk.danjitalk.domain.community.feed.entity.Feed;
 import com.danjitalk.danjitalk.domain.user.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -38,9 +37,11 @@ public class Comment extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
-    @Builder
-    public Comment(Long id, Comment parent, String contents, Feed feed, Member member) {
-        this.id = id;
+    public static Comment createComment(String contents, Comment parent, Feed feed, Member member) {
+        return new Comment(contents, parent, feed, member);
+    }
+
+    private Comment(String contents, Comment parent, Feed feed, Member member) {
         this.contents = contents;
         this.associateFeed(feed);
         this.associateParentComment(parent);
@@ -50,7 +51,7 @@ public class Comment extends BaseEntity {
     /**
      * 연관관계 설정
      * */
-    public void associateParentComment(Comment parentComment) {
+    private void associateParentComment(Comment parentComment) {
 
         // 부모가 없을때(첫 댓글)
         if(parentComment == null) {
@@ -65,7 +66,7 @@ public class Comment extends BaseEntity {
         parentComment.getChildrenList().add(this);
     }
 
-    public void associateFeed(Feed feed) {
+    private void associateFeed(Feed feed) {
 
         if(feed == null) {
             throw new BadRequestException("Feed is null");
@@ -75,7 +76,7 @@ public class Comment extends BaseEntity {
         feed.getCommentList().add(this);
     }
 
-    public void associateMember(Member member) {
+    private void associateMember(Member member) {
         if(member == null) {
             throw new BadRequestException("Member is null");
         }

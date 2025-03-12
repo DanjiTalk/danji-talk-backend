@@ -4,7 +4,6 @@ import com.danjitalk.danjitalk.common.exception.BadRequestException;
 import com.danjitalk.danjitalk.common.exception.DataNotFoundException;
 import com.danjitalk.danjitalk.common.util.SecurityContextHolderUtil;
 import com.danjitalk.danjitalk.domain.community.comment.dto.request.CreateCommentRequestDto;
-import com.danjitalk.danjitalk.domain.community.comment.dto.request.GetCommentRequestDto;
 import com.danjitalk.danjitalk.domain.community.comment.dto.request.UpdateCommentRequestDto;
 import com.danjitalk.danjitalk.domain.community.comment.dto.response.GetCommentResponseDto;
 import com.danjitalk.danjitalk.domain.community.comment.dto.response.PageResponseDto;
@@ -35,23 +34,23 @@ public class CommentService {
     /**
      * 댓글 조회 재귀 호출
      * */
-    public PageResponseDto<GetCommentResponseDto> getComments(GetCommentRequestDto getCommentRequestDto) {
+    public PageResponseDto<GetCommentResponseDto> getComments(Long feedId, Integer page, Integer size) {
 
-        Pageable pageRequest = PageRequest.of(getCommentRequestDto.page(), getCommentRequestDto.size());
+        Pageable pageRequest = PageRequest.of(page, size);
 
-        Page<Comment> page = commentRepository.findAllByFeedId(getCommentRequestDto.feedId(), pageRequest);
+        Page<Comment> pageComment = commentRepository.findAllByFeedId(feedId, pageRequest);
 
         // 부모 댓글만 조회 후 -> 대댓글 조회
-        List<GetCommentResponseDto> list = page.stream()
+        List<GetCommentResponseDto> list = pageComment.stream()
                 .map(comment -> this.converToDto(comment))
                 .toList();
 
         return new PageResponseDto<GetCommentResponseDto>(
                 list,
-                page.getNumber(),
-                page.getSize(),
-                page.getTotalElements(),
-                page.getTotalPages()
+                pageComment.getNumber(),
+                pageComment.getSize(),
+                pageComment.getTotalElements(),
+                pageComment.getTotalPages()
         );
     }
 
@@ -70,13 +69,7 @@ public class CommentService {
 
         Member member = memberRepository.findById(SecurityContextHolderUtil.getMemberId()).orElseThrow(() -> new DataNotFoundException());
 
-        Comment comment = Comment.builder()
-                .contents(createCommentRequestDto.contents())
-                .feed(feed)
-                .parent(parentComment)
-                .member(member)
-                .build();
-
+        Comment comment = Comment.createComment(createCommentRequestDto.contents(), parentComment, feed, member);
         commentRepository.save(comment);
     }
 
