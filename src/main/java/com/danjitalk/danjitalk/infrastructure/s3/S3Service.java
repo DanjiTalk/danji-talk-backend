@@ -1,9 +1,9 @@
 package com.danjitalk.danjitalk.infrastructure.s3;
 
 import com.danjitalk.danjitalk.common.util.FileSignatureValidator;
-import com.danjitalk.danjitalk.domain.community.feed.enums.FeedType;
 import com.danjitalk.danjitalk.domain.s3.dto.response.S3FileUrlResponseDto;
 import com.danjitalk.danjitalk.domain.s3.dto.response.S3ObjectResponseDto;
+import com.danjitalk.danjitalk.domain.s3.enums.FileType;
 import com.danjitalk.danjitalk.infrastructure.s3.properties.S3ConfigProperties;
 import io.jsonwebtoken.lang.Objects;
 import lombok.RequiredArgsConstructor;
@@ -77,13 +77,12 @@ public class S3Service {
 
     /**
      * S3 파일 멀티 업로드
-     * @param id ID값
      * @param fileType feed, MemberImg 등 파일 형식
      * @param multipartFileList 멀티파트파일
      * @return String {fileType}/{id}
      * */
-    public S3FileUrlResponseDto uploadFiles(String id, FeedType fileType, List<MultipartFile> multipartFileList) {
-
+    public S3FileUrlResponseDto uploadFiles(FileType fileType, List<MultipartFile> multipartFileList) {
+        String id = UUID.randomUUID().toString();
         String urlKey = String.format("%s/%s", fileType.toString().toLowerCase(), id);
         List<String> fileUrls = new ArrayList<>();
 

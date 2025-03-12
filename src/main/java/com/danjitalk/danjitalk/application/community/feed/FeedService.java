@@ -11,6 +11,7 @@ import com.danjitalk.danjitalk.domain.community.feed.dto.response.*;
 import com.danjitalk.danjitalk.domain.community.feed.entity.Feed;
 import com.danjitalk.danjitalk.domain.s3.dto.response.S3FileUrlResponseDto;
 import com.danjitalk.danjitalk.domain.s3.dto.response.S3ObjectResponseDto;
+import com.danjitalk.danjitalk.domain.s3.enums.FileType;
 import com.danjitalk.danjitalk.domain.user.member.dto.response.FeedMemberResponseDto;
 import com.danjitalk.danjitalk.domain.user.member.entity.Member;
 import com.danjitalk.danjitalk.infrastructure.repository.apartment.ApartmentRepository;
@@ -125,8 +126,7 @@ public class FeedService {
 
         // 파일이 있으면 S3에 업로드
         if(multipartFileList != null && !multipartFileList.isEmpty()) {
-            String randomUUID = UUID.randomUUID().toString();
-            s3FileUrlResponseDto = s3Service.uploadFiles(randomUUID, createFeedRequestDto.feedType(), multipartFileList);
+            s3FileUrlResponseDto = s3Service.uploadFiles(FileType.fromFeedType(createFeedRequestDto.feedType()), multipartFileList);
         }
 
         Member member = memberRepository.findById(SecurityContextHolderUtil.getMemberId()).orElseThrow(() -> new DataNotFoundException());
@@ -189,7 +189,7 @@ public class FeedService {
         if(!Objects.isEmpty(multipartFileList)) {
             // S3 스토리지에 남은 데이터가 없으면 새로 업데이트 + feed entity 에 설정, 있으면 파일만 추가
             if(feed.getFileUrl() == null) {
-                S3FileUrlResponseDto s3FileUrlResponseDto = s3Service.uploadFiles(UUID.randomUUID().toString(), feed.getFeedType(), multipartFileList);
+                S3FileUrlResponseDto s3FileUrlResponseDto = s3Service.uploadFiles(FileType.fromFeedType(feed.getFeedType()), multipartFileList);
 
                 if(s3FileUrlResponseDto != null) {
                     feed.setFileUrl(s3FileUrlResponseDto.fileUrl());
