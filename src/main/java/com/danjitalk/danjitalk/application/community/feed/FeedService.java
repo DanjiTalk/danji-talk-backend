@@ -25,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -44,9 +45,9 @@ public class FeedService {
      * 피드 목록 조회
      * limit 15, cursorDate 필요
      * */
-    public FeedListDto getFeedList(GetFeedListRequestDto requestDto) {
+    public FeedListDto getFeedList(Long apartmentId, LocalDateTime cursorDate) {
 
-        List<ProjectionFeedDto> projectionFeedList = feedRepository.getProjectionFeedList(requestDto).orElseThrow(() -> new IllegalArgumentException("No feeds found"));
+        List<ProjectionFeedDto> projectionFeedList = feedRepository.getProjectionFeedList(apartmentId, cursorDate).orElseThrow(() -> new IllegalArgumentException("No feeds found"));
 
         ProjectionFeedDto lastIndexFeedDto = projectionFeedList.get(projectionFeedList.size() - 1);
 
