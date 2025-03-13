@@ -58,9 +58,9 @@ public class CommentService {
      * 댓글 작성
      * */
     @Transactional
-    public void createComment(CreateCommentRequestDto createCommentRequestDto) {
+    public void createComment(Long feedId, CreateCommentRequestDto createCommentRequestDto) {
 
-        Feed feed = feedRepository.findById(createCommentRequestDto.feedId()).orElseThrow(() -> new DataNotFoundException());
+        Feed feed = feedRepository.findById(feedId).orElseThrow(() -> new DataNotFoundException());
 
         Comment parentComment = null;
         if (createCommentRequestDto.parentId() != null) {
@@ -77,9 +77,13 @@ public class CommentService {
      * 댓글 수정
      * */
     @Transactional
-    public void updateComment(Long commentId, UpdateCommentRequestDto updateCommentRequestDto) {
+    public void updateComment(Long feedId, Long commentId, UpdateCommentRequestDto updateCommentRequestDto) {
 
         Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new DataNotFoundException());
+
+        if(!feedId.equals(comment.getFeed().getId())) {
+            throw new BadRequestException("Not match comment id.");
+        }
 
         Long memberId = SecurityContextHolderUtil.getMemberId();
 
@@ -91,9 +95,13 @@ public class CommentService {
     }
 
     @Transactional
-    public void deleteComment(Long commentId) {
+    public void deleteComment(Long feedId, Long commentId) {
 
         Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new DataNotFoundException());
+
+        if(!feedId.equals(comment.getFeed().getId())) {
+            throw new BadRequestException("Not match comment id.");
+        }
 
         Long memberId = SecurityContextHolderUtil.getMemberId();
 
