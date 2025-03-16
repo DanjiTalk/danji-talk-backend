@@ -9,15 +9,18 @@ import com.danjitalk.danjitalk.domain.community.feed.dto.response.CreateFeedResp
 import com.danjitalk.danjitalk.domain.community.feed.dto.response.FeedDetailResponseDto;
 import com.danjitalk.danjitalk.domain.community.feed.dto.response.FeedListDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/community/feed")
+@RequestMapping("/api/community/feeds")
 public class FeedController {
 
     private final FeedService feedService;
@@ -43,7 +46,7 @@ public class FeedController {
             @RequestPart("requestDto") CreateFeedRequestDto requestDto,
             @RequestPart(value = "multipartFileList", required = false) List<MultipartFile> multipartFileList
             ) {
-        return ResponseEntity.ok(ApiResponse.success(200, null, feedService.save(requestDto, multipartFileList)));
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(201, null, feedService.save(requestDto, multipartFileList)));
     }
 
     /**
@@ -71,12 +74,12 @@ public class FeedController {
     @DeleteMapping("/{feedId}")
     public ResponseEntity<ApiResponse<Void>> deleteFeed(@PathVariable Long feedId) {
         feedService.deleteFeed(feedId);
-        return ResponseEntity.ok(ApiResponse.success(200, null, null));
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ApiResponse.success(204, null, null));
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<FeedListDto>> getFeedList(@RequestBody GetFeedListRequestDto requestDto) {
-        return ResponseEntity.ok(ApiResponse.success(200, null, feedService.getFeedList(requestDto)));
+    public ResponseEntity<ApiResponse<FeedListDto>> getFeedList(@RequestParam Long apartmentId, @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorDate) {
+        return ResponseEntity.ok(ApiResponse.success(200, null, feedService.getFeedList(apartmentId, cursorDate)));
     }
 
 }

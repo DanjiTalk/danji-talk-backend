@@ -33,7 +33,7 @@ public class FeedCustomRepositoryImpl implements FeedCustomRepository {
     }
 
     @Override
-    public Optional<List<ProjectionFeedDto>> getProjectionFeedList(GetFeedListRequestDto requestDto) {
+    public Optional<List<ProjectionFeedDto>> getProjectionFeedList(Long apartmentId, LocalDateTime cursorDate) {
 
         return Optional.ofNullable(queryFactory.select(
                 new QProjectionFeedDto(
@@ -50,8 +50,8 @@ public class FeedCustomRepositoryImpl implements FeedCustomRepository {
                 .from(feed)
                 .leftJoin(feed.member, member)
                 .where(
-                        apartmentIdEq(requestDto.apartmentId()),
-                        cursorDateGt(requestDto.cursorDate())
+                        apartmentIdEq(apartmentId),
+                        cursorDateGt(cursorDate)
                 )
                 .orderBy(feed.createdAt.desc())
                 .limit(15)
