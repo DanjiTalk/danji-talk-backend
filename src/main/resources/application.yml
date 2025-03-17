@@ -93,3 +93,7 @@ jwt:
   secret:
     access: ${ACCESS_SECRET:test}
     refresh: ${REFRESH_SECRET:test}
+
+# 스케줄러 on / off
+scheduler:
+  enabled: false
