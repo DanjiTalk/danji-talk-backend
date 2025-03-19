@@ -5,12 +5,15 @@ import com.danjitalk.danjitalk.domain.apartment.dto.ApartmentRegisterResponse;
 import com.danjitalk.danjitalk.domain.apartment.entity.Apartment;
 import com.danjitalk.danjitalk.domain.s3.dto.response.S3FileUrlResponseDto;
 import com.danjitalk.danjitalk.domain.s3.enums.FileType;
+import com.danjitalk.danjitalk.event.dto.GroupChatCreateEvent;
 import com.danjitalk.danjitalk.infrastructure.repository.apartment.ApartmentRepository;
 import com.danjitalk.danjitalk.infrastructure.s3.S3Service;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -20,9 +23,16 @@ public class ApartmentService {
 
     private final ApartmentRepository apartmentRepository;
     private final S3Service s3Service;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
+    /**
+     * 아파트 단지 등록
+     * @param request
+     * @param multipartFileList
+     * @return
+     */
+    @Transactional
     public ApartmentRegisterResponse registerApartment(ApartmentRegisterRequest request, List<MultipartFile> multipartFileList) {
-
         // 파일이 10개 이상이면 Exception
         if(multipartFileList != null && multipartFileList.size() > 10) {
             throw new IllegalArgumentException("More than 10 Files");
@@ -55,6 +65,8 @@ public class ApartmentService {
                 .build();
 
         apartmentRepository.save(apartment);
+
+        applicationEventPublisher.publishEvent(new GroupChatCreateEvent(request.name()));
 
         return ApartmentRegisterResponse.builder()
                 .id(apartment.getId())
