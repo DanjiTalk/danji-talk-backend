@@ -3,14 +3,16 @@ package com.danjitalk.danjitalk.infrastructure.scheduler.community;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.Cursor;
+import org.jooq.DSLContext;
+import org.jooq.Query;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+
+import static com.danjitalk.danjitalk.generated.tables.Feed.FEED;
 
 @Component
 @Slf4j
@@ -19,6 +21,7 @@ public class ReactionScheduleJob {
 
     private final RedisTemplate<String, String> redisTemplate;
     private final EntityManager entityManager;
+    private final DSLContext dslContext;
 
     // 30초마다 실행
     @Scheduled(fixedRate = 30000)
@@ -34,27 +37,32 @@ public class ReactionScheduleJob {
 
     /**
      * 좋아요 갯수 업데이트, JOOQ 사용 Bulk Update
+     * 현재 데이터가 많아도 배치사이즈를 두지않음. 나중에 필요 시 배치사이즈 이용
      * */
     private void bulkUpdateReactionCount() {
 
-        ScanOptions scanOptions = ScanOptions.scanOptions().match("reaction:count:*").count(1000).build();
         Map<Long, Long> reactionCountMap = new HashMap<Long, Long>();
 
-        try(Cursor<String> cursor = redisTemplate.opsForSet().scan("reaction:count", scanOptions)) {
+        Set<String> keys = redisTemplate.keys("reaction:count:*");
 
-            while (cursor.hasNext()) {
-                String key = cursor.next();        // 키 값 추출
+        if(keys.isEmpty()) return;
 
-                Long feedId = Long.parseLong(key.replace("reaction:count:", ""));
-                Long count = Long.parseLong(Objects.requireNonNull(redisTemplate.opsForValue().get(key)));
+        for (String key : keys) {
+            Long feedId = Long.parseLong(key.replace("reaction:count:", ""));
+            Long count = Long.parseLong(Objects.requireNonNull(redisTemplate.opsForValue().get(key)));
 
-                reactionCountMap.put(feedId, count);
-            }
-        } catch(Exception e) {
-            log.error(e.getMessage(), e);
+            reactionCountMap.put(feedId, count);
         }
 
-        // TODO :: bulk update
+        // Bulk Update
+        List<Query> list = reactionCountMap.entrySet().stream()
+                .map(entry -> (Query) dslContext
+                        .update(FEED)
+                        .set(FEED.REACTION_COUNT, entry.getValue().intValue())
+                        .where(FEED.ID.eq(entry.getKey()))
+                ).toList();
+
+        dslContext.batch(list).execute();
 
         // 데이터 삭제
         redisTemplate.delete(reactionCountMap.keySet()
