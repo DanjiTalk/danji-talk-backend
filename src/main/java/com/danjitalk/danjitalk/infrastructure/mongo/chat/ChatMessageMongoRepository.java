@@ -5,6 +5,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ChatMongoRepository extends MongoRepository<ChatMessage, String> {
+public interface ChatMessageMongoRepository extends MongoRepository<ChatMessage, String> {
 
 }
