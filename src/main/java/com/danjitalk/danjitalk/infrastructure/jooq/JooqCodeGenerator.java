@@ -39,8 +39,9 @@ public class JooqCodeGenerator {
                                 .withIncludes("feed|reaction")
                                 .withInputSchema(schemaName))
                         .withTarget(new Target()
-                                .withPackageName("com.danjitalk.danjitalk.generated")
-                                .withDirectory("build/generated/sources/jooq"))));
+                                .withDirectory("src/main/java")
+                                .withPackageName("com.danjitalk.danjitalk.infrastructure.jooq.table")
+                        )));
 
         log.info("Jooq code generation finished.");
     }

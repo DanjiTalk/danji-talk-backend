@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
-import static com.danjitalk.danjitalk.generated.tables.Feed.FEED;
+import static com.danjitalk.danjitalk.infrastructure.jooq.table.Tables.FEED;
 
 @Component
 @Slf4j
