@@ -90,6 +90,6 @@ jar {
 
 sourceSets {
 	main {
-		java.srcDirs("build/generated/sources/jooq")
+		java.srcDirs("src/main/java/com/danjitalk/danjitalk/infrastructure/scheduler/jooq")
 	}
 }
