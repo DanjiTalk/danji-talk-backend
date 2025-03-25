@@ -28,29 +28,4 @@ public class Reaction {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @Builder
-    public Reaction(ReactionType reactionType, Feed feed, Member member) {
-        this.reactionType = reactionType;
-        this.associateFeed(feed);
-        this.associateMember(member);
-    }
-    
-    /**
-     * 연관관계 세팅
-     * */
-    public void associateFeed(Feed feed) {
-
-        if(feed == null) return;
-
-        this.feed = feed;
-        feed.getReactionList().add(this);
-    }
-
-    public void associateMember(Member member) {
-        if(member == null) return;
-
-        this.member = member;
-    }
-
-
 }
