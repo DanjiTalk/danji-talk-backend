@@ -1,6 +1,6 @@
 package com.danjitalk.danjitalk.infrastructure.scheduler.community;
 
-import jakarta.persistence.EntityManager;
+import com.danjitalk.danjitalk.domain.community.reaction.enums.ReactionType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.DSLContext;
@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 
 import static com.danjitalk.danjitalk.infrastructure.jooq.table.Tables.FEED;
+import static com.danjitalk.danjitalk.infrastructure.jooq.table.Tables.REACTION;
 
 @Component
 @Slf4j
@@ -20,7 +21,6 @@ import static com.danjitalk.danjitalk.infrastructure.jooq.table.Tables.FEED;
 public class ReactionScheduleJob {
 
     private final RedisTemplate<String, String> redisTemplate;
-    private final EntityManager entityManager;
     private final DSLContext dslContext;
 
     // 30초마다 실행
@@ -62,24 +62,49 @@ public class ReactionScheduleJob {
                         .where(FEED.ID.eq(entry.getKey()))
                 ).toList();
 
-        dslContext.batch(list).execute();
+        try {
+            dslContext.batch(list).execute();
 
-        // 데이터 삭제
-        redisTemplate.delete(reactionCountMap.keySet()
-                .stream()
-                .map(feedId -> "reaction:count:" + feedId)
-                .toList()
-        );
+            // 데이터 삭제
+            redisTemplate.delete(reactionCountMap.keySet()
+                    .stream()
+                    .map(feedId -> "reaction:count:" + feedId)
+                    .toList()
+            );
+        } catch (Exception e) {
+            log.error("reaction count update failed", e);
+        }
     }
 
     /**
      * 좋아요 한 유저, JPA Persist() 사용 Bulk insert
      * */
-    private void bulkInsertReaction() {
+    public void bulkInsertReaction() {
         Set<String> keys1 = redisTemplate.keys("reaction:user:*");
 
+        if(keys1.isEmpty()) return;
+
+        List<Query> list = new ArrayList<>();
+
+        keys1.forEach(key -> {
+            Long feedId = Long.parseLong(key.replace("reaction:user:", ""));
+            Long memberId = Long.parseLong(Objects.requireNonNull(redisTemplate.opsForValue().get(key)));
+
+            list.add(
+                    dslContext.insertInto(REACTION)
+                            .set(REACTION.REACTION_TYPE, ReactionType.LIKE)
+                            .set(REACTION.FEED_ID, feedId)
+                            .set(REACTION.MEMBER_ID, memberId)
+            );
+        });
+
+        dslContext.batch(list).execute();
+
         // 데이터 삭제
-        redisTemplate.delete(keys1);
+        redisTemplate.delete(keys1
+                .stream()
+                .toList()
+        );
     }
 
     /**
@@ -87,6 +112,8 @@ public class ReactionScheduleJob {
      * */
     private void bulkDeleteReaction() {
         Set<String> keys1 = redisTemplate.keys("reaction:user:*");
+
+        if(keys1.isEmpty()) return;
 
         // 데이터 삭제
         redisTemplate.delete(keys1);
