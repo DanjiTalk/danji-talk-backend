@@ -4,6 +4,7 @@
 package com.danjitalk.danjitalk.infrastructure.jooq.table.tables;
 
 
+import com.danjitalk.danjitalk.domain.community.reaction.enums.ReactionType;
 import com.danjitalk.danjitalk.infrastructure.jooq.table.Keys;
 import com.danjitalk.danjitalk.infrastructure.jooq.table.Test;
 import com.danjitalk.danjitalk.infrastructure.jooq.table.tables.records.ReactionRecord;
@@ -26,6 +27,7 @@ import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
+import org.jooq.impl.AutoConverter;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
@@ -70,7 +72,7 @@ public class Reaction extends TableImpl<ReactionRecord> {
     /**
      * The column <code>test.reaction.reaction_type</code>.
      */
-    public final TableField<ReactionRecord, String> REACTION_TYPE = createField(DSL.name("reaction_type"), SQLDataType.VARCHAR(4).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
+    public final TableField<ReactionRecord, ReactionType> REACTION_TYPE = createField(DSL.name("reaction_type"), SQLDataType.VARCHAR(4).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "", new AutoConverter<String, ReactionType>(String.class, ReactionType.class));
 
     private Reaction(Name alias, Table<ReactionRecord> aliased) {
         this(alias, aliased, null);
@@ -181,14 +183,14 @@ public class Reaction extends TableImpl<ReactionRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Row4<Long, Long, Long, String> fieldsRow() {
+    public Row4<Long, Long, Long, ReactionType> fieldsRow() {
         return (Row4) super.fieldsRow();
     }
 
     /**
      * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
      */
-    public <U> SelectField<U> mapping(Function4<? super Long, ? super Long, ? super Long, ? super String, ? extends U> from) {
+    public <U> SelectField<U> mapping(Function4<? super Long, ? super Long, ? super Long, ? super ReactionType, ? extends U> from) {
         return convertFrom(Records.mapping(from));
     }
 
@@ -196,7 +198,7 @@ public class Reaction extends TableImpl<ReactionRecord> {
      * Convenience mapping calling {@link SelectField#convertFrom(Class,
      * Function)}.
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function4<? super Long, ? super Long, ? super Long, ? super String, ? extends U> from) {
+    public <U> SelectField<U> mapping(Class<U> toType, Function4<? super Long, ? super Long, ? super Long, ? super ReactionType, ? extends U> from) {
         return convertFrom(toType, Records.mapping(from));
     }
 }

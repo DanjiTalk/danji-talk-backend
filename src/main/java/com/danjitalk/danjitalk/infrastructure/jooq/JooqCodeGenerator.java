@@ -9,6 +9,8 @@ import org.jooq.meta.jaxb.*;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Slf4j
 @RequiredArgsConstructor
 @EnableConfigurationProperties(JooqDataSourceProperties.class)
@@ -37,7 +39,14 @@ public class JooqCodeGenerator {
                         .withDatabase(new Database()
                                 .withName(databaseName)
                                 .withIncludes("feed|reaction")
-                                .withInputSchema(schemaName))
+                                .withInputSchema(schemaName)
+                                // enum 처리
+                                .withForcedTypes(List.of(
+                                        new ForcedType()
+                                                .withUserType("com.danjitalk.danjitalk.domain.community.reaction.enums.ReactionType")
+                                                .withIncludeExpression("reaction\\.reaction_type")
+                                ))
+                        )
                         .withTarget(new Target()
                                 .withDirectory("src/main/java")
                                 .withPackageName("com.danjitalk.danjitalk.infrastructure.jooq.table")
