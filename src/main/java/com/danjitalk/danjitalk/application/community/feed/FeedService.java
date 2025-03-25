@@ -68,7 +68,8 @@ public class FeedService {
                         projectionFeedDto.localDateTime(),
                         projectionFeedDto.reactionCount(),
                         projectionFeedDto.commentCount(),
-                        thumbnailFileUrl
+                        thumbnailFileUrl,
+                        projectionFeedDto.isReacted()
                 );
             }
         ).toList();
@@ -88,6 +89,7 @@ public class FeedService {
         }
 
         Feed feed = feedRepository.findFeedFetchJoinMemberByFeedId((feedId)).orElseThrow(DataNotFoundException::new);
+        Boolean reacted = feedRepository.isReacted(feedId, feed.getMember().getId());
 
         List<S3ObjectResponseDto> s3ObjectResponseDtoList = Optional.ofNullable(feed.getFileUrl()).map(url -> s3Service.getS3Object(url)).orElseGet(Collections::emptyList);
 
@@ -100,7 +102,8 @@ public class FeedService {
                         feed.getMember().getId(),
                         feed.getMember().getNickname()
                 ),
-                s3ObjectResponseDtoList
+                s3ObjectResponseDtoList,
+                reacted
         );
     }
 

@@ -12,7 +12,8 @@ public record FeedDetailResponseDto(
         String contents,
         LocalDateTime createdAt,
         FeedMemberResponseDto feedMemberResponseDto,
-        List<S3ObjectResponseDto> s3ObjectResponseDtoList
+        List<S3ObjectResponseDto> s3ObjectResponseDtoList,
+        Boolean isReacted
         )
 {
 }

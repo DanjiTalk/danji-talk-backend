@@ -5,8 +5,10 @@ import com.danjitalk.danjitalk.domain.community.feed.dto.request.GetFeedListRequ
 import com.danjitalk.danjitalk.domain.community.feed.dto.response.ProjectionFeedDto;
 import com.danjitalk.danjitalk.domain.community.feed.dto.response.QProjectionFeedDto;
 import com.danjitalk.danjitalk.domain.community.feed.entity.Feed;
+import com.danjitalk.danjitalk.domain.community.reaction.entity.QReaction;
 import com.danjitalk.danjitalk.infrastructure.repository.community.feed.FeedCustomRepository;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 
@@ -15,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.danjitalk.danjitalk.domain.community.feed.entity.QFeed.feed;
+import static com.danjitalk.danjitalk.domain.community.reaction.entity.QReaction.reaction;
 import static com.danjitalk.danjitalk.domain.user.member.entity.QMember.member;
 
 @RequiredArgsConstructor
@@ -27,6 +30,7 @@ public class FeedCustomRepositoryImpl implements FeedCustomRepository {
         return Optional.ofNullable(queryFactory
                 .selectFrom(feed)
                 .join(feed.member, member).fetchJoin()
+                .join(feed.reactionList, reaction).fetchJoin()
                 .where(feed.id.eq(feedId))
                 .fetchOne()
         );
@@ -45,7 +49,14 @@ public class FeedCustomRepositoryImpl implements FeedCustomRepository {
                         feed.createdAt.as("localDateTime"),
                         feed.reactionCount.as("reactionCount"),
                         feed.commentCount.as("commentCount"),
-                        feed.thumbnailFileUrl.as("thumbnailFileUrl")
+                        feed.thumbnailFileUrl.as("thumbnailFileUrl"),
+                        JPAExpressions
+                                .selectOne()
+                                .from(reaction)
+                                .where(
+                                        reaction.feed.id.eq(feed.id),
+                                        reaction.member.id.eq(member.id)
+                                ).exists().as("isReacted")
                 ))
                 .from(feed)
                 .leftJoin(feed.member, member)
@@ -56,6 +67,15 @@ public class FeedCustomRepositoryImpl implements FeedCustomRepository {
                 .orderBy(feed.createdAt.desc())
                 .limit(15)
                 .fetch());
+    }
+
+    @Override
+    public Boolean isReacted(Long feedId, Long memberId) {
+        return queryFactory
+                .selectOne()
+                .from(reaction)
+                .where(reaction.feed.id.eq(feedId), reaction.member.id.eq(memberId))
+                .fetchFirst() != null;
     }
 
     private BooleanExpression apartmentIdEq(Long apartmentId) {

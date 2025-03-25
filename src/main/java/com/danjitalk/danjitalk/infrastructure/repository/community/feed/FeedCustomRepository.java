@@ -13,4 +13,6 @@ public interface FeedCustomRepository {
     Optional<Feed> findFeedFetchJoinMemberByFeedId(Long feedId);
 
     Optional<List<ProjectionFeedDto>> getProjectionFeedList(Long apartmentId, LocalDateTime cursorDate);
+
+    Boolean isReacted(Long feedId, Long memberId);
 }
