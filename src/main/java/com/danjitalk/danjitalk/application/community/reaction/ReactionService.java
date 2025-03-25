@@ -53,7 +53,7 @@ public class ReactionService {
 
         Boolean exists = redisTemplate.opsForSet().isMember(userSetKey, memberId);
 
-        // 레디스에 유저가 있으면 값 감소, 레디스 SET 에서 삭제
+        // 레디스에 유저가 있으면 값 감소, 레디스 SET 에서 삭제, 스케쥴링이 돌기 전 다시 해제 했을때
         if(Boolean.TRUE.equals(exists)) {
             redisTemplate.opsForValue().decrement(countKey);
             redisTemplate.opsForSet().remove(userSetKey, memberId);

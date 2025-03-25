@@ -43,11 +43,11 @@ public class ReactionScheduleJob {
 
         Map<Long, Long> reactionCountMap = new HashMap<Long, Long>();
 
-        Set<String> keys = redisTemplate.keys("reaction:count:*");
+        Set<String> countKeys = redisTemplate.keys("reaction:count:*");
 
-        if(keys.isEmpty()) return;
+        if(countKeys.isEmpty()) return;
 
-        for (String key : keys) {
+        for (String key : countKeys) {
             Long feedId = Long.parseLong(key.replace("reaction:count:", ""));
             Long count = Long.parseLong(Objects.requireNonNull(redisTemplate.opsForValue().get(key)));
 
@@ -80,13 +80,13 @@ public class ReactionScheduleJob {
      * 좋아요 한 유저, JPA Persist() 사용 Bulk insert
      * */
     public void bulkInsertReaction() {
-        Set<String> keys1 = redisTemplate.keys("reaction:user:*");
+        Set<String> userKeys = redisTemplate.keys("reaction:user:*");
 
-        if(keys1.isEmpty()) return;
+        if(userKeys.isEmpty()) return;
 
         List<Query> list = new ArrayList<>();
 
-        keys1.forEach(key -> {
+        userKeys.forEach(key -> {
             Long feedId = Long.parseLong(key.replace("reaction:user:", ""));
             Long memberId = Long.parseLong(Objects.requireNonNull(redisTemplate.opsForValue().get(key)));
 
@@ -98,25 +98,45 @@ public class ReactionScheduleJob {
             );
         });
 
-        dslContext.batch(list).execute();
+        try {
+            dslContext.batch(list).execute();
 
-        // 데이터 삭제
-        redisTemplate.delete(keys1
-                .stream()
-                .toList()
-        );
+            // 데이터 삭제
+            redisTemplate.delete(userKeys.stream().toList());
+        } catch (Exception e) {
+            log.error("reaction insert failed", e);
+        }
     }
 
     /**
      * 좋아요 해제 한 유저, JPA Persist() 사용 bulk delete
      * */
-    private void bulkDeleteReaction() {
-        Set<String> keys1 = redisTemplate.keys("reaction:user:*");
+    public void bulkDeleteReaction() {
+        Set<String> removeKeys = redisTemplate.keys("reaction:removeUser:*");
 
-        if(keys1.isEmpty()) return;
+        if(removeKeys.isEmpty()) return;
 
-        // 데이터 삭제
-        redisTemplate.delete(keys1);
+        List<Query> list = new ArrayList<>();
+
+        removeKeys.forEach(key -> {
+            Long feedId = Long.parseLong(key.replace("reaction:removeUser:", ""));
+            Long memberId = Long.parseLong(Objects.requireNonNull(redisTemplate.opsForValue().get(key)));
+
+            list.add(
+                    dslContext.deleteFrom(REACTION)
+                            .where(REACTION.FEED_ID.eq(feedId))
+                            .and(REACTION.MEMBER_ID.eq(memberId))
+            );
+        });
+
+        try {
+            dslContext.batch(list).execute();
+
+            redisTemplate.delete(removeKeys.stream().toList());
+        } catch (Exception e) {
+            log.error("reaction delete failed", e);
+        }
+
     }
 
 }
