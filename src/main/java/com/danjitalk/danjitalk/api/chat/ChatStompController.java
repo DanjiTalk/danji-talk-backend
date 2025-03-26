@@ -37,13 +37,9 @@ public class ChatStompController {
     @SubscribeMapping("/topic/chat/{roomId}") // /topic/chat/7
     public void joinChatroom(
         @DestinationVariable Long roomId,
-        SimpMessageHeaderAccessor accessor
+        StompHeaderAccessor accessor
     ) {
-        Principal principal = accessor.getUser();
-        UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) principal;
-        CustomMemberDetails customMemberDetails = (CustomMemberDetails) token.getPrincipal();
-        Long memberId = customMemberDetails.getUser().getMember().getId();
-        chatService.joinChatroom(memberId, roomId);
+        chatService.joinChatroom(roomId, accessor);
     }
 
     /**

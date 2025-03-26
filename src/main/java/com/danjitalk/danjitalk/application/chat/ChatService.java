@@ -15,6 +15,8 @@ import com.danjitalk.danjitalk.infrastructure.repository.user.member.MemberRepos
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +29,7 @@ public class ChatService {
     private final ChatroomMemberMappingRepository chatroomMemberMappingRepository;
     private final MemberRepository memberRepository;
     private final ChatMessageMongoRepository chatMessageMongoRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
     /**
      * 채팅방 생성 메소드
@@ -54,21 +57,34 @@ public class ChatService {
 
     /**
      * 채팅방 참여
-     * @param memberId
-     * @param chatroomId
+     * @param chatroomId 방 번호
+     * @param accessor StompHeader
      */
-    public void joinChatroom(Long memberId, Long chatroomId) {
-        log.info("memberId={}, chatroomId={}", memberId, chatroomId);
+    @Transactional
+    public void joinChatroom(Long chatroomId, StompHeaderAccessor accessor) {
+        String email = (String) accessor.getSessionAttributes().get("email");
+        String destination = accessor.getDestination();
+        Long memberId = (Long) accessor.getSessionAttributes().get("memberId");
+        log.info("memberId={}, chatroomId={}, destination: {}", memberId, chatroomId, destination);
+
+        Member member = memberRepository.findByEmail(email).orElseThrow();
         Chatroom chatroom = chatroomRepository.findById(chatroomId).orElseThrow();
-        Member member = memberRepository.findById(memberId).orElseThrow();
 
-        ChatroomMemberMapping chatroomMemberMapping = ChatroomMemberMapping.builder()
-                .chatroom(chatroom)
-                .member(member)
-                .chatroomName(chatroom.getName())
-                .build();
+        boolean isAlreadyInChatroom = chatroomMemberMappingRepository.existsByChatroomAndMember(chatroom, member);
+        log.info("isAlreadyInChatroom: {}", isAlreadyInChatroom);
+        if(!isAlreadyInChatroom) {
+            ChatroomMemberMapping chatroomMemberMapping = ChatroomMemberMapping.builder()
+                    .chatroom(chatroom)
+                    .member(member)
+                    .chatroomName(chatroom.getName())
+                    .build();
 
-        chatroomMemberMappingRepository.save(chatroomMemberMapping);
+            chatroomMemberMappingRepository.save(chatroomMemberMapping);
+
+            if (destination != null && destination.startsWith("/topic/chat/")) {
+                messagingTemplate.convertAndSend(destination, member.getNickname() + " 사용자가 입장했습니다.");
+            }
+        }
     }
 
     /**
