@@ -24,8 +24,7 @@ public class JooqCodeGenerator {
 
         String databaseName = "local".equals(profile) ? "org.jooq.meta.mariadb.MariaDBDatabase" : "org.jooq.meta.mysql.MySQLDatabase";
 
-        // 추가 필요
-        String schemaName = "local".equals(profile) ? "test" : "추가 필요";
+        String schemaName = "local".equals(profile) ? "test" : "danjitalk";
 
         Jdbc jdbcConfig = new Jdbc()
                 .withDriver(jooqDataSourceProperties.getDriverClassName())
@@ -52,6 +51,5 @@ public class JooqCodeGenerator {
                                 .withPackageName("com.danjitalk.danjitalk.infrastructure.jooq.table")
                         )));
 
-        log.info("Jooq code generation finished.");
     }
 }
