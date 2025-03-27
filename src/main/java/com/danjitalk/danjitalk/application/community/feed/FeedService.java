@@ -22,6 +22,7 @@ import com.danjitalk.danjitalk.infrastructure.s3.properties.S3ConfigProperties;
 import io.jsonwebtoken.lang.Objects;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -40,6 +41,7 @@ public class FeedService {
     private final MemberRepository memberRepository;
     private final ApartmentRepository apartmentRepository;
     private final S3ConfigProperties s3ConfigProperties;
+    private final RedisTemplate<String, String> redisTemplate;
 
     /**
      * 피드 목록 조회
@@ -89,7 +91,7 @@ public class FeedService {
         }
 
         Feed feed = feedRepository.findFeedFetchJoinMemberByFeedId((feedId)).orElseThrow(DataNotFoundException::new);
-        Boolean reacted = feedRepository.isReacted(feedId, feed.getMember().getId());
+        Boolean reacted = this.isReacted(feed.getId(), feed.getMember().getId());
 
         List<S3ObjectResponseDto> s3ObjectResponseDtoList = Optional.ofNullable(feed.getFileUrl()).map(url -> s3Service.getS3Object(url)).orElseGet(Collections::emptyList);
 
@@ -231,5 +233,19 @@ public class FeedService {
         }
 
         feedRepository.delete(feed);
+    }
+
+    /**
+     * 레디스, DB에 좋아요가 있는지 확인
+     * */
+    private Boolean isReacted(Long feedId, Long memberId) {
+        Boolean isUser = redisTemplate.opsForSet().isMember("reaction:user:" + feedId.toString(), memberId);
+        Boolean isRemoveUser = redisTemplate.opsForSet().isMember("reaction:removeUser:" + feedId.toString(), memberId);
+
+        if (Boolean.TRUE.equals(isUser) && Boolean.FALSE.equals(isRemoveUser)) {
+            return true;
+        } else {
+            return feedRepository.isReacted(feedId, memberId);
+        }
     }
 }
