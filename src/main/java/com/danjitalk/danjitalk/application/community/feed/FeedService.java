@@ -242,8 +242,8 @@ public class FeedService {
      * 레디스, DB에 좋아요가 있는지 확인
      * */
     private Boolean isReacted(Long feedId, Long memberId) {
-        Boolean isUser = redisTemplate.opsForSet().isMember("reaction:user:" + feedId.toString(), memberId);
-        Boolean isRemoveUser = redisTemplate.opsForSet().isMember("reaction:removeUser:" + feedId.toString(), memberId);
+        Boolean isUser = redisTemplate.opsForSet().isMember("reaction:user:" + feedId.toString(), memberId.toString());
+        Boolean isRemoveUser = redisTemplate.opsForSet().isMember("reaction:removeUser:" + feedId.toString(), memberId.toString());
 
         if (Boolean.TRUE.equals(isUser) && Boolean.FALSE.equals(isRemoveUser)) {
             return true;
