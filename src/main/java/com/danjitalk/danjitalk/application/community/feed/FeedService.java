@@ -5,7 +5,6 @@ import com.danjitalk.danjitalk.common.exception.DataNotFoundException;
 import com.danjitalk.danjitalk.common.util.SecurityContextHolderUtil;
 import com.danjitalk.danjitalk.domain.apartment.entity.Apartment;
 import com.danjitalk.danjitalk.domain.community.feed.dto.request.CreateFeedRequestDto;
-import com.danjitalk.danjitalk.domain.community.feed.dto.request.GetFeedListRequestDto;
 import com.danjitalk.danjitalk.domain.community.feed.dto.request.UpdateFeedRequestDto;
 import com.danjitalk.danjitalk.domain.community.feed.dto.response.*;
 import com.danjitalk.danjitalk.domain.community.feed.entity.Feed;
@@ -30,7 +29,6 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -49,7 +47,12 @@ public class FeedService {
      * */
     public FeedListDto getFeedList(Long apartmentId, LocalDateTime cursorDate) {
 
-        List<ProjectionFeedDto> projectionFeedList = feedRepository.getProjectionFeedList(apartmentId, cursorDate).orElseThrow(() -> new IllegalArgumentException("No feeds found"));
+        List<ProjectionFeedDto> projectionFeedList = feedRepository.getProjectionFeedList(apartmentId, cursorDate).orElse(Collections.emptyList());
+
+        // 비어있을땐 빈 데이터 반환
+        if(projectionFeedList.isEmpty()) {
+            return new FeedListDto(List.of(), LocalDateTime.now(), 0);
+        }
 
         ProjectionFeedDto lastIndexFeedDto = projectionFeedList.get(projectionFeedList.size() - 1);
 

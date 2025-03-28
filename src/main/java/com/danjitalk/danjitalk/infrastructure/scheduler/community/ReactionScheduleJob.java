@@ -88,14 +88,16 @@ public class ReactionScheduleJob {
 
         userKeys.forEach(key -> {
             Long feedId = Long.parseLong(key.replace("reaction:user:", ""));
-            Long memberId = Long.parseLong(Objects.requireNonNull(redisTemplate.opsForValue().get(key)));
 
-            list.add(
-                    dslContext.insertInto(REACTION)
-                            .set(REACTION.REACTION_TYPE, ReactionType.LIKE)
-                            .set(REACTION.FEED_ID, feedId)
-                            .set(REACTION.MEMBER_ID, memberId)
-            );
+            Objects.requireNonNull(redisTemplate.opsForSet().members(key)).forEach(memberId -> {
+                list.add(
+                        dslContext.insertInto(REACTION)
+                                .set(REACTION.REACTION_TYPE, ReactionType.LIKE)
+                                .set(REACTION.FEED_ID, feedId)
+                                .set(REACTION.MEMBER_ID, Long.parseLong(memberId))
+                );
+            });
+
         });
 
         try {
@@ -120,13 +122,14 @@ public class ReactionScheduleJob {
 
         removeKeys.forEach(key -> {
             Long feedId = Long.parseLong(key.replace("reaction:removeUser:", ""));
-            Long memberId = Long.parseLong(Objects.requireNonNull(redisTemplate.opsForValue().get(key)));
 
-            list.add(
-                    dslContext.deleteFrom(REACTION)
-                            .where(REACTION.FEED_ID.eq(feedId))
-                            .and(REACTION.MEMBER_ID.eq(memberId))
-            );
+            Objects.requireNonNull(redisTemplate.opsForSet().members(key)).forEach(memberId -> {
+                list.add(
+                        dslContext.deleteFrom(REACTION)
+                                .where(REACTION.FEED_ID.eq(feedId))
+                                .and(REACTION.MEMBER_ID.eq(Long.parseLong(memberId)))
+                );
+            });
         });
 
         try {
