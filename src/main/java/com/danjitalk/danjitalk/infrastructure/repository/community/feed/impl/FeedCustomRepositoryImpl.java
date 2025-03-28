@@ -1,11 +1,9 @@
 package com.danjitalk.danjitalk.infrastructure.repository.community.feed.impl;
 
 import com.danjitalk.danjitalk.common.exception.BadRequestException;
-import com.danjitalk.danjitalk.domain.community.feed.dto.request.GetFeedListRequestDto;
 import com.danjitalk.danjitalk.domain.community.feed.dto.response.ProjectionFeedDto;
 import com.danjitalk.danjitalk.domain.community.feed.dto.response.QProjectionFeedDto;
 import com.danjitalk.danjitalk.domain.community.feed.entity.Feed;
-import com.danjitalk.danjitalk.domain.community.reaction.entity.QReaction;
 import com.danjitalk.danjitalk.infrastructure.repository.community.feed.FeedCustomRepository;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
@@ -30,7 +28,7 @@ public class FeedCustomRepositoryImpl implements FeedCustomRepository {
         return Optional.ofNullable(queryFactory
                 .selectFrom(feed)
                 .join(feed.member, member).fetchJoin()
-                .join(feed.reactionList, reaction).fetchJoin()
+                .leftJoin(feed.reactionList, reaction).fetchJoin()
                 .where(feed.id.eq(feedId))
                 .fetchOne()
         );
