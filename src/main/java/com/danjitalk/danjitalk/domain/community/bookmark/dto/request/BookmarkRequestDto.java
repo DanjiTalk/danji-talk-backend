@@ -10,7 +10,7 @@ public record BookmarkRequestDto(
     /**
      * entity 변환
      * */
-    public static Bookmark toEntity(Long id, Long feedId, Long memberId) {
-        return new Bookmark(id, feedId, memberId);
+    public Bookmark toEntity(Long memberId) {
+        return new Bookmark(null, this.feedId, memberId);
     }
 }

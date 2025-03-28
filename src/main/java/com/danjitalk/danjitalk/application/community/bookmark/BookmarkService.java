@@ -41,7 +41,7 @@ public class BookmarkService {
             throw new IllegalArgumentException("Bookmark already exists");
         }
 
-        bookmarkRepository.save(BookmarkRequestDto.toEntity(null, feedId, memberId));
+        bookmarkRepository.save(bookmarkRequestDto.toEntity(memberId));
 
     }
     
