@@ -1,7 +1,7 @@
 package com.danjitalk.danjitalk.infrastructure.jooq;
 
 
-import com.danjitalk.danjitalk.infrastructure.jooq.properties.JooqDataSourceProperties;
+import com.danjitalk.danjitalk.infrastructure.jooq.properties.JooqProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.codegen.GenerationTool;
@@ -13,32 +13,27 @@ import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
-@EnableConfigurationProperties(JooqDataSourceProperties.class)
+@EnableConfigurationProperties(JooqProperties.class)
 @Component
 public class JooqCodeGenerator {
 
-    private final JooqDataSourceProperties jooqDataSourceProperties;
+    private final JooqProperties jooqProperties;
 
     public void codeGenerator() throws Exception {
-        String profile = System.getProperty("spring.profiles.active", "local");
-
-        String databaseName = "local".equals(profile) ? "org.jooq.meta.mariadb.MariaDBDatabase" : "org.jooq.meta.mysql.MySQLDatabase";
-
-        String schemaName = "local".equals(profile) ? "test" : "danjitalk";
 
         Jdbc jdbcConfig = new Jdbc()
-                .withDriver(jooqDataSourceProperties.getDriverClassName())
-                .withUrl(jooqDataSourceProperties.getUrl())
-                .withUser(jooqDataSourceProperties.getUsername())
-                .withPassword(jooqDataSourceProperties.getPassword());
+                .withDriver(jooqProperties.getDatasource().getDriverClassName())
+                .withUrl(jooqProperties.getDatasource().getUrl())
+                .withUser(jooqProperties.getDatasource().getUsername())
+                .withPassword(jooqProperties.getDatasource().getPassword());
 
         GenerationTool.generate(new Configuration()
                 .withJdbc(jdbcConfig)
                 .withGenerator(new Generator()
                         .withDatabase(new Database()
-                                .withName(databaseName)
+                                .withName(jooqProperties.getJooq().getSql())
                                 .withIncludes("feed|reaction")
-                                .withInputSchema(schemaName)
+                                .withInputSchema(jooqProperties.getJooq().getSchemaName())
                                 // enum 처리
                                 .withForcedTypes(List.of(
                                         new ForcedType()

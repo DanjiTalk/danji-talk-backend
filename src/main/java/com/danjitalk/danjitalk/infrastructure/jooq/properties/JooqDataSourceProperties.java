@@ -1,16 +1,19 @@
 package com.danjitalk.danjitalk.infrastructure.jooq.properties;
 
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-
-@Getter
-@Setter
-@ConfigurationProperties(prefix = "spring.datasource")
+//@Getter
+//@Setter
+//@ConfigurationProperties(prefix = "spring")
 public class JooqDataSourceProperties {
 
-    private String url;
-    private String username;
-    private String password;
-    private String driverClassName;
+    public static class JooqDataProperties {
+        private String datasourceUrl;
+        private String datasourceUsername;
+        private String datasourcePassword;
+        private String datasourceDriverClassName;
+    }
+
+    public static class JooqProperties {
+
+    }
+
 }

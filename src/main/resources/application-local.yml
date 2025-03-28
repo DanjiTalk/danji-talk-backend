@@ -9,12 +9,17 @@
 #  # JPA 기본 설정, 운영 시 update 나 none 설정
 #  jpa:
 #    hibernate:
-#      ddl-auto: create
+#      ddl-auto: update
 #    properties:
 #      hibernate:
 #        dialect: org.hibernate.dialect.MariaDBDialect
 #        format_sql: true
 #        show_sql: true
+#
+#  jooq:
+#    sql: org.jooq.meta.mariadb.MariaDBDatabase
+#    schema-name: test
+#
 #logging:
 #  level:
 #    org.hibernate.SQL: WARN  # 실행된 SQL 쿼리를 디버깅 로그로 확인
@@ -37,6 +42,11 @@ spring:
       hibernate:
         format_sql: true
         show_sql: true
+
+  jooq:
+    sql: org.jooq.meta.mysql.MySQLDatabase
+    schema-name: danjitalk
+
 logging:
   level:
     org.hibernate.SQL: info  # 실행된 SQL 쿼리를 디버깅 로그로 확인
