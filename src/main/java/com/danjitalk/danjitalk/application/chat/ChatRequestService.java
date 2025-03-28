@@ -26,6 +26,10 @@ public class ChatRequestService {
     public void requestChat(CreateChatRequest request) {
         Long currentId = SecurityContextHolderUtil.getMemberId();
 
+        if (currentId.equals(request.receiverId())) {
+            throw new BadRequestException("본인에게 보낼 수 없습니다.");
+        }
+
         // 이미 보낸 신청이 있는지 확인 (중복 방지)
         boolean exists = chatRequestRepository.existsByRequesterIdAndReceiverIdAndStatus(currentId, request.receiverId(), ChatRequestStatus.PENDING);
 
