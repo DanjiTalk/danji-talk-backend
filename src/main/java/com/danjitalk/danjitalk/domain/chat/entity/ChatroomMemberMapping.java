@@ -28,5 +28,6 @@ public class ChatroomMemberMapping {
         this.chatroom = chatroom;
         this.member = member;
         this.chatroomName = chatroomName;
+        chatroom.getChatroomMemberList().add(this);
     }
 }
