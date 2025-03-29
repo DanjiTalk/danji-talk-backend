@@ -1,5 +1,7 @@
 package com.danjitalk.danjitalk.application.chat;
 
+import com.danjitalk.danjitalk.common.exception.BadRequestException;
+import com.danjitalk.danjitalk.common.exception.ConflictException;
 import com.danjitalk.danjitalk.common.util.SecurityContextHolderUtil;
 import com.danjitalk.danjitalk.domain.chat.dto.CreateChatRequest;
 import com.danjitalk.danjitalk.domain.chat.entity.ChatRequest;
@@ -34,7 +36,7 @@ public class ChatRequestService {
         boolean exists = chatRequestRepository.existsByRequesterIdAndReceiverIdAndStatus(currentId, request.receiverId(), ChatRequestStatus.PENDING);
 
         if (exists) {
-            throw new IllegalStateException("이미 채팅 신청을 보냈습니다.");
+            throw new ConflictException("이미 채팅 신청을 보냈습니다.");
         }
 
         Member requester = memberRepository.findById(currentId).orElseThrow();
