@@ -1,9 +1,11 @@
 package com.danjitalk.danjitalk.application.chat;
 
 import com.danjitalk.danjitalk.common.exception.DataNotFoundException;
+import com.danjitalk.danjitalk.common.util.SecurityContextHolderUtil;
 import com.danjitalk.danjitalk.domain.chat.dto.ChatMessageRequest;
 import com.danjitalk.danjitalk.domain.chat.dto.ChatMessageResponse;
 import com.danjitalk.danjitalk.domain.chat.dto.MemberInformation;
+import com.danjitalk.danjitalk.domain.chat.dto.DirectChatResponse;
 import com.danjitalk.danjitalk.domain.chat.entity.ChatMessage;
 import com.danjitalk.danjitalk.domain.chat.entity.Chatroom;
 import com.danjitalk.danjitalk.domain.chat.entity.ChatroomMemberMapping;
@@ -124,5 +126,34 @@ public class ChatService {
                 .build();
 
         return chatMessageMongoRepository.save(chatMessage);
+    }
+
+    /**
+     * 1대1 채팅 목록 조회
+     */
+    @Transactional
+    public List<DirectChatResponse> getDirectChatList() {
+        Long currentId = SecurityContextHolderUtil.getMemberId();
+        return chatroomMemberMappingRepository.findChatroomMemberMappingWithMemberAndChatroomByMemberId(currentId)
+                .stream()
+                .map(chatroomMemberMapping -> {
+                    Long roomId = chatroomMemberMapping.getChatroom().getId();
+                    return chatMessageMongoRepository.findTopByChatroomIdOrderByCreatedAtDesc(roomId)
+                        .map(chatMessage ->
+                            new DirectChatResponse(
+                                roomId,
+                                MemberInformation.from(chatroomMemberMapping.getMember()),
+                                chatMessage.getMessage(),
+                                chatMessage.getCreatedAt()
+                            )
+                        ).orElseGet(
+                            () -> new DirectChatResponse(
+                                roomId,
+                                MemberInformation.from(chatroomMemberMapping.getMember()),
+                                "대화를 시작해보세요",
+                                chatroomMemberMapping.getChatroom().getCreatedAt()
+                            )
+                        );
+                }).toList();
     }
 }

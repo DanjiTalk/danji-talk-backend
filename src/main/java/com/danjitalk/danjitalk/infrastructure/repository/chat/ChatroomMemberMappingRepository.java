@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ChatroomMemberMappingRepository extends JpaRepository<ChatroomMemberMapping, Long> {
+public interface ChatroomMemberMappingRepository extends JpaRepository<ChatroomMemberMapping, Long>, ChatroomMemberMappingCustomRepository {
 
     List<ChatroomMemberMapping> findChatroomMemberMappingByMemberId(Long memberId);
     boolean existsByChatroomAndMember(Chatroom chatroom, Member member);
