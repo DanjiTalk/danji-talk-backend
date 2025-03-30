@@ -1,5 +1,6 @@
 package com.danjitalk.danjitalk.domain.chat.entity;
 
+import com.danjitalk.danjitalk.domain.common.entity.BaseEntity;
 import com.danjitalk.danjitalk.domain.user.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -10,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ChatroomMemberMapping {
+public class ChatroomMemberMapping extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
