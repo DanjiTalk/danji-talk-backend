@@ -59,6 +59,7 @@ public class ChatRequestService {
                 .requester(requester)  // 요청자
                 .receiver(receiver)  // 받는 사람
                 .status(ChatRequestStatus.PENDING)  // 대기 상태
+                .message(request.message())
                 .build();
 
         chatRequestRepository.save(chatRequest);
