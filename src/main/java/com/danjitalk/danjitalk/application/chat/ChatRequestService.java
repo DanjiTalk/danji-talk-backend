@@ -148,7 +148,7 @@ public class ChatRequestService {
         return chatRequestRepository.findChatRequestWithRequesterByReceiverId(currentId)
                 .stream()
                 .map(e ->
-                    new ChatRequestResponse(e.getMessage(), MemberInformation.from(e.getRequester()), e.getId(), e.getStatus())
+                    new ChatRequestResponse(e.getMessage(), MemberInformation.from(e.getRequester()), e.getId(), e.getStatus(), e.getCreatedAt())
                 ).toList();
     }
 
@@ -161,7 +161,7 @@ public class ChatRequestService {
         return chatRequestRepository.findChatRequestWithRequesterByRequesterId(currentId)
                 .stream()
                 .map(e ->
-                    new ChatRequestResponse(e.getMessage(), MemberInformation.from(e.getRequester()), e.getId(), e.getStatus())
+                    new ChatRequestResponse(e.getMessage(), MemberInformation.from(e.getRequester()), e.getId(), e.getStatus(), e.getCreatedAt())
                 ).toList();
     }
 }
