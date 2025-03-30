@@ -151,4 +151,17 @@ public class ChatRequestService {
                     new ChatRequestResponse(e.getMessage(), MemberInformation.from(e.getRequester()), e.getId(), e.getStatus())
                 ).toList();
     }
+
+    /**
+     * 보낸 채팅 요청 리스트
+     * @return
+     */
+    public List<ChatRequestResponse> sentRequests() {
+        Long currentId = SecurityContextHolderUtil.getMemberId();
+        return chatRequestRepository.findChatRequestWithRequesterByRequesterId(currentId)
+                .stream()
+                .map(e ->
+                    new ChatRequestResponse(e.getMessage(), MemberInformation.from(e.getRequester()), e.getId(), e.getStatus())
+                ).toList();
+    }
 }

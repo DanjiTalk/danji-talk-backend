@@ -30,4 +30,12 @@ public class ChatRequestCustomRepositoryImpl implements ChatRequestCustomReposit
                 .where(chatRequest.receiver.id.eq(receiverId))
                 .fetch();
     }
+
+    @Override
+    public List<ChatRequest> findChatRequestWithRequesterByRequesterId(Long requesterId) {
+        return queryFactory.selectFrom(chatRequest)
+                .join(chatRequest.requester).fetchJoin()
+                .where(chatRequest.requester.id.eq(requesterId))
+                .fetch();
+    }
 }

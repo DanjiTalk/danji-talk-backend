@@ -46,4 +46,9 @@ public class ChatRequestController {
         return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), null, chatRequestResponses));
     }
 
+    @GetMapping("/sent")
+    public ResponseEntity<ApiResponse<List<ChatRequestResponse>>> getSentChatRequests() {
+        List<ChatRequestResponse> chatRequestResponses = chatRequestService.sentRequests();
+        return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), null, chatRequestResponses));
+    }
 }

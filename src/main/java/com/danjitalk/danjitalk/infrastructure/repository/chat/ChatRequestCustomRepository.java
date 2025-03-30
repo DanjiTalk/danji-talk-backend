@@ -8,5 +8,6 @@ public interface ChatRequestCustomRepository {
 
     Optional<ChatRequest> findChatRequestWithRequesterAndReceiverById(Long id);
     List<ChatRequest> findChatRequestWithRequesterByReceiverId(Long receiverId);
+    List<ChatRequest> findChatRequestWithRequesterByRequesterId(Long requesterId);
 
 }
