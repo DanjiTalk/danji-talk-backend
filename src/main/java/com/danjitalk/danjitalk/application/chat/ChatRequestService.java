@@ -4,7 +4,7 @@ import com.danjitalk.danjitalk.common.exception.BadRequestException;
 import com.danjitalk.danjitalk.common.exception.ConflictException;
 import com.danjitalk.danjitalk.common.exception.DataNotFoundException;
 import com.danjitalk.danjitalk.common.util.SecurityContextHolderUtil;
-import com.danjitalk.danjitalk.domain.chat.dto.ApproveChatRequest;
+import com.danjitalk.danjitalk.domain.chat.dto.DecisionChatRequest;
 import com.danjitalk.danjitalk.domain.chat.dto.CreateChatRequest;
 import com.danjitalk.danjitalk.domain.chat.entity.ChatRequest;
 import com.danjitalk.danjitalk.domain.chat.entity.Chatroom;
@@ -68,7 +68,7 @@ public class ChatRequestService {
      * @param request
      */
     @Transactional
-    public void approveRequest(ApproveChatRequest request) {
+    public void approveRequest(DecisionChatRequest request) {
         Long currentId = SecurityContextHolderUtil.getMemberId();
         ChatRequest chatRequest = chatRequestRepository.findChatRequestWithRequesterAndReceiverById(request.requestId()).orElseThrow(DataNotFoundException::new);
 
@@ -112,5 +112,29 @@ public class ChatRequestService {
         );
 
         chatroomMemberMappingRepository.saveAll(mappings);
+    }
+
+    /**
+     * 채팅 요청 거절
+     * @param request
+     */
+    @Transactional
+    public void rejectRequest(DecisionChatRequest request) {
+        Long currentId = SecurityContextHolderUtil.getMemberId();
+        ChatRequest chatRequest = chatRequestRepository.findById(request.requestId()).orElseThrow(DataNotFoundException::new);
+
+        if (chatRequest.getStatus() != ChatRequestStatus.PENDING) {
+            throw new IllegalStateException("이미 처리된 요청");
+        }
+
+        Long receiverId = chatRequest.getReceiver().getId();
+
+        if (!currentId.equals(receiverId)) {
+            throw new IllegalStateException("권한이 없습니다!");
+        }
+
+        // 거절 처리
+        chatRequest.changeStatus(ChatRequestStatus.APPROVED);
+        chatRequestRepository.save(chatRequest);
     }
 }

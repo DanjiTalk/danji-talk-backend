@@ -1,6 +1,6 @@
 package com.danjitalk.danjitalk.domain.chat.dto;
 
-public record ApproveChatRequest(
+public record DecisionChatRequest(
     Long requestId
 ) {
 
