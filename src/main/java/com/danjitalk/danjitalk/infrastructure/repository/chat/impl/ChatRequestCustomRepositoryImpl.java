@@ -3,6 +3,7 @@ package com.danjitalk.danjitalk.infrastructure.repository.chat.impl;
 import com.danjitalk.danjitalk.domain.chat.entity.ChatRequest;
 import com.danjitalk.danjitalk.infrastructure.repository.chat.ChatRequestCustomRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 
@@ -20,5 +21,13 @@ public class ChatRequestCustomRepositoryImpl implements ChatRequestCustomReposit
                 .join(chatRequest.requester).fetchJoin()
                 .where(chatRequest.id.eq(id))
                 .fetchOne());
+    }
+
+    @Override
+    public List<ChatRequest> findChatRequestWithRequesterByReceiverId(Long receiverId) {
+        return queryFactory.selectFrom(chatRequest)
+                .join(chatRequest.requester).fetchJoin()
+                .where(chatRequest.receiver.id.eq(receiverId))
+                .fetch();
     }
 }

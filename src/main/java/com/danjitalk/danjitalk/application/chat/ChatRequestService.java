@@ -4,7 +4,9 @@ import com.danjitalk.danjitalk.common.exception.BadRequestException;
 import com.danjitalk.danjitalk.common.exception.ConflictException;
 import com.danjitalk.danjitalk.common.exception.DataNotFoundException;
 import com.danjitalk.danjitalk.common.util.SecurityContextHolderUtil;
+import com.danjitalk.danjitalk.domain.chat.dto.ChatRequestResponse;
 import com.danjitalk.danjitalk.domain.chat.dto.CreateChatRequest;
+import com.danjitalk.danjitalk.domain.chat.dto.MemberInformation;
 import com.danjitalk.danjitalk.domain.chat.entity.ChatRequest;
 import com.danjitalk.danjitalk.domain.chat.entity.Chatroom;
 import com.danjitalk.danjitalk.domain.chat.entity.ChatroomMemberMapping;
@@ -135,5 +137,18 @@ public class ChatRequestService {
         // 거절 처리
         chatRequest.changeStatus(ChatRequestStatus.APPROVED);
         chatRequestRepository.save(chatRequest);
+    }
+
+    /**
+     * 받은 채팅 요청 리스트
+     * @return
+     */
+    public List<ChatRequestResponse> receivedRequests() {
+        Long currentId = SecurityContextHolderUtil.getMemberId();
+        return chatRequestRepository.findChatRequestWithRequesterByReceiverId(currentId)
+                .stream()
+                .map(e ->
+                    new ChatRequestResponse(e.getMessage(), MemberInformation.from(e.getRequester()), e.getId(), e.getStatus())
+                ).toList();
     }
 }

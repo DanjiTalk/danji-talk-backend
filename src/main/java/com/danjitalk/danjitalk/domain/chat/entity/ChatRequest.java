@@ -43,12 +43,15 @@ public class ChatRequest extends BaseEntity { // 1대1 채팅 요청
 
     private Long chatroomId;
 
+    private String message;
+
     @Builder
-    public ChatRequest(Member requester, Member receiver, ChatRequestStatus status, Long chatroomId) {
+    public ChatRequest(Member requester, Member receiver, ChatRequestStatus status, Long chatroomId, String message) {
         this.requester = requester;
         this.receiver = receiver;
         this.status = status;
         this.chatroomId = chatroomId;
+        this.message = message;
     }
 
     public void changeStatus(ChatRequestStatus status) {
