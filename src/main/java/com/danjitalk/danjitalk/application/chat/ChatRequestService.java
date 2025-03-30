@@ -70,7 +70,7 @@ public class ChatRequestService {
     @Transactional
     public void approveRequest(ApproveChatRequest request) {
         Long currentId = SecurityContextHolderUtil.getMemberId();
-        ChatRequest chatRequest = chatRequestRepository.findById(request.requestId()).orElseThrow(DataNotFoundException::new);
+        ChatRequest chatRequest = chatRequestRepository.findChatRequestWithRequesterAndReceiverById(request.requestId()).orElseThrow(DataNotFoundException::new);
 
         if (chatRequest.getStatus() != ChatRequestStatus.PENDING) {
             throw new IllegalStateException("이미 처리된 요청");
