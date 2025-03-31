@@ -11,6 +11,7 @@ import com.danjitalk.danjitalk.domain.chat.entity.ChatRequest;
 import com.danjitalk.danjitalk.domain.chat.entity.Chatroom;
 import com.danjitalk.danjitalk.domain.chat.entity.ChatroomMemberMapping;
 import com.danjitalk.danjitalk.domain.chat.enums.ChatRequestStatus;
+import com.danjitalk.danjitalk.domain.chat.enums.ChatroomType;
 import com.danjitalk.danjitalk.domain.user.member.entity.Member;
 import com.danjitalk.danjitalk.infrastructure.repository.chat.ChatRequestRepository;
 import com.danjitalk.danjitalk.infrastructure.repository.chat.ChatroomMemberMappingRepository;
@@ -92,6 +93,7 @@ public class ChatRequestService {
         Chatroom chatroom = Chatroom.builder()
                 .name(requester.getNickname() + "님이 신청한 대화")
                 .isPrivate(true) // 1대1 채팅
+                .type(ChatroomType.ONE_ON_ONE)
                 .build();
 
         Long chatroomId = chatroomRepository.save(chatroom).getId();

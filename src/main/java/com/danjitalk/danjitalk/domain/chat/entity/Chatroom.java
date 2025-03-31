@@ -1,5 +1,6 @@
 package com.danjitalk.danjitalk.domain.chat.entity;
 
+import com.danjitalk.danjitalk.domain.chat.enums.ChatroomType;
 import com.danjitalk.danjitalk.domain.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -22,12 +23,16 @@ public class Chatroom extends BaseEntity {
 
     private Boolean isPrivate;
 
+    @Enumerated(EnumType.STRING)
+    private ChatroomType type;
+
     @OneToMany(mappedBy = "chatroom")
     private List<ChatroomMemberMapping> chatroomMemberList = new ArrayList<>();
 
     @Builder
-    public Chatroom(String name, Boolean isPrivate) {
+    public Chatroom(String name, Boolean isPrivate, ChatroomType type) {
         this.name = name;
         this.isPrivate = isPrivate;
+        this.type = type;
     }
 }

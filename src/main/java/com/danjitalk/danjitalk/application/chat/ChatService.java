@@ -9,6 +9,7 @@ import com.danjitalk.danjitalk.domain.chat.dto.DirectChatResponse;
 import com.danjitalk.danjitalk.domain.chat.entity.ChatMessage;
 import com.danjitalk.danjitalk.domain.chat.entity.Chatroom;
 import com.danjitalk.danjitalk.domain.chat.entity.ChatroomMemberMapping;
+import com.danjitalk.danjitalk.domain.chat.enums.ChatroomType;
 import com.danjitalk.danjitalk.domain.user.member.entity.Member;
 import com.danjitalk.danjitalk.infrastructure.mongo.chat.ChatMessageMongoRepository;
 import com.danjitalk.danjitalk.infrastructure.repository.chat.ChatroomMemberMappingRepository;
@@ -41,6 +42,7 @@ public class ChatService {
         Chatroom chatroom = Chatroom.builder()
                 .isPrivate(false) // TODO: 채팅방 암호화 기능
                 .name(chatroomName)
+                .type(ChatroomType.GROUP)
                 .build();
         return chatroomRepository.save(chatroom);
     }
