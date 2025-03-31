@@ -1,6 +1,8 @@
 package com.danjitalk.danjitalk.infrastructure.repository.user.member;
 
 import com.danjitalk.danjitalk.domain.user.member.entity.Member;
+import java.util.Collection;
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,4 +15,5 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberCus
     boolean existsByEmail(String email);
     Optional<Member> findByNameAndPhoneNumber(String name, String phoneNumber);
     Optional<Member> findByEmail(String email);
+    List<Member> findByIdIn(Collection<Long> ids);
 }

@@ -17,6 +17,7 @@ import com.danjitalk.danjitalk.infrastructure.repository.chat.ChatroomRepository
 import com.danjitalk.danjitalk.infrastructure.repository.user.member.MemberRepository;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -135,6 +136,8 @@ public class ChatService {
 
     /**
      * 채팅 목록 조회
+     * @param type 타입으로 단체 채팅, 1대1 채팅 구분
+     * @return
      */
     @Transactional
     public List<ChatroomSummaryResponse> getChatListByType(ChatroomType type) {
@@ -151,6 +154,16 @@ public class ChatService {
                 .stream()
                 .collect(Collectors.toMap(ChatMessage::getChatroomId, Function.identity()));
 
+        Set<Long> senderIds = latestMessages.values()
+                .stream()
+                .map(ChatMessage::getSenderId)
+                .collect(Collectors.toSet());
+
+        Map<Long, Member> senderMap = memberRepository.findByIdIn(senderIds)
+                .stream()
+                .collect(Collectors.toMap(Member::getId, Function.identity()));
+
+
         return chatroomMemberMappings.stream()
             .map(chatroomMemberMapping -> {
                 Long chatroomId = chatroomMemberMapping.getChatroom().getId();
@@ -158,14 +171,15 @@ public class ChatService {
                 if (chatMessage == null) {
                     return new ChatroomSummaryResponse(
                         chatroomId,
-                        MemberInformation.from(chatroomMemberMapping.getMember()),
+                        MemberInformation.from(chatroomMemberMapping.getMember()), // TODO: 대화 없을 때 일단 본인 프로필, 협의 후 수정하기
                         "대화를 시작해보세요",
                         chatroomMemberMapping.getChatroom().getCreatedAt()
                     );
                 } else {
+                    Member sender = senderMap.get(chatMessage.getSenderId());
                     return new ChatroomSummaryResponse(
                         chatroomId,
-                        MemberInformation.from(chatroomMemberMapping.getMember()),
+                        MemberInformation.from(sender),
                         chatMessage.getMessage(),
                         chatMessage.getCreatedAt()
                     );
