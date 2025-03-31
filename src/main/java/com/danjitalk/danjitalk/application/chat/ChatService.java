@@ -5,7 +5,7 @@ import com.danjitalk.danjitalk.common.util.SecurityContextHolderUtil;
 import com.danjitalk.danjitalk.domain.chat.dto.ChatMessageRequest;
 import com.danjitalk.danjitalk.domain.chat.dto.ChatMessageResponse;
 import com.danjitalk.danjitalk.domain.chat.dto.MemberInformation;
-import com.danjitalk.danjitalk.domain.chat.dto.DirectChatResponse;
+import com.danjitalk.danjitalk.domain.chat.dto.ChatroomSummaryResponse;
 import com.danjitalk.danjitalk.domain.chat.entity.ChatMessage;
 import com.danjitalk.danjitalk.domain.chat.entity.Chatroom;
 import com.danjitalk.danjitalk.domain.chat.entity.ChatroomMemberMapping;
@@ -16,6 +16,9 @@ import com.danjitalk.danjitalk.infrastructure.repository.chat.ChatroomMemberMapp
 import com.danjitalk.danjitalk.infrastructure.repository.chat.ChatroomRepository;
 import com.danjitalk.danjitalk.infrastructure.repository.user.member.MemberRepository;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -131,31 +134,42 @@ public class ChatService {
     }
 
     /**
-     * 1대1 채팅 목록 조회
+     * 채팅 목록 조회
      */
     @Transactional
-    public List<DirectChatResponse> getDirectChatList() {
+    public List<ChatroomSummaryResponse> getChatListByType(ChatroomType type) {
         Long currentId = SecurityContextHolderUtil.getMemberId();
-        return chatroomMemberMappingRepository.findChatroomMemberMappingWithMemberAndChatroomByMemberId(currentId)
+
+        List<ChatroomMemberMapping> chatroomMemberMappings =
+                chatroomMemberMappingRepository.findChatroomMemberMappingWithMemberAndChatroomByMemberId(currentId, type);
+
+        List<Long> roomIds = chatroomMemberMappings.stream()
+                .map(e -> e.getChatroom().getId())
+                .toList();
+
+        Map<Long, ChatMessage> latestMessages = chatMessageMongoRepository.findTopByChatroomIdInOrderByCreatedAtDesc(roomIds)
                 .stream()
-                .map(chatroomMemberMapping -> {
-                    Long roomId = chatroomMemberMapping.getChatroom().getId();
-                    return chatMessageMongoRepository.findTopByChatroomIdOrderByCreatedAtDesc(roomId)
-                        .map(chatMessage ->
-                            new DirectChatResponse(
-                                roomId,
-                                MemberInformation.from(chatroomMemberMapping.getMember()),
-                                chatMessage.getMessage(),
-                                chatMessage.getCreatedAt()
-                            )
-                        ).orElseGet(
-                            () -> new DirectChatResponse(
-                                roomId,
-                                MemberInformation.from(chatroomMemberMapping.getMember()),
-                                "대화를 시작해보세요",
-                                chatroomMemberMapping.getChatroom().getCreatedAt()
-                            )
-                        );
-                }).toList();
+                .collect(Collectors.toMap(ChatMessage::getChatroomId, Function.identity()));
+
+        return chatroomMemberMappings.stream()
+            .map(chatroomMemberMapping -> {
+                Long chatroomId = chatroomMemberMapping.getChatroom().getId();
+                ChatMessage chatMessage = latestMessages.get(chatroomId);
+                if (chatMessage == null) {
+                    return new ChatroomSummaryResponse(
+                        chatroomId,
+                        MemberInformation.from(chatroomMemberMapping.getMember()),
+                        "대화를 시작해보세요",
+                        chatroomMemberMapping.getChatroom().getCreatedAt()
+                    );
+                } else {
+                    return new ChatroomSummaryResponse(
+                        chatroomId,
+                        MemberInformation.from(chatroomMemberMapping.getMember()),
+                        chatMessage.getMessage(),
+                        chatMessage.getCreatedAt()
+                    );
+                }
+            }).toList();
     }
 }
