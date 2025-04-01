@@ -49,11 +49,6 @@ public class StompEventHandler { //StompSubProtocolHandler 에서 이벤트 처�
     @EventListener
     public void handleConnectedListener(SessionConnectedEvent event) { // StompCommand.CONNECTED 일 때 실행, 연결 후 응답 하느라고 accessor(message) 값이 달라짐
         log.info("사용자 연결 후");
-//        MessageHeaders messageHeaders = event.getMessage().getHeaders();
-//        log.info("messageHeaders {}", messageHeaders);
-//        Message<?> genericMessage = (Message<?>) messageHeaders.get("simpConnectMessage");
-//        MessageHeaders headers = genericMessage.getHeaders();
-//        log.info("headers {}", headers); // 원본  메시지 가져오기
     }
 
     @EventListener

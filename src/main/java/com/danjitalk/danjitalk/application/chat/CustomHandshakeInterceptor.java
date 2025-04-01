@@ -37,22 +37,6 @@ public class CustomHandshakeInterceptor implements HandshakeInterceptor {
             return false;
         }
 
-//        HttpHeaders headers = request.getHeaders();
-//        String cookieHeader = headers.getFirst(HttpHeaders.COOKIE); // 쿠키 헤더 가져오기, 쿠키 ;로 나눠서 가져옴
-//        log.info("cookieHeader: {}", cookieHeader);
-//
-//        if(cookieHeader != null && !cookieHeader.isEmpty()) { // String.isEmpty -> ""길이0인 문자열
-//            String[] cookies = cookieHeader.split(";");
-//            for(String cookie : cookies) {
-//                cookie = cookie.trim();
-//                if (cookie.startsWith("access=")) {
-//                    cookie = cookie.substring(7);
-//                    attributes.put("access", cookie);
-//                }
-//                log.info("cookie: {}", cookie);  // StompHeaderAccessor의 simpSessionAttributes에 넣음
-//            }
-//        }
-//        log.info("attributes: {}", attributes); // 이후 ChannelInterceptor에 simpSessionAttributes에서 사용
         return true;
     }
 
