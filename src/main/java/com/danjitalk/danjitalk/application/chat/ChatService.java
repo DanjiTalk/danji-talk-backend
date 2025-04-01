@@ -15,6 +15,9 @@ import com.danjitalk.danjitalk.infrastructure.mongo.chat.ChatMessageMongoReposit
 import com.danjitalk.danjitalk.infrastructure.repository.chat.ChatroomMemberMappingRepository;
 import com.danjitalk.danjitalk.infrastructure.repository.chat.ChatroomRepository;
 import com.danjitalk.danjitalk.infrastructure.repository.user.member.MemberRepository;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -150,14 +153,16 @@ public class ChatService {
                 .map(e -> e.getChatroom().getId())
                 .toList();
 
-        Map<Long, ChatMessage> latestMessages = chatMessageMongoRepository.findTopByChatroomIdInOrderByCreatedAtDesc(roomIds)
-                .stream()
-                .collect(Collectors.toMap(ChatMessage::getChatroomId, Function.identity()));
+        // 채팅방 ID 목록 & 썸네일 Sender ID 목록 & 마지막 메시지
+        Set<Long> senderIds = new HashSet<>();
+        Map<Long, ChatMessage> chatroomLatestMessages = new HashMap<>();
 
-        Set<Long> senderIds = latestMessages.values()
-                .stream()
-                .map(ChatMessage::getSenderId)
-                .collect(Collectors.toSet());
+        // 최신 메시지 조회
+        chatMessageMongoRepository.findTopByChatroomIdInOrderByCreatedAtDesc(roomIds)
+                .forEach(chatMessage -> {
+                    chatroomLatestMessages.put(chatMessage.getChatroomId(), chatMessage);
+                    senderIds.add(chatMessage.getSenderId()); // senderId 수집
+                });
 
         Map<Long, Member> senderMap = memberRepository.findByIdIn(senderIds)
                 .stream()
@@ -167,7 +172,7 @@ public class ChatService {
         return chatroomMemberMappings.stream()
             .map(chatroomMemberMapping -> {
                 Long chatroomId = chatroomMemberMapping.getChatroom().getId();
-                ChatMessage chatMessage = latestMessages.get(chatroomId);
+                ChatMessage chatMessage = chatroomLatestMessages.get(chatroomId);
                 if (chatMessage == null) {
                     return new ChatroomSummaryResponse(
                         chatroomId,
