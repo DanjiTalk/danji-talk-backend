@@ -2,6 +2,7 @@ package com.danjitalk.danjitalk.api.chat;
 
 import com.danjitalk.danjitalk.application.chat.ChatService;
 import com.danjitalk.danjitalk.common.response.ApiResponse;
+import com.danjitalk.danjitalk.domain.chat.dto.ChatroomDetailsResponse;
 import com.danjitalk.danjitalk.domain.chat.dto.ChatroomSummaryResponse;
 import com.danjitalk.danjitalk.domain.chat.enums.ChatroomType;
 import java.util.List;
@@ -9,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,5 +31,11 @@ public class ChatController {
     public ResponseEntity<ApiResponse<List<ChatroomSummaryResponse>>> getGroupChats() {
         List<ChatroomSummaryResponse> groupChatList = chatService.getChatListByType(ChatroomType.GROUP);
         return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), null, groupChatList));
+    }
+
+    @GetMapping("/room/{id}")
+    public ResponseEntity<ApiResponse<ChatroomDetailsResponse>> getRoomChats(@PathVariable Long id) {
+        ChatroomDetailsResponse chatroomDetailsResponse = chatService.getChatroomMessageDetails(id);
+        return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), null, chatroomDetailsResponse));
     }
 }

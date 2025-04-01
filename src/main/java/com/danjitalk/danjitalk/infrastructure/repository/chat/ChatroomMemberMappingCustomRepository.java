@@ -7,4 +7,5 @@ import java.util.List;
 public interface ChatroomMemberMappingCustomRepository {
 
     List<ChatroomMemberMapping> findChatroomMemberMappingWithMemberAndChatroomByMemberId(Long memberId, ChatroomType chatroomType);
+    List<ChatroomMemberMapping> findChatroomMemberMappingWithMemberByChatroomId(Long chatroomId);
 }

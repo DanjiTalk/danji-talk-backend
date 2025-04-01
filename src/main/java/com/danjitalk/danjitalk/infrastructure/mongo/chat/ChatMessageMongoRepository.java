@@ -9,4 +9,5 @@ import org.springframework.stereotype.Repository;
 public interface ChatMessageMongoRepository extends MongoRepository<ChatMessage, String> {
 
     List<ChatMessage> findTopByChatroomIdInOrderByCreatedAtDesc(List<Long> chatroomIds);
+    List<ChatMessage> findByChatroomIdOrderByCreatedAtDesc(Long chatroomId);
 }

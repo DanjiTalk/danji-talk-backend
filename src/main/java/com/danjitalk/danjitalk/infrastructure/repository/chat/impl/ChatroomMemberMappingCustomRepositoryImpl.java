@@ -27,4 +27,14 @@ public class ChatroomMemberMappingCustomRepositoryImpl implements ChatroomMember
                 )
                 .fetch();
     }
+
+    @Override
+    public List<ChatroomMemberMapping> findChatroomMemberMappingWithMemberByChatroomId(Long chatroomId) {
+        return queryFactory.selectFrom(chatroomMemberMapping)
+            .join(chatroomMemberMapping.member).fetchJoin()
+            .where(
+                chatroomMemberMapping.chatroom.id.eq(chatroomId)
+            )
+            .fetch();
+    }
 }

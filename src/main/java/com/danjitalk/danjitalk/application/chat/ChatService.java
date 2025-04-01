@@ -1,9 +1,11 @@
 package com.danjitalk.danjitalk.application.chat;
 
 import com.danjitalk.danjitalk.common.exception.DataNotFoundException;
+import com.danjitalk.danjitalk.common.exception.ForbiddenException;
 import com.danjitalk.danjitalk.common.util.SecurityContextHolderUtil;
 import com.danjitalk.danjitalk.domain.chat.dto.ChatMessageRequest;
 import com.danjitalk.danjitalk.domain.chat.dto.ChatMessageResponse;
+import com.danjitalk.danjitalk.domain.chat.dto.ChatroomDetailsResponse;
 import com.danjitalk.danjitalk.domain.chat.dto.MemberInformation;
 import com.danjitalk.danjitalk.domain.chat.dto.ChatroomSummaryResponse;
 import com.danjitalk.danjitalk.domain.chat.entity.ChatMessage;
@@ -142,7 +144,7 @@ public class ChatService {
      * @param type 타입으로 단체 채팅, 1대1 채팅 구분
      * @return
      */
-    @Transactional
+    @Transactional(readOnly = true)
     public List<ChatroomSummaryResponse> getChatListByType(ChatroomType type) {
         Long currentId = SecurityContextHolderUtil.getMemberId();
 
@@ -190,5 +192,54 @@ public class ChatService {
                     );
                 }
             }).toList();
+    }
+
+    /**
+     * 채팅방 상세 조회
+     * @param chatroomId
+     */
+    @Transactional(readOnly = true)
+    public ChatroomDetailsResponse getChatroomMessageDetails(Long chatroomId) {
+        Long currentId = SecurityContextHolderUtil.getMemberId();
+        List<ChatroomMemberMapping> chatroomMemberMapping = chatroomMemberMappingRepository.findChatroomMemberMappingWithMemberByChatroomId(chatroomId);
+
+        // 멤버 정보 매핑 & 채팅방 이름 찾기
+        Map<Long, Member> memberMap = new HashMap<>();
+        List<MemberInformation> memberInformationList = new ArrayList<>();
+        String chatroomName = null;
+
+        boolean isInChatroom = false;
+
+        for (ChatroomMemberMapping mapping : chatroomMemberMapping) {
+            Member member = mapping.getMember();
+            memberMap.put(member.getId(), member);
+            memberInformationList.add(MemberInformation.from(member));
+
+            if (member.getId().equals(currentId)) {
+                isInChatroom = true;
+                chatroomName = mapping.getChatroomName();
+            }
+        }
+
+        if(!isInChatroom) {
+            throw new ForbiddenException(403, "채팅방에 참여하지 않아 메시지를 조회할 수 없습니다. 참여 후 다시 시도해 주세요.");
+        }
+
+        int count = memberMap.size();
+
+        List<ChatMessageResponse> chatMessageResponses = chatMessageMongoRepository.findByChatroomIdOrderByCreatedAtDesc(chatroomId)
+                .stream()
+                .map(e ->
+                     new ChatMessageResponse(
+                        e.getId(),
+                        e.getChatroomId(),
+                        MemberInformation.from(memberMap.get(e.getSenderId())),
+                        e.getMessage(),
+                        e.getImageUrl(),
+                        e.getCreatedAt()
+                    )
+                ).toList();
+
+        return new ChatroomDetailsResponse(chatroomName, count, chatMessageResponses, memberInformationList);
     }
 }
