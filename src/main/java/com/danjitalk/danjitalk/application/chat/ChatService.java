@@ -64,12 +64,12 @@ public class ChatService {
     public List<Long> subscribeRoomIds(Long memberId) {
         List<ChatroomMemberMapping> chatroomMemberMappings = chatroomMemberMappingRepository.findChatroomMemberMappingByMemberId(memberId);
         return chatroomMemberMappings.stream()
-            .map(e -> e.getChatroom().getId())
-            .toList();
+                .map(e -> e.getChatroom().getId())
+                .toList();
     }
 
     /**
-     * 채팅방 참여
+     * 채팅방 참여 및 구독
      * @param chatroomId 방 번호
      * @param accessor StompHeader
      */
@@ -169,7 +169,6 @@ public class ChatService {
         Map<Long, Member> senderMap = memberRepository.findByIdIn(senderIds)
                 .stream()
                 .collect(Collectors.toMap(Member::getId, Function.identity()));
-
 
         return chatroomMemberMappings.stream()
             .map(chatroomMemberMapping -> {
