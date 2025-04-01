@@ -25,4 +25,9 @@ public class ChatController {
         return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), null, directChatList));
     }
 
+    @GetMapping("/group")
+    public ResponseEntity<ApiResponse<List<ChatroomSummaryResponse>>> getGroupChats() {
+        List<ChatroomSummaryResponse> groupChatList = chatService.getChatListByType(ChatroomType.GROUP);
+        return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), null, groupChatList));
+    }
 }
