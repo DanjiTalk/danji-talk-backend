@@ -75,6 +75,7 @@ public class FeedService {
                         projectionFeedDto.localDateTime(),
                         projectionFeedDto.reactionCount(),
                         projectionFeedDto.commentCount(),
+                        projectionFeedDto.bookmarkCount(),
                         thumbnailFileUrl,
                         projectionFeedDto.isReacted()
                 );
