@@ -1,5 +1,6 @@
 package com.danjitalk.danjitalk.application.community.feed;
 
+import com.danjitalk.danjitalk.application.community.bookmark.BookmarkService;
 import com.danjitalk.danjitalk.common.exception.BadRequestException;
 import com.danjitalk.danjitalk.common.exception.DataNotFoundException;
 import com.danjitalk.danjitalk.common.util.SecurityContextHolderUtil;
@@ -40,6 +41,7 @@ public class FeedService {
     private final ApartmentRepository apartmentRepository;
     private final S3ConfigProperties s3ConfigProperties;
     private final RedisTemplate<String, String> redisTemplate;
+    private final BookmarkService bookmarkService;
 
     /**
      * 피드 목록 조회
@@ -98,6 +100,8 @@ public class FeedService {
 
         List<S3ObjectResponseDto> s3ObjectResponseDtoList = Optional.ofNullable(feed.getFileUrl()).map(url -> s3Service.getS3Object(url)).orElseGet(Collections::emptyList);
 
+        Boolean bookmarked = bookmarkService.isBookmarked(feedId);
+
         return new FeedDetailResponseDto(
                 feed.getId(),
                 feed.getTitle(),
@@ -108,7 +112,8 @@ public class FeedService {
                         feed.getMember().getNickname()
                 ),
                 s3ObjectResponseDtoList,
-                reacted
+                reacted,
+                bookmarked
         );
     }
 
