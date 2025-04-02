@@ -4,6 +4,7 @@
 package com.danjitalk.danjitalk.infrastructure.jooq.table;
 
 
+import com.danjitalk.danjitalk.infrastructure.jooq.table.tables.Bookmark;
 import com.danjitalk.danjitalk.infrastructure.jooq.table.tables.Feed;
 import com.danjitalk.danjitalk.infrastructure.jooq.table.tables.Reaction;
 
@@ -27,6 +28,11 @@ public class Test extends SchemaImpl {
      * The reference instance of <code>test</code>
      */
     public static final Test TEST = new Test();
+
+    /**
+     * The table <code>test.bookmark</code>.
+     */
+    public final Bookmark BOOKMARK = Bookmark.BOOKMARK;
 
     /**
      * The table <code>test.feed</code>.
@@ -54,6 +60,7 @@ public class Test extends SchemaImpl {
     @Override
     public final List<Table<?>> getTables() {
         return Arrays.asList(
+            Bookmark.BOOKMARK,
             Feed.FEED,
             Reaction.REACTION
         );

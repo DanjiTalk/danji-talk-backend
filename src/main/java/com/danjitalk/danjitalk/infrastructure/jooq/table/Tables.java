@@ -4,6 +4,7 @@
 package com.danjitalk.danjitalk.infrastructure.jooq.table;
 
 
+import com.danjitalk.danjitalk.infrastructure.jooq.table.tables.Bookmark;
 import com.danjitalk.danjitalk.infrastructure.jooq.table.tables.Feed;
 import com.danjitalk.danjitalk.infrastructure.jooq.table.tables.Reaction;
 
@@ -13,6 +14,11 @@ import com.danjitalk.danjitalk.infrastructure.jooq.table.tables.Reaction;
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Tables {
+
+    /**
+     * The table <code>test.bookmark</code>.
+     */
+    public static final Bookmark BOOKMARK = Bookmark.BOOKMARK;
 
     /**
      * The table <code>test.feed</code>.
