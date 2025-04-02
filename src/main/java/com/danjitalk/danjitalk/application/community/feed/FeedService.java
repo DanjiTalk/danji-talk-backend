@@ -5,7 +5,6 @@ import com.danjitalk.danjitalk.common.exception.DataNotFoundException;
 import com.danjitalk.danjitalk.common.util.SecurityContextHolderUtil;
 import com.danjitalk.danjitalk.domain.apartment.entity.Apartment;
 import com.danjitalk.danjitalk.domain.community.feed.dto.request.CreateFeedRequestDto;
-import com.danjitalk.danjitalk.domain.community.feed.dto.request.GetFeedListRequestDto;
 import com.danjitalk.danjitalk.domain.community.feed.dto.request.UpdateFeedRequestDto;
 import com.danjitalk.danjitalk.domain.community.feed.dto.response.*;
 import com.danjitalk.danjitalk.domain.community.feed.entity.Feed;
@@ -22,6 +21,7 @@ import com.danjitalk.danjitalk.infrastructure.s3.properties.S3ConfigProperties;
 import io.jsonwebtoken.lang.Objects;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,7 +29,6 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +39,7 @@ public class FeedService {
     private final MemberRepository memberRepository;
     private final ApartmentRepository apartmentRepository;
     private final S3ConfigProperties s3ConfigProperties;
+    private final RedisTemplate<String, String> redisTemplate;
 
     /**
      * 피드 목록 조회
@@ -47,7 +47,12 @@ public class FeedService {
      * */
     public FeedListDto getFeedList(Long apartmentId, LocalDateTime cursorDate) {
 
-        List<ProjectionFeedDto> projectionFeedList = feedRepository.getProjectionFeedList(apartmentId, cursorDate).orElseThrow(() -> new IllegalArgumentException("No feeds found"));
+        List<ProjectionFeedDto> projectionFeedList = feedRepository.getProjectionFeedList(apartmentId, cursorDate).orElse(Collections.emptyList());
+
+        // 비어있을땐 빈 데이터 반환
+        if(projectionFeedList.isEmpty()) {
+            return new FeedListDto(List.of(), LocalDateTime.now(), 0);
+        }
 
         ProjectionFeedDto lastIndexFeedDto = projectionFeedList.get(projectionFeedList.size() - 1);
 
@@ -68,7 +73,8 @@ public class FeedService {
                         projectionFeedDto.localDateTime(),
                         projectionFeedDto.reactionCount(),
                         projectionFeedDto.commentCount(),
-                        thumbnailFileUrl
+                        thumbnailFileUrl,
+                        projectionFeedDto.isReacted()
                 );
             }
         ).toList();
@@ -88,6 +94,7 @@ public class FeedService {
         }
 
         Feed feed = feedRepository.findFeedFetchJoinMemberByFeedId((feedId)).orElseThrow(DataNotFoundException::new);
+        Boolean reacted = this.isReacted(feed.getId(), feed.getMember().getId());
 
         List<S3ObjectResponseDto> s3ObjectResponseDtoList = Optional.ofNullable(feed.getFileUrl()).map(url -> s3Service.getS3Object(url)).orElseGet(Collections::emptyList);
 
@@ -100,7 +107,8 @@ public class FeedService {
                         feed.getMember().getId(),
                         feed.getMember().getNickname()
                 ),
-                s3ObjectResponseDtoList
+                s3ObjectResponseDtoList,
+                reacted
         );
     }
 
@@ -228,5 +236,19 @@ public class FeedService {
         }
 
         feedRepository.delete(feed);
+    }
+
+    /**
+     * 레디스, DB에 좋아요가 있는지 확인
+     * */
+    private Boolean isReacted(Long feedId, Long memberId) {
+        Boolean isUser = redisTemplate.opsForSet().isMember("reaction:user:" + feedId.toString(), memberId.toString());
+        Boolean isRemoveUser = redisTemplate.opsForSet().isMember("reaction:removeUser:" + feedId.toString(), memberId.toString());
+
+        if (Boolean.TRUE.equals(isUser) && Boolean.FALSE.equals(isRemoveUser)) {
+            return true;
+        } else {
+            return feedRepository.isReacted(feedId, memberId);
+        }
     }
 }

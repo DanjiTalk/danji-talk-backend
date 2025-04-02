@@ -2,8 +2,10 @@ package com.danjitalk.danjitalk.domain.community.reaction.entity;
 
 import com.danjitalk.danjitalk.domain.community.feed.entity.Feed;
 import com.danjitalk.danjitalk.domain.community.reaction.enums.ReactionType;
+import com.danjitalk.danjitalk.domain.user.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -21,5 +23,9 @@ public class Reaction {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "feed_id")
     private Feed feed;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
 
 }

@@ -11,6 +11,7 @@ public record FeedDto(
         LocalDateTime localDateTime,
         Integer reactionCount,
         Integer commentCount,
-        String thumbnailFileUrl
+        String thumbnailFileUrl,
+        Boolean isReacted
 ) {
 }
