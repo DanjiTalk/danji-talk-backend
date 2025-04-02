@@ -2,7 +2,7 @@ package com.danjitalk.danjitalk.application.community.bookmark;
 
 import com.danjitalk.danjitalk.common.exception.BadRequestException;
 import com.danjitalk.danjitalk.common.util.SecurityContextHolderUtil;
-import com.danjitalk.danjitalk.domain.community.bookmark.dto.request.BookmarkRequestDto;
+import com.danjitalk.danjitalk.domain.community.bookmark.entity.Bookmark;
 import com.danjitalk.danjitalk.infrastructure.repository.community.bookmark.BookmarkRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -30,9 +30,10 @@ public class BookmarkService {
      * 북마크 추가
      * */
     @Transactional
-    public void addBookmark(BookmarkRequestDto bookmarkRequestDto) {
+    public void addBookmark(Long feedId) {
 
-        Long feedId = this.validatedFeedId(bookmarkRequestDto.feedId());
+        Long validFeedId = this.validatedFeedId(feedId);
+
         Long memberId = SecurityContextHolderUtil.getMemberId();
 
         boolean exists = bookmarkRepository.existsByFeedIdAndMemberId(feedId, memberId);
@@ -41,7 +42,9 @@ public class BookmarkService {
             throw new IllegalArgumentException("Bookmark already exists");
         }
 
-        bookmarkRepository.save(bookmarkRequestDto.toEntity(memberId));
+        Bookmark bookmark = new Bookmark(null, validFeedId, memberId);
+
+        bookmarkRepository.save(bookmark);
 
     }
     
@@ -49,17 +52,17 @@ public class BookmarkService {
      * 북마크 제거
      * */
     @Transactional
-    public void deleteBookmark(BookmarkRequestDto bookmarkRequestDto) {
-        Long feedId = this.validatedFeedId(bookmarkRequestDto.feedId());
+    public void deleteBookmark(Long feedId) {
+        Long validFeedId = this.validatedFeedId(feedId);
         Long memberId = SecurityContextHolderUtil.getMemberId();
 
-        boolean exists = bookmarkRepository.existsByFeedIdAndMemberId(feedId, memberId);
+        boolean exists = bookmarkRepository.existsByFeedIdAndMemberId(validFeedId, memberId);
 
         if(!exists) {
             throw new IllegalArgumentException("Bookmark does not exist");
         }
 
-        bookmarkRepository.deleteByFeedIdAndMemberId(feedId, memberId);
+        bookmarkRepository.deleteByFeedIdAndMemberId(validFeedId, memberId);
     }
 
     /**
