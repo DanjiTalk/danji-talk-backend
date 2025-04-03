@@ -150,8 +150,14 @@ public class ChatRequestService {
         Long currentId = SecurityContextHolderUtil.getMemberId();
         return chatRequestRepository.findChatRequestWithRequesterByReceiverId(currentId)
                 .stream()
-                .map(e ->
-                    new ChatRequestResponse(e.getMessage(), MemberInformation.from(e.getRequester()), e.getId(), e.getStatus(), e.getCreatedAt())
+                .map(chatRequest ->
+                    new ChatRequestResponse(
+                        chatRequest.getMessage(),
+                        MemberInformation.from(chatRequest.getRequester()),
+                        chatRequest.getId(),
+                        chatRequest.getStatus(),
+                        chatRequest.getCreatedAt()
+                    )
                 ).toList();
     }
 
@@ -163,8 +169,14 @@ public class ChatRequestService {
         Long currentId = SecurityContextHolderUtil.getMemberId();
         return chatRequestRepository.findChatRequestWithRequesterByRequesterId(currentId)
                 .stream()
-                .map(e ->
-                    new ChatRequestResponse(e.getMessage(), MemberInformation.from(e.getRequester()), e.getId(), e.getStatus(), e.getCreatedAt())
+                .map(chatRequest ->
+                    new ChatRequestResponse(
+                        chatRequest.getMessage(),
+                        MemberInformation.from(chatRequest.getRequester()),
+                        chatRequest.getId(),
+                        chatRequest.getStatus(),
+                        chatRequest.getCreatedAt()
+                    )
                 ).toList();
     }
 }

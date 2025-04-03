@@ -64,7 +64,7 @@ public class ChatService {
     public List<Long> subscribeRoomIds(Long memberId) {
         List<ChatroomMemberMapping> chatroomMemberMappings = chatroomMemberMappingRepository.findChatroomMemberMappingByMemberId(memberId);
         return chatroomMemberMappings.stream()
-                .map(e -> e.getChatroom().getId())
+                .map(chatroomMemberMapping -> chatroomMemberMapping.getChatroom().getId())
                 .toList();
     }
 
@@ -152,7 +152,7 @@ public class ChatService {
                 chatroomMemberMappingRepository.findChatroomMemberMappingWithMemberAndChatroomByMemberId(currentId, type);
 
         List<Long> roomIds = chatroomMemberMappings.stream()
-                .map(e -> e.getChatroom().getId())
+                .map(chatroomMemberMapping -> chatroomMemberMapping.getChatroom().getId())
                 .toList();
 
         // 채팅방 ID 목록 & 썸네일 Sender ID 목록 & 마지막 메시지
@@ -228,14 +228,14 @@ public class ChatService {
 
         List<ChatMessageResponse> chatMessageResponses = chatMessageMongoRepository.findByChatroomIdOrderByCreatedAtDesc(chatroomId)
                 .stream()
-                .map(e ->
+                .map(chatMessage ->
                      new ChatMessageResponse(
-                        e.getId(),
-                        e.getChatroomId(),
-                        MemberInformation.from(memberMap.get(e.getSenderId())),
-                        e.getMessage(),
-                        e.getImageUrl(),
-                        e.getCreatedAt()
+                        chatMessage.getId(),
+                        chatMessage.getChatroomId(),
+                        MemberInformation.from(memberMap.get(chatMessage.getSenderId())),
+                        chatMessage.getMessage(),
+                        chatMessage.getImageUrl(),
+                        chatMessage.getCreatedAt()
                     )
                 ).toList();
 
