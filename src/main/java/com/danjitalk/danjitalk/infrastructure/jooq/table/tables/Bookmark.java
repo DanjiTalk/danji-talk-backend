@@ -4,8 +4,8 @@
 package com.danjitalk.danjitalk.infrastructure.jooq.table.tables;
 
 
+import com.danjitalk.danjitalk.infrastructure.jooq.table.Danjitalk;
 import com.danjitalk.danjitalk.infrastructure.jooq.table.Keys;
-import com.danjitalk.danjitalk.infrastructure.jooq.table.Test;
 import com.danjitalk.danjitalk.infrastructure.jooq.table.tables.records.BookmarkRecord;
 
 import java.time.LocalDateTime;
@@ -41,7 +41,7 @@ public class Bookmark extends TableImpl<BookmarkRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>test.bookmark</code>
+     * The reference instance of <code>danjitalk.bookmark</code>
      */
     public static final Bookmark BOOKMARK = new Bookmark();
 
@@ -54,27 +54,27 @@ public class Bookmark extends TableImpl<BookmarkRecord> {
     }
 
     /**
-     * The column <code>test.bookmark.id</code>.
+     * The column <code>danjitalk.bookmark.id</code>.
      */
     public final TableField<BookmarkRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
 
     /**
-     * The column <code>test.bookmark.created_at</code>.
+     * The column <code>danjitalk.bookmark.created_at</code>.
      */
     public final TableField<BookmarkRecord, LocalDateTime> CREATED_AT = createField(DSL.name("created_at"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "");
 
     /**
-     * The column <code>test.bookmark.updated_at</code>.
+     * The column <code>danjitalk.bookmark.updated_at</code>.
      */
     public final TableField<BookmarkRecord, LocalDateTime> UPDATED_AT = createField(DSL.name("updated_at"), SQLDataType.LOCALDATETIME(6).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.LOCALDATETIME)), this, "");
 
     /**
-     * The column <code>test.bookmark.feed_id</code>.
+     * The column <code>danjitalk.bookmark.feed_id</code>.
      */
     public final TableField<BookmarkRecord, Long> FEED_ID = createField(DSL.name("feed_id"), SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
-     * The column <code>test.bookmark.member_id</code>.
+     * The column <code>danjitalk.bookmark.member_id</code>.
      */
     public final TableField<BookmarkRecord, Long> MEMBER_ID = createField(DSL.name("member_id"), SQLDataType.BIGINT.nullable(false), this, "");
 
@@ -87,21 +87,21 @@ public class Bookmark extends TableImpl<BookmarkRecord> {
     }
 
     /**
-     * Create an aliased <code>test.bookmark</code> table reference
+     * Create an aliased <code>danjitalk.bookmark</code> table reference
      */
     public Bookmark(String alias) {
         this(DSL.name(alias), BOOKMARK);
     }
 
     /**
-     * Create an aliased <code>test.bookmark</code> table reference
+     * Create an aliased <code>danjitalk.bookmark</code> table reference
      */
     public Bookmark(Name alias) {
         this(alias, BOOKMARK);
     }
 
     /**
-     * Create a <code>test.bookmark</code> table reference
+     * Create a <code>danjitalk.bookmark</code> table reference
      */
     public Bookmark() {
         this(DSL.name("bookmark"), null);
@@ -113,7 +113,7 @@ public class Bookmark extends TableImpl<BookmarkRecord> {
 
     @Override
     public Schema getSchema() {
-        return aliased() ? null : Test.TEST;
+        return aliased() ? null : Danjitalk.DANJITALK;
     }
 
     @Override

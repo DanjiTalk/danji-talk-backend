@@ -23,12 +23,11 @@ public class BookmarkScheduleJob {
     // 30초마다 실행
     @Scheduled(fixedRate = 30000)
     @Transactional
-    public void syncReaction() {
+    public void syncBookmarks() {
 
         bulkUpdateBookmarkCount();
 
     }
-
 
     /**
      * 북마크 카운트 업데이트

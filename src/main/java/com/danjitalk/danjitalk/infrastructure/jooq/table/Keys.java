@@ -20,7 +20,7 @@ import org.jooq.impl.Internal;
 
 /**
  * A class modelling foreign key relationships and constraints of tables in
- * test.
+ * danjitalk.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Keys {

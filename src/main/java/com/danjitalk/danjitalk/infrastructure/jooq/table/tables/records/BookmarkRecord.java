@@ -24,70 +24,70 @@ public class BookmarkRecord extends UpdatableRecordImpl<BookmarkRecord> implemen
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>test.bookmark.id</code>.
+     * Setter for <code>danjitalk.bookmark.id</code>.
      */
     public void setId(Long value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>test.bookmark.id</code>.
+     * Getter for <code>danjitalk.bookmark.id</code>.
      */
     public Long getId() {
         return (Long) get(0);
     }
 
     /**
-     * Setter for <code>test.bookmark.created_at</code>.
+     * Setter for <code>danjitalk.bookmark.created_at</code>.
      */
     public void setCreatedAt(LocalDateTime value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>test.bookmark.created_at</code>.
+     * Getter for <code>danjitalk.bookmark.created_at</code>.
      */
     public LocalDateTime getCreatedAt() {
         return (LocalDateTime) get(1);
     }
 
     /**
-     * Setter for <code>test.bookmark.updated_at</code>.
+     * Setter for <code>danjitalk.bookmark.updated_at</code>.
      */
     public void setUpdatedAt(LocalDateTime value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>test.bookmark.updated_at</code>.
+     * Getter for <code>danjitalk.bookmark.updated_at</code>.
      */
     public LocalDateTime getUpdatedAt() {
         return (LocalDateTime) get(2);
     }
 
     /**
-     * Setter for <code>test.bookmark.feed_id</code>.
+     * Setter for <code>danjitalk.bookmark.feed_id</code>.
      */
     public void setFeedId(Long value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>test.bookmark.feed_id</code>.
+     * Getter for <code>danjitalk.bookmark.feed_id</code>.
      */
     public Long getFeedId() {
         return (Long) get(3);
     }
 
     /**
-     * Setter for <code>test.bookmark.member_id</code>.
+     * Setter for <code>danjitalk.bookmark.member_id</code>.
      */
     public void setMemberId(Long value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>test.bookmark.member_id</code>.
+     * Getter for <code>danjitalk.bookmark.member_id</code>.
      */
     public Long getMemberId() {
         return (Long) get(4);

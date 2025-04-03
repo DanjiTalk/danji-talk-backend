@@ -4,8 +4,8 @@
 package com.danjitalk.danjitalk.infrastructure.jooq.table.tables;
 
 
+import com.danjitalk.danjitalk.infrastructure.jooq.table.Danjitalk;
 import com.danjitalk.danjitalk.infrastructure.jooq.table.Keys;
-import com.danjitalk.danjitalk.infrastructure.jooq.table.Test;
 import com.danjitalk.danjitalk.infrastructure.jooq.table.tables.records.FeedRecord;
 
 import java.time.LocalDateTime;
@@ -39,7 +39,7 @@ public class Feed extends TableImpl<FeedRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>test.feed</code>
+     * The reference instance of <code>danjitalk.feed</code>
      */
     public static final Feed FEED = new Feed();
 
@@ -52,69 +52,69 @@ public class Feed extends TableImpl<FeedRecord> {
     }
 
     /**
-     * The column <code>test.feed.comment_count</code>.
-     */
-    public final TableField<FeedRecord, Integer> COMMENT_COUNT = createField(DSL.name("comment_count"), SQLDataType.INTEGER.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.INTEGER)), this, "");
-
-    /**
-     * The column <code>test.feed.reaction_count</code>.
-     */
-    public final TableField<FeedRecord, Integer> REACTION_COUNT = createField(DSL.name("reaction_count"), SQLDataType.INTEGER.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.INTEGER)), this, "");
-
-    /**
-     * The column <code>test.feed.apartment_id</code>.
-     */
-    public final TableField<FeedRecord, Long> APARTMENT_ID = createField(DSL.name("apartment_id"), SQLDataType.BIGINT.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINT)), this, "");
-
-    /**
-     * The column <code>test.feed.created_at</code>.
-     */
-    public final TableField<FeedRecord, LocalDateTime> CREATED_AT = createField(DSL.name("created_at"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "");
-
-    /**
-     * The column <code>test.feed.id</code>.
+     * The column <code>danjitalk.feed.id</code>.
      */
     public final TableField<FeedRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
 
     /**
-     * The column <code>test.feed.member_id</code>.
+     * The column <code>danjitalk.feed.created_at</code>.
      */
-    public final TableField<FeedRecord, Long> MEMBER_ID = createField(DSL.name("member_id"), SQLDataType.BIGINT.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINT)), this, "");
+    public final TableField<FeedRecord, LocalDateTime> CREATED_AT = createField(DSL.name("created_at"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "");
 
     /**
-     * The column <code>test.feed.updated_at</code>.
+     * The column <code>danjitalk.feed.updated_at</code>.
      */
     public final TableField<FeedRecord, LocalDateTime> UPDATED_AT = createField(DSL.name("updated_at"), SQLDataType.LOCALDATETIME(6).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.LOCALDATETIME)), this, "");
 
     /**
-     * The column <code>test.feed.file_url</code>.
+     * The column <code>danjitalk.feed.bookmark_count</code>.
      */
-    public final TableField<FeedRecord, String> FILE_URL = createField(DSL.name("file_url"), SQLDataType.VARCHAR(255).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
+    public final TableField<FeedRecord, Integer> BOOKMARK_COUNT = createField(DSL.name("bookmark_count"), SQLDataType.INTEGER.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.INTEGER)), this, "");
 
     /**
-     * The column <code>test.feed.thumbnail_file_url</code>.
+     * The column <code>danjitalk.feed.comment_count</code>.
      */
-    public final TableField<FeedRecord, String> THUMBNAIL_FILE_URL = createField(DSL.name("thumbnail_file_url"), SQLDataType.VARCHAR(255).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
+    public final TableField<FeedRecord, Integer> COMMENT_COUNT = createField(DSL.name("comment_count"), SQLDataType.INTEGER.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.INTEGER)), this, "");
 
     /**
-     * The column <code>test.feed.title</code>.
-     */
-    public final TableField<FeedRecord, String> TITLE = createField(DSL.name("title"), SQLDataType.VARCHAR(255).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
-
-    /**
-     * The column <code>test.feed.contents</code>.
+     * The column <code>danjitalk.feed.contents</code>.
      */
     public final TableField<FeedRecord, String> CONTENTS = createField(DSL.name("contents"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "");
 
     /**
-     * The column <code>test.feed.feed_type</code>.
+     * The column <code>danjitalk.feed.feed_type</code>.
      */
     public final TableField<FeedRecord, String> FEED_TYPE = createField(DSL.name("feed_type"), SQLDataType.VARCHAR(6).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
 
     /**
-     * The column <code>test.feed.bookmark_count</code>.
+     * The column <code>danjitalk.feed.file_url</code>.
      */
-    public final TableField<FeedRecord, Integer> BOOKMARK_COUNT = createField(DSL.name("bookmark_count"), SQLDataType.INTEGER.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.INTEGER)), this, "");
+    public final TableField<FeedRecord, String> FILE_URL = createField(DSL.name("file_url"), SQLDataType.VARCHAR(255).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
+
+    /**
+     * The column <code>danjitalk.feed.reaction_count</code>.
+     */
+    public final TableField<FeedRecord, Integer> REACTION_COUNT = createField(DSL.name("reaction_count"), SQLDataType.INTEGER.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.INTEGER)), this, "");
+
+    /**
+     * The column <code>danjitalk.feed.thumbnail_file_url</code>.
+     */
+    public final TableField<FeedRecord, String> THUMBNAIL_FILE_URL = createField(DSL.name("thumbnail_file_url"), SQLDataType.VARCHAR(255).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
+
+    /**
+     * The column <code>danjitalk.feed.title</code>.
+     */
+    public final TableField<FeedRecord, String> TITLE = createField(DSL.name("title"), SQLDataType.VARCHAR(255).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
+
+    /**
+     * The column <code>danjitalk.feed.apartment_id</code>.
+     */
+    public final TableField<FeedRecord, Long> APARTMENT_ID = createField(DSL.name("apartment_id"), SQLDataType.BIGINT.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINT)), this, "");
+
+    /**
+     * The column <code>danjitalk.feed.member_id</code>.
+     */
+    public final TableField<FeedRecord, Long> MEMBER_ID = createField(DSL.name("member_id"), SQLDataType.BIGINT.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINT)), this, "");
 
     private Feed(Name alias, Table<FeedRecord> aliased) {
         this(alias, aliased, null);
@@ -125,21 +125,21 @@ public class Feed extends TableImpl<FeedRecord> {
     }
 
     /**
-     * Create an aliased <code>test.feed</code> table reference
+     * Create an aliased <code>danjitalk.feed</code> table reference
      */
     public Feed(String alias) {
         this(DSL.name(alias), FEED);
     }
 
     /**
-     * Create an aliased <code>test.feed</code> table reference
+     * Create an aliased <code>danjitalk.feed</code> table reference
      */
     public Feed(Name alias) {
         this(alias, FEED);
     }
 
     /**
-     * Create a <code>test.feed</code> table reference
+     * Create a <code>danjitalk.feed</code> table reference
      */
     public Feed() {
         this(DSL.name("feed"), null);
@@ -151,7 +151,7 @@ public class Feed extends TableImpl<FeedRecord> {
 
     @Override
     public Schema getSchema() {
-        return aliased() ? null : Test.TEST;
+        return aliased() ? null : Danjitalk.DANJITALK;
     }
 
     @Override
@@ -208,14 +208,14 @@ public class Feed extends TableImpl<FeedRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Row13<Integer, Integer, Long, LocalDateTime, Long, Long, LocalDateTime, String, String, String, String, String, Integer> fieldsRow() {
+    public Row13<Long, LocalDateTime, LocalDateTime, Integer, Integer, String, String, String, Integer, String, String, Long, Long> fieldsRow() {
         return (Row13) super.fieldsRow();
     }
 
     /**
      * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
      */
-    public <U> SelectField<U> mapping(Function13<? super Integer, ? super Integer, ? super Long, ? super LocalDateTime, ? super Long, ? super Long, ? super LocalDateTime, ? super String, ? super String, ? super String, ? super String, ? super String, ? super Integer, ? extends U> from) {
+    public <U> SelectField<U> mapping(Function13<? super Long, ? super LocalDateTime, ? super LocalDateTime, ? super Integer, ? super Integer, ? super String, ? super String, ? super String, ? super Integer, ? super String, ? super String, ? super Long, ? super Long, ? extends U> from) {
         return convertFrom(Records.mapping(from));
     }
 
@@ -223,7 +223,7 @@ public class Feed extends TableImpl<FeedRecord> {
      * Convenience mapping calling {@link SelectField#convertFrom(Class,
      * Function)}.
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function13<? super Integer, ? super Integer, ? super Long, ? super LocalDateTime, ? super Long, ? super Long, ? super LocalDateTime, ? super String, ? super String, ? super String, ? super String, ? super String, ? super Integer, ? extends U> from) {
+    public <U> SelectField<U> mapping(Class<U> toType, Function13<? super Long, ? super LocalDateTime, ? super LocalDateTime, ? super Integer, ? super Integer, ? super String, ? super String, ? super String, ? super Integer, ? super String, ? super String, ? super Long, ? super Long, ? extends U> from) {
         return convertFrom(toType, Records.mapping(from));
     }
 }

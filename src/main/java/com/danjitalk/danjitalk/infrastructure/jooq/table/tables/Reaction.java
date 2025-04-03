@@ -5,8 +5,8 @@ package com.danjitalk.danjitalk.infrastructure.jooq.table.tables;
 
 
 import com.danjitalk.danjitalk.domain.community.reaction.enums.ReactionType;
+import com.danjitalk.danjitalk.infrastructure.jooq.table.Danjitalk;
 import com.danjitalk.danjitalk.infrastructure.jooq.table.Keys;
-import com.danjitalk.danjitalk.infrastructure.jooq.table.Test;
 import com.danjitalk.danjitalk.infrastructure.jooq.table.tables.records.ReactionRecord;
 
 import java.util.Arrays;
@@ -42,7 +42,7 @@ public class Reaction extends TableImpl<ReactionRecord> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The reference instance of <code>test.reaction</code>
+     * The reference instance of <code>danjitalk.reaction</code>
      */
     public static final Reaction REACTION = new Reaction();
 
@@ -55,24 +55,24 @@ public class Reaction extends TableImpl<ReactionRecord> {
     }
 
     /**
-     * The column <code>test.reaction.feed_id</code>.
-     */
-    public final TableField<ReactionRecord, Long> FEED_ID = createField(DSL.name("feed_id"), SQLDataType.BIGINT.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINT)), this, "");
-
-    /**
-     * The column <code>test.reaction.id</code>.
+     * The column <code>danjitalk.reaction.id</code>.
      */
     public final TableField<ReactionRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
 
     /**
-     * The column <code>test.reaction.member_id</code>.
-     */
-    public final TableField<ReactionRecord, Long> MEMBER_ID = createField(DSL.name("member_id"), SQLDataType.BIGINT.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINT)), this, "");
-
-    /**
-     * The column <code>test.reaction.reaction_type</code>.
+     * The column <code>danjitalk.reaction.reaction_type</code>.
      */
     public final TableField<ReactionRecord, ReactionType> REACTION_TYPE = createField(DSL.name("reaction_type"), SQLDataType.VARCHAR(4).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "", new AutoConverter<String, ReactionType>(String.class, ReactionType.class));
+
+    /**
+     * The column <code>danjitalk.reaction.feed_id</code>.
+     */
+    public final TableField<ReactionRecord, Long> FEED_ID = createField(DSL.name("feed_id"), SQLDataType.BIGINT.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINT)), this, "");
+
+    /**
+     * The column <code>danjitalk.reaction.member_id</code>.
+     */
+    public final TableField<ReactionRecord, Long> MEMBER_ID = createField(DSL.name("member_id"), SQLDataType.BIGINT.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINT)), this, "");
 
     private Reaction(Name alias, Table<ReactionRecord> aliased) {
         this(alias, aliased, null);
@@ -83,21 +83,21 @@ public class Reaction extends TableImpl<ReactionRecord> {
     }
 
     /**
-     * Create an aliased <code>test.reaction</code> table reference
+     * Create an aliased <code>danjitalk.reaction</code> table reference
      */
     public Reaction(String alias) {
         this(DSL.name(alias), REACTION);
     }
 
     /**
-     * Create an aliased <code>test.reaction</code> table reference
+     * Create an aliased <code>danjitalk.reaction</code> table reference
      */
     public Reaction(Name alias) {
         this(alias, REACTION);
     }
 
     /**
-     * Create a <code>test.reaction</code> table reference
+     * Create a <code>danjitalk.reaction</code> table reference
      */
     public Reaction() {
         this(DSL.name("reaction"), null);
@@ -109,7 +109,7 @@ public class Reaction extends TableImpl<ReactionRecord> {
 
     @Override
     public Schema getSchema() {
-        return aliased() ? null : Test.TEST;
+        return aliased() ? null : Danjitalk.DANJITALK;
     }
 
     @Override
@@ -130,7 +130,7 @@ public class Reaction extends TableImpl<ReactionRecord> {
     private transient Feed _feed;
 
     /**
-     * Get the implicit join path to the <code>test.feed</code> table.
+     * Get the implicit join path to the <code>danjitalk.feed</code> table.
      */
     public Feed feed() {
         if (_feed == null)
@@ -183,14 +183,14 @@ public class Reaction extends TableImpl<ReactionRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Row4<Long, Long, Long, ReactionType> fieldsRow() {
+    public Row4<Long, ReactionType, Long, Long> fieldsRow() {
         return (Row4) super.fieldsRow();
     }
 
     /**
      * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
      */
-    public <U> SelectField<U> mapping(Function4<? super Long, ? super Long, ? super Long, ? super ReactionType, ? extends U> from) {
+    public <U> SelectField<U> mapping(Function4<? super Long, ? super ReactionType, ? super Long, ? super Long, ? extends U> from) {
         return convertFrom(Records.mapping(from));
     }
 
@@ -198,7 +198,7 @@ public class Reaction extends TableImpl<ReactionRecord> {
      * Convenience mapping calling {@link SelectField#convertFrom(Class,
      * Function)}.
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function4<? super Long, ? super Long, ? super Long, ? super ReactionType, ? extends U> from) {
+    public <U> SelectField<U> mapping(Class<U> toType, Function4<? super Long, ? super ReactionType, ? super Long, ? super Long, ? extends U> from) {
         return convertFrom(toType, Records.mapping(from));
     }
 }
