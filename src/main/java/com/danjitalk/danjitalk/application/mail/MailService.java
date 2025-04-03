@@ -4,7 +4,9 @@ import static com.danjitalk.danjitalk.common.util.RandomCodeGeneratorUtil.genera
 
 import com.danjitalk.danjitalk.common.exception.BadRequestException;
 import com.danjitalk.danjitalk.common.exception.ConflictException;
+import com.danjitalk.danjitalk.common.exception.DataNotFoundException;
 import com.danjitalk.danjitalk.domain.mail.dto.MailRequest;
+import com.danjitalk.danjitalk.domain.mail.enums.MailType;
 import com.danjitalk.danjitalk.infrastructure.repository.mail.RedisRepository;
 import com.danjitalk.danjitalk.infrastructure.repository.user.member.MemberRepository;
 import jakarta.mail.MessagingException;
@@ -37,11 +39,20 @@ public class MailService {
     // 1. 인증번호 받기 버튼을 누른다.
     // 2. 인증번호를 생성하고 redis에 저장한다.
     // 3. redis에 저장된 번호를 보낸다.
+    /**
+     * 회원가입, 비밀번호 찾기 시 인증메일 전송
+     * @param request
+     */
     public void sendVerificationEmail(MailRequest request) {
+        boolean isEmailExists = memberRepository.existsByEmail(request.mail());
 
-        // 메일중복 시 메소드 예외
-        if (memberRepository.existsByEmail(request.mail())) {
+        if (request.type() == MailType.SIGN_UP && isEmailExists) {
+            // 메일중복 시 메소드 예외
             throw new ConflictException("이미 가입된 메일입니다. : " + request.mail());
+        }
+
+        if (request.type() == MailType.FIND_PASSWORD && !isEmailExists) {
+            throw new DataNotFoundException("가입되지 않은 메일입니다. : " + request.mail());
         }
 
         // 랜덤번호 생성
