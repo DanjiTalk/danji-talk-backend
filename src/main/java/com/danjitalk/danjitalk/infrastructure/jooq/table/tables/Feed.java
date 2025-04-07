@@ -13,12 +13,12 @@ import java.util.function.Function;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function13;
+import org.jooq.Function14;
 import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
 import org.jooq.Records;
-import org.jooq.Row13;
+import org.jooq.Row14;
 import org.jooq.Schema;
 import org.jooq.SelectField;
 import org.jooq.Table;
@@ -105,6 +105,11 @@ public class Feed extends TableImpl<FeedRecord> {
      * The column <code>danjitalk.feed.title</code>.
      */
     public final TableField<FeedRecord, String> TITLE = createField(DSL.name("title"), SQLDataType.VARCHAR(255).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
+
+    /**
+     * The column <code>danjitalk.feed.view_count</code>.
+     */
+    public final TableField<FeedRecord, Integer> VIEW_COUNT = createField(DSL.name("view_count"), SQLDataType.INTEGER.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.INTEGER)), this, "");
 
     /**
      * The column <code>danjitalk.feed.apartment_id</code>.
@@ -204,18 +209,18 @@ public class Feed extends TableImpl<FeedRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row13 type methods
+    // Row14 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row13<Long, LocalDateTime, LocalDateTime, Integer, Integer, String, String, String, Integer, String, String, Long, Long> fieldsRow() {
-        return (Row13) super.fieldsRow();
+    public Row14<Long, LocalDateTime, LocalDateTime, Integer, Integer, String, String, String, Integer, String, String, Integer, Long, Long> fieldsRow() {
+        return (Row14) super.fieldsRow();
     }
 
     /**
      * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
      */
-    public <U> SelectField<U> mapping(Function13<? super Long, ? super LocalDateTime, ? super LocalDateTime, ? super Integer, ? super Integer, ? super String, ? super String, ? super String, ? super Integer, ? super String, ? super String, ? super Long, ? super Long, ? extends U> from) {
+    public <U> SelectField<U> mapping(Function14<? super Long, ? super LocalDateTime, ? super LocalDateTime, ? super Integer, ? super Integer, ? super String, ? super String, ? super String, ? super Integer, ? super String, ? super String, ? super Integer, ? super Long, ? super Long, ? extends U> from) {
         return convertFrom(Records.mapping(from));
     }
 
@@ -223,7 +228,7 @@ public class Feed extends TableImpl<FeedRecord> {
      * Convenience mapping calling {@link SelectField#convertFrom(Class,
      * Function)}.
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function13<? super Long, ? super LocalDateTime, ? super LocalDateTime, ? super Integer, ? super Integer, ? super String, ? super String, ? super String, ? super Integer, ? super String, ? super String, ? super Long, ? super Long, ? extends U> from) {
+    public <U> SelectField<U> mapping(Class<U> toType, Function14<? super Long, ? super LocalDateTime, ? super LocalDateTime, ? super Integer, ? super Integer, ? super String, ? super String, ? super String, ? super Integer, ? super String, ? super String, ? super Integer, ? super Long, ? super Long, ? extends U> from) {
         return convertFrom(toType, Records.mapping(from));
     }
 }

@@ -13,6 +13,10 @@ public record FeedDetailResponseDto(
         LocalDateTime createdAt,
         FeedMemberResponseDto feedMemberResponseDto,
         List<S3ObjectResponseDto> s3ObjectResponseDtoList,
+        Integer viewCount,
+        Integer reactionCount,
+        Integer commentCount,
+        Integer bookmarkCount,
         Boolean isReacted,
         Boolean isBookmarked
         )

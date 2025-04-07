@@ -73,6 +73,7 @@ public class FeedService {
                         projectionFeedDto.title(),
                         projectionFeedDto.contents(),
                         projectionFeedDto.localDateTime(),
+                        projectionFeedDto.viewCount(),
                         projectionFeedDto.reactionCount(),
                         projectionFeedDto.commentCount(),
                         projectionFeedDto.bookmarkCount(),
@@ -113,6 +114,10 @@ public class FeedService {
                         feed.getMember().getNickname()
                 ),
                 s3ObjectResponseDtoList,
+                feed.getViewCount(),
+                feed.getReactionCount(),
+                feed.getCommentCount(),
+                feed.getBookmarkCount(),
                 reacted,
                 bookmarked
         );

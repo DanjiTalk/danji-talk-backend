@@ -11,6 +11,7 @@ public record ProjectionFeedDto(
         String title,
         String contents,
         LocalDateTime localDateTime,
+        Integer viewCount,
         Integer reactionCount,
         Integer commentCount,
         Integer bookmarkCount,
@@ -20,7 +21,7 @@ public record ProjectionFeedDto(
 
     @QueryProjection
     public ProjectionFeedDto(
-            Long feedId, Long memberId, String nickName, String title, String contents, LocalDateTime localDateTime, Integer reactionCount, Integer commentCount, Integer bookmarkCount, String thumbnailFileUrl, Boolean isReacted
+            Long feedId, Long memberId, String nickName, String title, String contents, LocalDateTime localDateTime, Integer viewCount, Integer reactionCount, Integer commentCount, Integer bookmarkCount, String thumbnailFileUrl, Boolean isReacted
     ) {
         this.feedId = feedId;
         this.memberId = memberId;
@@ -28,6 +29,7 @@ public record ProjectionFeedDto(
         this.title = title;
         this.contents = contents;
         this.localDateTime = localDateTime;
+        this.viewCount = viewCount;
         this.reactionCount = reactionCount;
         this.commentCount = commentCount;
         this.bookmarkCount = bookmarkCount;
