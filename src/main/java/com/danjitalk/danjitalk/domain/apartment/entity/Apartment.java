@@ -1,6 +1,5 @@
 package com.danjitalk.danjitalk.domain.apartment.entity;
 
-import com.danjitalk.danjitalk.domain.chat.entity.Chatroom;
 import com.danjitalk.danjitalk.domain.community.feed.entity.Feed;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -37,9 +36,7 @@ public class Apartment {
 
     private String thumbnailFileUrl;
 
-    @OneToOne(fetch = FetchType.LAZY)       // TODO: 연관관계 필요성?
-    @JoinColumn(name = "chatroom_id")
-    private Chatroom chatroom;
+    private Long chatroomId;
 
     @OneToMany(mappedBy = "apartment")
     private List<Feed> feedList = new ArrayList<>();
@@ -58,7 +55,7 @@ public class Apartment {
         this.thumbnailFileUrl = thumbnailFileUrl;
     }
 
-    public void addChatroom(Chatroom chatroom) {
-        this.chatroom = chatroom;
+    public void addChatroom(Long chatroomId) {
+        this.chatroomId = chatroomId;
     }
 }

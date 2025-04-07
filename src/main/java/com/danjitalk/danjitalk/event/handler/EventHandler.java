@@ -25,7 +25,7 @@ public class EventHandler {
     public void handleGroupChatCreateEvent(GroupChatCreateEvent event) {
         Chatroom chatroom = chatService.createChatroom(event.groupChatName());
         Apartment apartment = apartmentRepository.findByName(event.groupChatName()).orElseThrow();
-        apartment.addChatroom(chatroom);
+        apartment.addChatroom(chatroom.getId());
         apartmentRepository.save(apartment);
     }
 }
