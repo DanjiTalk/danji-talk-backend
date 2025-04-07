@@ -42,7 +42,7 @@ public class BookmarkService {
             throw new IllegalArgumentException("Bookmark already exists");
         }
 
-        Bookmark bookmark = new Bookmark(null, memberId, feedId);
+        Bookmark bookmark = new Bookmark(memberId, feedId);
 
         bookmarkRepository.save(bookmark);
 

@@ -1,8 +1,6 @@
 package com.danjitalk.danjitalk.domain.community.bookmark.entity;
 
 import com.danjitalk.danjitalk.domain.common.entity.BaseEntity;
-import com.danjitalk.danjitalk.domain.community.feed.entity.Feed;
-import com.danjitalk.danjitalk.domain.user.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -26,8 +24,8 @@ public class Bookmark extends BaseEntity {
     private Long feedId;
 
     @Builder
-    public Bookmark(Long id, Long memberId, Long feedId) {
-        this.id = id;
+    public Bookmark(Long memberId, Long feedId) {
+        this.id = null;
         this.memberId = memberId;
         this.feedId = feedId;
     }
