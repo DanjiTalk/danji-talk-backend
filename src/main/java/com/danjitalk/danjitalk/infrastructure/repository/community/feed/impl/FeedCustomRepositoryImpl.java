@@ -45,6 +45,7 @@ public class FeedCustomRepositoryImpl implements FeedCustomRepository {
                         feed.title.as("title"),
                         feed.contents.as("contents"),
                         feed.createdAt.as("localDateTime"),
+                        feed.viewCount.as("viewCount"),
                         feed.reactionCount.as("reactionCount"),
                         feed.commentCount.as("commentCount"),
                         feed.bookmarkCount.as("bookmarkCount"),

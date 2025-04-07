@@ -9,6 +9,7 @@ public record FeedDto(
         String title,
         String contents,
         LocalDateTime localDateTime,
+        Integer viewCount,
         Integer reactionCount,
         Integer commentCount,
         Integer bookmarkCount,

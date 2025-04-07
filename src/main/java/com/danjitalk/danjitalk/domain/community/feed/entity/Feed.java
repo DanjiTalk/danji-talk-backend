@@ -35,6 +35,8 @@ public class Feed extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String contents;
 
+    private Integer viewCount;
+
     private Integer commentCount;
 
     private Integer reactionCount;
@@ -55,6 +57,7 @@ public class Feed extends BaseEntity {
 
     @PrePersist
     public void prePersist() {
+        if (viewCount == null) viewCount = 0;
         if (commentCount == null) commentCount = 0;
         if (reactionCount == null) reactionCount = 0;
         if (bookmarkCount == null) bookmarkCount = 0;

@@ -121,6 +121,7 @@ public class CommentService {
                 comment.getId(),
                 comment.getFeed().getId(),
                 comment.getContents(),
+                comment.getCreatedAt(),
                 new CommentMemberResponseDto(comment.getMember().getId(), comment.getMember().getNickname(), comment.getMember().getFileId()),
                 comment.getChildrenList().stream()
                         .map(this::converToDto)
