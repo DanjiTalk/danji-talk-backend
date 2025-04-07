@@ -13,7 +13,8 @@ public record FeedDetailResponseDto(
         LocalDateTime createdAt,
         FeedMemberResponseDto feedMemberResponseDto,
         List<S3ObjectResponseDto> s3ObjectResponseDtoList,
-        Boolean isReacted
+        Boolean isReacted,
+        Boolean isBookmarked
         )
 {
 }

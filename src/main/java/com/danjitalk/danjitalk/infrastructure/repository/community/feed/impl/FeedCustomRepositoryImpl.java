@@ -47,6 +47,7 @@ public class FeedCustomRepositoryImpl implements FeedCustomRepository {
                         feed.createdAt.as("localDateTime"),
                         feed.reactionCount.as("reactionCount"),
                         feed.commentCount.as("commentCount"),
+                        feed.bookmarkCount.as("bookmarkCount"),
                         feed.thumbnailFileUrl.as("thumbnailFileUrl"),
                         JPAExpressions
                                 .selectOne()

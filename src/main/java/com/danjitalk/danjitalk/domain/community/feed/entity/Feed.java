@@ -39,6 +39,8 @@ public class Feed extends BaseEntity {
 
     private Integer reactionCount;
 
+    private Integer bookmarkCount;
+
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
@@ -50,6 +52,13 @@ public class Feed extends BaseEntity {
 
     @OneToMany(mappedBy = "feed")
     private List<Comment> commentList = new ArrayList<>();
+
+    @PrePersist
+    public void prePersist() {
+        if (commentCount == null) commentCount = 0;
+        if (reactionCount == null) reactionCount = 0;
+        if (bookmarkCount == null) bookmarkCount = 0;
+    }
 
     // entity save 에서 사용
     @Builder

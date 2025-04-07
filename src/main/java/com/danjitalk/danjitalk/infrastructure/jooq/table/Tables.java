@@ -4,23 +4,29 @@
 package com.danjitalk.danjitalk.infrastructure.jooq.table;
 
 
+import com.danjitalk.danjitalk.infrastructure.jooq.table.tables.Bookmark;
 import com.danjitalk.danjitalk.infrastructure.jooq.table.tables.Feed;
 import com.danjitalk.danjitalk.infrastructure.jooq.table.tables.Reaction;
 
 
 /**
- * Convenience access to all tables in test.
+ * Convenience access to all tables in danjitalk.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Tables {
 
     /**
-     * The table <code>test.feed</code>.
+     * The table <code>danjitalk.bookmark</code>.
+     */
+    public static final Bookmark BOOKMARK = Bookmark.BOOKMARK;
+
+    /**
+     * The table <code>danjitalk.feed</code>.
      */
     public static final Feed FEED = Feed.FEED;
 
     /**
-     * The table <code>test.reaction</code>.
+     * The table <code>danjitalk.reaction</code>.
      */
     public static final Reaction REACTION = Reaction.REACTION;
 }

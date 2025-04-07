@@ -32,7 +32,7 @@ public class JooqCodeGenerator {
                 .withGenerator(new Generator()
                         .withDatabase(new Database()
                                 .withName(jooqProperties.getJooq().getSql())
-                                .withIncludes("feed|reaction")
+                                .withIncludes("feed|reaction|bookmark")
                                 .withInputSchema(jooqProperties.getJooq().getSchemaName())
                                 // enum 처리
                                 .withForcedTypes(List.of(
