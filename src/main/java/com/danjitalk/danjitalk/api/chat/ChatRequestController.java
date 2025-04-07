@@ -4,6 +4,7 @@ import com.danjitalk.danjitalk.application.chat.ChatRequestService;
 import com.danjitalk.danjitalk.common.response.ApiResponse;
 import com.danjitalk.danjitalk.domain.chat.dto.ChatRequestResponse;
 import com.danjitalk.danjitalk.domain.chat.dto.CreateChatRequest;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,7 +24,7 @@ public class ChatRequestController {
     private final ChatRequestService chatRequestService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<Void>> requestChat(@RequestBody CreateChatRequest request) {
+    public ResponseEntity<ApiResponse<Void>> requestChat(@Valid @RequestBody CreateChatRequest request) {
         chatRequestService.requestChat(request);
         return ResponseEntity.ok().build();
     }
