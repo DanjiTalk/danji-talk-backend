@@ -1,5 +1,7 @@
 package com.danjitalk.danjitalk.config;
 
+import static org.springframework.security.config.Customizer.withDefaults;
+
 import com.danjitalk.danjitalk.application.oauth.OAuth2LoginSuccessHandler;
 import com.danjitalk.danjitalk.application.oauth.PrincipalOauth2UserService;
 import com.danjitalk.danjitalk.common.security.*;
@@ -49,6 +51,7 @@ public class SecurityConfig {
         JwtAuthorizationFilter jwtAuthorizationFilter = new JwtAuthorizationFilter(systemUserRepository, jwtUtil, accessTokenUtil, refreshTokenUtil);
 
         http
+            .cors(withDefaults()) // cors를 활성화하여 addCorsMappings이 spring security와 함께 동작하도록함
             .csrf(AbstractHttpConfigurer::disable)
             .httpBasic(AbstractHttpConfigurer::disable)
             .formLogin(AbstractHttpConfigurer::disable)

@@ -29,12 +29,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity
             .status(HttpStatus.NOT_FOUND)
             .body(ApiResponse.fail(HttpStatus.NOT_FOUND.value(), e.getMessage()));
-
-//        ModelAndView mav = new ModelAndView();
-//        mav.setViewName("error/404"); // templates/error/404.html 렌더링
-//        mav.setStatus(HttpStatus.NOT_FOUND);
-//        mav.addObject("message", e.getMessage()); // Thymeleaf에서 사용 가능
-//        return mav;
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

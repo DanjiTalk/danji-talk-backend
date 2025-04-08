@@ -36,6 +36,8 @@ public class Apartment {
 
     private String thumbnailFileUrl;
 
+    private Long chatroomId;
+
     @OneToMany(mappedBy = "apartment")
     private List<Feed> feedList = new ArrayList<>();
 
@@ -51,5 +53,9 @@ public class Apartment {
         this.buildingRange = buildingRange;
         this.fileUrl = fileUrl;
         this.thumbnailFileUrl = thumbnailFileUrl;
+    }
+
+    public void addChatroom(Long chatroomId) {
+        this.chatroomId = chatroomId;
     }
 }

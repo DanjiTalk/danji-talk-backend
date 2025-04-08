@@ -30,7 +30,6 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final SystemUserRepository systemUserRepository;
-    private final MemberDomainService memberDomainService;
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Transactional
