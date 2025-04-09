@@ -3,11 +3,11 @@ package com.danjitalk.danjitalk.api.community.feed;
 import com.danjitalk.danjitalk.application.community.feed.FeedService;
 import com.danjitalk.danjitalk.common.response.ApiResponse;
 import com.danjitalk.danjitalk.domain.community.feed.dto.request.CreateFeedRequestDto;
-import com.danjitalk.danjitalk.domain.community.feed.dto.request.GetFeedListRequestDto;
 import com.danjitalk.danjitalk.domain.community.feed.dto.request.UpdateFeedRequestDto;
 import com.danjitalk.danjitalk.domain.community.feed.dto.response.CreateFeedResponseDto;
 import com.danjitalk.danjitalk.domain.community.feed.dto.response.FeedDetailResponseDto;
 import com.danjitalk.danjitalk.domain.community.feed.dto.response.FeedListDto;
+import com.danjitalk.danjitalk.domain.community.feed.enums.FeedSortType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -78,8 +78,8 @@ public class FeedController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<FeedListDto>> getFeedList(@RequestParam Long apartmentId, @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorDate) {
-        return ResponseEntity.ok(ApiResponse.success(200, null, feedService.getFeedList(apartmentId, cursorDate)));
+    public ResponseEntity<ApiResponse<FeedListDto>> getFeedList(@RequestParam Long apartmentId, @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursorDate, @RequestParam(required = false, defaultValue = "ALL") FeedSortType sort) {
+        return ResponseEntity.ok(ApiResponse.success(200, null, feedService.getFeedList(apartmentId, cursorDate, sort)));
     }
 
 }

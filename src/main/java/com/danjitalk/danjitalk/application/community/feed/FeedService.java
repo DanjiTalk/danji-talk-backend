@@ -9,6 +9,7 @@ import com.danjitalk.danjitalk.domain.community.feed.dto.request.CreateFeedReque
 import com.danjitalk.danjitalk.domain.community.feed.dto.request.UpdateFeedRequestDto;
 import com.danjitalk.danjitalk.domain.community.feed.dto.response.*;
 import com.danjitalk.danjitalk.domain.community.feed.entity.Feed;
+import com.danjitalk.danjitalk.domain.community.feed.enums.FeedSortType;
 import com.danjitalk.danjitalk.domain.s3.dto.response.S3FileUrlResponseDto;
 import com.danjitalk.danjitalk.domain.s3.dto.response.S3ObjectResponseDto;
 import com.danjitalk.danjitalk.domain.s3.enums.FileType;
@@ -47,9 +48,9 @@ public class FeedService {
      * 피드 목록 조회
      * limit 15, cursorDate 필요
      * */
-    public FeedListDto getFeedList(Long apartmentId, LocalDateTime cursorDate) {
+    public FeedListDto getFeedList(Long apartmentId, LocalDateTime cursorDate, FeedSortType sort) {
 
-        List<ProjectionFeedDto> projectionFeedList = feedRepository.getProjectionFeedList(apartmentId, cursorDate).orElse(Collections.emptyList());
+        List<ProjectionFeedDto> projectionFeedList = feedRepository.getProjectionFeedList(apartmentId, cursorDate, sort).orElse(Collections.emptyList());
 
         // 비어있을땐 빈 데이터 반환
         if(projectionFeedList.isEmpty()) {
