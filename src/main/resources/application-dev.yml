@@ -22,7 +22,8 @@ spring:
 logging:
   level:
     root: info  # 기본 로그 레벨
-    org.springframework: trace
+    org.springframework: info
+    com.danjitalk.: info
 
 # 스케줄러 on / off
 scheduler:
