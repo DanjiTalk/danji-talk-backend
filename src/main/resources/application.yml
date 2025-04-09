@@ -83,7 +83,7 @@ spring:
       password: ${REDIS_PASSWORD:test}
 
     mongodb:
-      uri: mongodb://localhost:27017/danjitalk?retryWrites=true&w=majority
+      uri: mongodb://${MONGODB_HOST:localhost:27017}/danjitalk?retryWrites=true&w=majority
 
 aws:
   s3:
