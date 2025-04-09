@@ -22,7 +22,11 @@ spring:
 logging:
   level:
     root: info  # 기본 로그 레벨
-    org.springframework: trace
+    com.danjitalk.: info
+    org.hibernate.SQL: info  # 실제 실행되는 SQL
+
+    org.springframework: info
+    org.springframework.security: DEBUG
 
 # 스케줄러 on / off
 scheduler:
