@@ -1,5 +1,6 @@
 package com.danjitalk.danjitalk.application.chat;
 
+import com.danjitalk.danjitalk.common.exception.BadRequestException;
 import com.danjitalk.danjitalk.common.exception.DataNotFoundException;
 import com.danjitalk.danjitalk.common.exception.ForbiddenException;
 import com.danjitalk.danjitalk.common.util.SecurityContextHolderUtil;
@@ -97,6 +98,32 @@ public class ChatService {
             if (destination != null && destination.startsWith("/topic/chat/")) {
                 messagingTemplate.convertAndSend(destination, member.getNickname() + " 사용자가 입장했습니다.");
             }
+        }
+    }
+
+    /**
+     * 채팅방 나가기 (구독 취소)
+     * @param chatroomId 나갈 방 번호
+     * @param memberId 현재 회원 아아디
+     */
+    @Transactional
+    public void exitRoom(Long chatroomId, Long memberId) {
+        log.info("채팅방 나가기 요청 - memberId={}, chatroomId={}", memberId, chatroomId);
+
+        if (!memberRepository.existsById(memberId)) {
+            throw new DataNotFoundException("존재하지 않는 회원입니다.");
+        }
+
+        if (!chatroomRepository.existsById(chatroomId)) {
+            throw new DataNotFoundException("존재하지 않는 채팅방입니다");
+        }
+
+        boolean isInChatRoom = chatroomMemberMappingRepository.existsByChatroomIdAndMemberId(chatroomId, memberId);
+
+        if (isInChatRoom) {
+            chatroomMemberMappingRepository.deleteByChatroomIdAndMemberId(chatroomId, memberId);
+        } else {
+            throw new BadRequestException("이미 나간 채팅방입니다.");
         }
     }
 
