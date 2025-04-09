@@ -262,4 +262,19 @@ public class FeedService {
             return feedRepository.isReacted(feedId, memberId);
         }
     }
+
+    /**
+     * 조회수 증가 로직
+     * TODO :: 아직 정책상 정해진게 없음, 중복 조회수 허용이 되어야하는지? 안된다면 텀을 얼마나 둬야하는지 등
+     * */
+    public void increaseViews(Long feedId) {
+
+        String feedKey = "feed:viewCount:" + feedId;
+        String redisFeed = redisTemplate.opsForValue().get(feedKey);
+
+        if(redisFeed == null || redisFeed.isEmpty()) {
+            redisTemplate.opsForValue().increment(feedKey);
+        }
+
+    }
 }
