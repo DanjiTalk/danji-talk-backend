@@ -104,6 +104,8 @@ public class FeedService {
 
         Boolean bookmarked = bookmarkService.isBookmarked(feedId);
 
+        Boolean isAuthor = SecurityContextHolderUtil.getMemberId().equals(feed.getMember().getId());
+
         return new FeedDetailResponseDto(
                 feed.getId(),
                 feed.getTitle(),
@@ -119,7 +121,8 @@ public class FeedService {
                 feed.getCommentCount(),
                 feed.getBookmarkCount(),
                 reacted,
-                bookmarked
+                bookmarked,
+                isAuthor
         );
     }
 
