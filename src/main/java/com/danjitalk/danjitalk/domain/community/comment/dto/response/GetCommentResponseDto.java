@@ -11,6 +11,7 @@ public record GetCommentResponseDto(
         String contents,
         LocalDateTime createdAt,
         CommentMemberResponseDto commentMemberResponseDto,
-        List<GetCommentResponseDto> childrenCommentDto
+        List<GetCommentResponseDto> childrenCommentDto,
+        Boolean isAuthor
 ) {
 }

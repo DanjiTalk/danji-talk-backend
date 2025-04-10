@@ -18,7 +18,8 @@ public record FeedDetailResponseDto(
         Integer commentCount,
         Integer bookmarkCount,
         Boolean isReacted,
-        Boolean isBookmarked
+        Boolean isBookmarked,
+        Boolean isAuthor
         )
 {
 }
