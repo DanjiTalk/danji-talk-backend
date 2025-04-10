@@ -117,6 +117,13 @@ public class CommentService {
      * 재귀 호출로 DTO 변환
      * */
     private GetCommentResponseDto converToDto(Comment comment) {
+
+        if(comment == null) {
+            return null;
+        }
+
+        Boolean isAuthor = SecurityContextHolderUtil.getMemberId().equals(comment.getMember().getId());
+
         return new GetCommentResponseDto(
                 comment.getId(),
                 comment.getFeed().getId(),
@@ -125,7 +132,8 @@ public class CommentService {
                 new CommentMemberResponseDto(comment.getMember().getId(), comment.getMember().getNickname(), comment.getMember().getFileId()),
                 comment.getChildrenList().stream()
                         .map(this::converToDto)
-                        .toList()
+                        .toList(),
+                isAuthor
         );
     }
 
