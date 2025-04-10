@@ -69,7 +69,7 @@ public class FeedCustomRepositoryImpl implements FeedCustomRepository {
                         cursorDateGt(cursorDate)
                 )
                 .orderBy(this.sortByParam(sort))
-                .limit(5)
+                .limit(15)
                 .fetch());
     }
 
