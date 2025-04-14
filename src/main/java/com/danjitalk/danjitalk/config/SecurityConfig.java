@@ -92,6 +92,7 @@ public class SecurityConfig {
                 .userService(principalOauth2UserService)
             )
             .successHandler(oAuth2LoginSuccessHandler)
+//                .failureHandler() // TODO
         );
 
         return http.build();
@@ -114,6 +115,7 @@ public class SecurityConfig {
     public WebSecurityCustomizer webSecurityCustomizer() { // 시큐리티와 관련 없는(인증/인가 필요 없는) 필터를 타면 안되는 경로
         return web -> {
             web.ignoring()
+                .requestMatchers("/api/oauth/exchange")
                 .requestMatchers(HttpMethod.POST, "/api/member/signup")
                 .requestMatchers(HttpMethod.POST, "/api/member/check-email-duplication")
                 .requestMatchers(HttpMethod.POST, "/api/mail/certification-code/send")
