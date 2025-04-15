@@ -53,7 +53,9 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         map.put("memberEmail", user.getLoginId());
         map.put("provider", user.getLastLoginMethod());
 
-        redisTemplate.opsForValue().set(uuid, map, Duration.ofMinutes(3));
+        String key = "jwt:temp:claim:" + uuid;
+
+        redisTemplate.opsForValue().set(key, map, Duration.ofMinutes(3));
 
         // 성공 후 리다이렉트 SecurityConfig에 .defaultSuccessUrl("/api/success/oauth")는 쿠키설정이 안됨
         getRedirectStrategy().sendRedirect(request, response, frontendRedirectUrl + "/oauth/redirect?status=success&social-code=" + uuid); // 리다이렉트 주소

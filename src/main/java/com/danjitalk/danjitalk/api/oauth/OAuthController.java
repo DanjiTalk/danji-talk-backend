@@ -31,10 +31,11 @@ public class OAuthController {
     }
 
     @GetMapping("/api/oauth/exchange")
-    public ResponseEntity oauthExchange(HttpServletResponse response, @RequestParam String code) {
+    public ResponseEntity<Void> oauthExchange(HttpServletResponse response, @RequestParam String code) {
         log.info("oauthExchange: {}", code);
 
-        Map<String, Object> data = (Map<String, Object>) redisTemplate.opsForValue().get(code);
+        String key = "jwt:temp:claim:" + code;
+        Map<String, Object> data = (Map<String, Object>) redisTemplate.opsForValue().get(key);
 
         Map<String, Object> accessClaims = new HashMap<>();
         accessClaims.put("memberId", data.get("memberId"));
