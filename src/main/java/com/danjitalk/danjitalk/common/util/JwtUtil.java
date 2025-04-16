@@ -39,10 +39,28 @@ public class JwtUtil {
             .compact();
     }
 
+    public String createAccessToken(Map<String, Object> claims) {
+        return Jwts.builder()
+            .subject("accessToken")
+            .claims(claims)
+            .expiration(createTokenExpiration(ACCESS_TOKEN_VALIDITY_TIME))
+            .signWith(createSigningKey(jwtSecretKeys.getAccessSecret()))
+            .compact();
+    }
+
     public String createRefreshToken(SystemUser user) {
         return Jwts.builder()
             .subject("refreshToken")
             .claims(createRefreshTokenClaims(user))
+            .expiration(createTokenExpiration(REFRESH_TOKEN_VALIDITY_TIME))
+            .signWith(createSigningKey(jwtSecretKeys.getRefreshSecret()))
+            .compact();
+    }
+
+    public String createRefreshToken(Map<String, Object> claims) {
+        return Jwts.builder()
+            .subject("refreshToken")
+            .claims(claims)
             .expiration(createTokenExpiration(REFRESH_TOKEN_VALIDITY_TIME))
             .signWith(createSigningKey(jwtSecretKeys.getRefreshSecret()))
             .compact();

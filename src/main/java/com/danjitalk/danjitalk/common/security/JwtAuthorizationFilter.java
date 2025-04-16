@@ -77,6 +77,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
             // 리프레시는 있다면 유효성 검사 하고
             if (!refreshTokenUtil.checkIfRefreshTokenValid(refreshToken)) {
+                log.info("refresh token: {}", refreshToken);
                 ResponseUtil.createResponseBody(response, HttpStatus.UNAUTHORIZED, "access-token expired, refresh-token is invalid");
                 filterChain.doFilter(request, response);
                 return;
@@ -101,6 +102,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         SystemUser systemUser = null;
 
         try {
+            log.info("accessToken: {}", accessToken);
             claims = accessTokenUtil.getClaimsFromAccessToken(accessToken);
         } catch (ExpiredJwtException e) {
             // 엑세스 토큰이 만료되었을 때 리프레시 토큰이 유효하다면, 엑세스 토큰을 새로 발급해줍니다.
