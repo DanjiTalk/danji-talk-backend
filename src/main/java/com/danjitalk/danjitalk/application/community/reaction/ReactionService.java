@@ -52,13 +52,15 @@ public class ReactionService {
         }
 
         Boolean exists = redisTemplate.opsForSet().isMember(userSetKey, memberId);
+        // 있으면 TRUE, 없으면 FALSE
+        Boolean alreadyRemoved = redisTemplate.opsForSet().isMember(removeSetKey, memberId);
 
         // 레디스에 유저가 있으면 값 감소, 레디스 SET 에서 삭제, 스케쥴링이 돌기 전 다시 해제 했을때
-        if(Boolean.TRUE.equals(exists)) {
+        if(Boolean.TRUE.equals(exists) && Boolean.FALSE.equals(alreadyRemoved)) {
             redisTemplate.opsForValue().decrement(countKey);
             redisTemplate.opsForSet().remove(userSetKey, memberId);
             redisTemplate.opsForSet().add(removeSetKey, memberId);
-        } else {
+        } else if(Boolean.FALSE.equals(exists) && Boolean.FALSE.equals(alreadyRemoved)) {
             // 데이터가 존재하면 delete, 레디스에서 -1
             reactionRepository.findByMemberIdAndFeedId(Long.parseLong(memberId), feedId).ifPresent(reaction -> {
                 redisTemplate.opsForValue().decrement(countKey);

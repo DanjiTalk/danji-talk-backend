@@ -58,7 +58,7 @@ public class ReactionScheduleJob {
         List<Query> list = reactionCountMap.entrySet().stream()
                 .map(entry -> (Query) dslContext
                         .update(FEED)
-                        .set(FEED.REACTION_COUNT, entry.getValue().intValue())
+                        .set(FEED.REACTION_COUNT, FEED.REACTION_COUNT.plus(entry.getValue().intValue()))
                         .where(FEED.ID.eq(entry.getKey()))
                 ).toList();
 
