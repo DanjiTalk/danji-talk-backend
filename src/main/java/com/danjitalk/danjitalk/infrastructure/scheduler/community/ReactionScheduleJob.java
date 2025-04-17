@@ -8,7 +8,6 @@ import org.jooq.Query;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -25,15 +24,13 @@ public class ReactionScheduleJob {
 
     // 30초마다 실행
     @Scheduled(fixedRate = 30000)
-    @Transactional
     public void syncReaction() {
 
-        bulkUpdateReactionCount();
         bulkInsertReaction();
         bulkDeleteReaction();
+        bulkUpdateReactionCount();
 
     }
-
 
     /**
      * 좋아요 갯수 업데이트, JOOQ 사용 Bulk Update
@@ -84,30 +81,35 @@ public class ReactionScheduleJob {
 
         if(userKeys.isEmpty()) return;
 
-        List<Query> list = new ArrayList<>();
 
         userKeys.forEach(key -> {
+            List<Query> insertQueries = new ArrayList<>();
             Long feedId = Long.parseLong(key.replace("reaction:user:", ""));
 
-            Objects.requireNonNull(redisTemplate.opsForSet().members(key)).forEach(memberId -> {
-                list.add(
-                        dslContext.insertInto(REACTION)
-                                .set(REACTION.REACTION_TYPE, ReactionType.LIKE)
-                                .set(REACTION.FEED_ID, feedId)
-                                .set(REACTION.MEMBER_ID, Long.parseLong(memberId))
+            Set<String> memberIdList = redisTemplate.opsForSet().members(key);
+
+            if(memberIdList == null || memberIdList.isEmpty()) return;
+
+            Objects.requireNonNull(memberIdList).forEach(memberId -> {
+                insertQueries.add(
+                        // language=MySQL
+                        dslContext.query("INSERT IGNORE INTO reaction (feed_id, reaction_type, member_id) VALUES (?, ?, ?)",
+                        feedId, ReactionType.LIKE.name(), Long.parseLong(memberId))
                 );
             });
 
+            int[] execute = dslContext.batch(insertQueries).execute();
+            int insertedCount = Arrays.stream(execute).sum();
+            long duplicateCount = memberIdList.size() - insertedCount;
+
+            // Count 보정
+            if(duplicateCount > 0) {
+                redisTemplate.opsForValue().decrement("reaction:count:" + feedId, duplicateCount);
+            }
         });
 
-        try {
-            dslContext.batch(list).execute();
-
-            // 데이터 삭제
+            // Redis 데이터 삭제
             redisTemplate.delete(userKeys.stream().toList());
-        } catch (Exception e) {
-            log.error("reaction insert failed", e);
-        }
     }
 
     /**
@@ -118,27 +120,37 @@ public class ReactionScheduleJob {
 
         if(removeKeys.isEmpty()) return;
 
-        List<Query> list = new ArrayList<>();
+        List<Query> deleteQueries = new ArrayList<>();
 
         removeKeys.forEach(key -> {
             Long feedId = Long.parseLong(key.replace("reaction:removeUser:", ""));
 
-            Objects.requireNonNull(redisTemplate.opsForSet().members(key)).forEach(memberId -> {
-                list.add(
+            Set<String> memberIdList = redisTemplate.opsForSet().members(key);
+
+            Objects.requireNonNull(memberIdList).forEach(memberId -> {
+                deleteQueries.add(
                         dslContext.deleteFrom(REACTION)
                                 .where(REACTION.FEED_ID.eq(feedId))
                                 .and(REACTION.MEMBER_ID.eq(Long.parseLong(memberId)))
                 );
             });
+
+            // 배치 작업
+            int[] execute = dslContext.batch(deleteQueries).execute();
+
+            // 쿼리에 영향을 받은 수
+            int deletedCount = Arrays.stream(execute).sum();
+
+            // 덜 삭제된 수
+            long duplicateCount = memberIdList.size() - deletedCount;
+            if(duplicateCount > 0) {
+                // 덜 삭제된 데이터 만큼 increment
+                redisTemplate.opsForValue().increment("reaction:count:" + feedId, duplicateCount);
+            }
+
         });
 
-        try {
-            dslContext.batch(list).execute();
-
-            redisTemplate.delete(removeKeys.stream().toList());
-        } catch (Exception e) {
-            log.error("reaction delete failed", e);
-        }
+        redisTemplate.delete(removeKeys.stream().toList());
 
     }
 
