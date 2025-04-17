@@ -5,13 +5,18 @@ import com.danjitalk.danjitalk.domain.community.reaction.enums.ReactionType;
 import com.danjitalk.danjitalk.domain.user.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(
+        name = "reaction",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uq_feed_member", columnNames = {"feed_id", "member_id"})
+        }
+)
 public class Reaction {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
