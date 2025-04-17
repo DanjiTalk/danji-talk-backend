@@ -6,5 +6,6 @@ import java.util.List;
 
 public interface ApartmentCustomRepository {
 
-    List<ApartmentSearchResponse> findByKeyword(String keyword);
+    List<ApartmentSearchResponse> findByKeywordWithCursor(String keyword, Long cursor, long limit);
+    long countByKeyword(String keyword);
 }

@@ -2,8 +2,7 @@ package com.danjitalk.danjitalk.api.search;
 
 import com.danjitalk.danjitalk.application.search.SearchService;
 import com.danjitalk.danjitalk.common.response.ApiResponse;
-import com.danjitalk.danjitalk.domain.search.dto.ApartmentSearchResponse;
-import java.util.List;
+import com.danjitalk.danjitalk.domain.search.dto.ApartmentSearchResultResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,9 +19,13 @@ public class SearchController {
     private final SearchService searchService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<ApartmentSearchResponse>>> searchApartments(@RequestParam String keyword) {
-        List<ApartmentSearchResponse> apartmentSearchResponses =  searchService.searchApartments(keyword);
-        return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), null, apartmentSearchResponses));
+    public ResponseEntity<ApiResponse<ApartmentSearchResultResponse>> searchApartments(
+        @RequestParam String keyword,
+        @RequestParam(required = false) Long lastIndex,
+        @RequestParam(required = false, defaultValue = "20") long limit
+    ) {
+        ApartmentSearchResultResponse apartmentSearchResultResponse =  searchService.searchApartments(keyword, lastIndex, limit);
+        return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), null, apartmentSearchResultResponse));
     }
 
 }
