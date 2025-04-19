@@ -34,8 +34,11 @@ public class SearchService {
             redisTemplate.opsForValue().set(countKey, resultCount, Duration.ofMinutes(10));
         }
 
-        List<ApartmentSearchResponse> apartmentSearchResponses = apartmentRepository.findByKeywordWithCursor(keyword, cursor, limit);
-        boolean lastPage = apartmentSearchResponses.isEmpty();
+        List<ApartmentSearchResponse> apartmentSearchResponses = apartmentRepository.findByKeywordWithCursor(keyword, cursor, limit + 1);
+        boolean lastPage = apartmentSearchResponses.size() <= limit; // true => 이후 데이터 없음
+        if (!lastPage) {
+            apartmentSearchResponses.remove((int) limit); // 초과분 제거
+        }
         return new ApartmentSearchResultResponse(apartmentSearchResponses, Long.valueOf(resultCount), lastPage);
     }
 }
