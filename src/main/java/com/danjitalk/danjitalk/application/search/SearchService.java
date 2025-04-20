@@ -18,6 +18,7 @@ public class SearchService {
 
     private static final int MAXIMUM_SAVED_VALUE = 5;
     private static final String SEARCH_MEMBER_KEY = "search:member";
+    private static final String SEARCH_COUNT_KEY = "search:count:";
 
     private final ApartmentRepository apartmentRepository;
     private final RedisTemplate<String, String> redisTemplate;
@@ -47,6 +48,7 @@ public class SearchService {
 
             if (!resultCount.equals("0")) {
                 addKeywordInRedis(keyword, key);
+                incrementSearchCount(keyword);
             }
         }
 
@@ -73,5 +75,12 @@ public class SearchService {
         if (size != null && size > MAXIMUM_SAVED_VALUE) {
             listOperations.trim(key, 0, MAXIMUM_SAVED_VALUE - 1);
         }
+    }
+
+    // 검색 키워드 조회 횟수 저장
+    private void incrementSearchCount(String keyword) {
+        // Redis에서 해당 검색어의 검색 횟수 증가
+        String countKey = SEARCH_COUNT_KEY + keyword;
+        redisTemplate.opsForValue().increment(countKey);
     }
 }
