@@ -1,5 +1,6 @@
 package com.danjitalk.danjitalk.application.search;
 
+import com.danjitalk.danjitalk.common.exception.BadRequestException;
 import com.danjitalk.danjitalk.common.util.SecurityContextHolderUtil;
 import com.danjitalk.danjitalk.domain.search.dto.ApartmentSearchResponse;
 import com.danjitalk.danjitalk.domain.search.dto.ApartmentSearchResultResponse;
@@ -30,6 +31,10 @@ public class SearchService {
      */
     @Transactional(readOnly = true)
     public ApartmentSearchResultResponse searchApartments(String keyword, Long cursor, long limit) {
+        if (isInvalidKeyword(keyword)){
+            throw new BadRequestException("Invalid keyword");
+        }
+
         Long memberId = SecurityContextHolderUtil.getMemberIdOptional().orElse(0L);
 
         // TODO: 북마크 여부 추가하기
@@ -82,5 +87,9 @@ public class SearchService {
         // Redis에서 해당 검색어의 검색 횟수 증가
         String countKey = SEARCH_COUNT_KEY + keyword;
         redisTemplate.opsForValue().increment(countKey);
+    }
+
+    private boolean isInvalidKeyword(String keyword) {
+        return keyword == null || keyword.isBlank() || keyword.isEmpty();
     }
 }
