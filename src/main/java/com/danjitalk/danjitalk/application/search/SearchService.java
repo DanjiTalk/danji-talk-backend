@@ -4,9 +4,12 @@ import com.danjitalk.danjitalk.common.exception.BadRequestException;
 import com.danjitalk.danjitalk.common.util.SecurityContextHolderUtil;
 import com.danjitalk.danjitalk.domain.search.dto.ApartmentSearchResponse;
 import com.danjitalk.danjitalk.domain.search.dto.ApartmentSearchResultResponse;
+import com.danjitalk.danjitalk.domain.search.dto.PopularKeywordResponse;
 import com.danjitalk.danjitalk.infrastructure.repository.apartment.ApartmentRepository;
 import java.time.Duration;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -52,8 +55,8 @@ public class SearchService {
             String key = SEARCH_MEMBER_KEY + memberId;
 
             if (!resultCount.equals("0")) {
-                addKeywordInRedis(keyword, key);
-                incrementSearchCount(keyword);
+                addKeywordInRedis(keyword, key); // 사용자 검색어 저장
+                incrementSearchCount(keyword); // 검색 키워드 카운트 증가
             }
         }
 
@@ -85,11 +88,24 @@ public class SearchService {
     // 검색 키워드 조회 횟수 저장
     private void incrementSearchCount(String keyword) {
         // Redis에서 해당 검색어의 검색 횟수 증가
-        String countKey = SEARCH_COUNT_KEY + keyword;
-        redisTemplate.opsForValue().increment(countKey);
+        redisTemplate.opsForZSet().incrementScore(SEARCH_COUNT_KEY, keyword, 1);
     }
 
     private boolean isInvalidKeyword(String keyword) {
         return keyword == null || keyword.isBlank() || keyword.isEmpty();
+    }
+
+    // 인기 Top 5 키워드 조회 (일 단위? 누적?)
+    public List<PopularKeywordResponse> getTopKeywords(Long limit) {
+        // Sorted Set에서 조회 횟수 기준으로 상위 5개 키워드 조회 (내림차순)
+        Set<String> topKeywords = redisTemplate.opsForZSet().reverseRange(SEARCH_COUNT_KEY, 0, limit - 1);
+
+        if (topKeywords == null) {
+            return Collections.emptyList(); // 빈 리스트 반환
+        }
+
+        return topKeywords.stream()
+                .map(PopularKeywordResponse::new)
+                .toList();
     }
 }
