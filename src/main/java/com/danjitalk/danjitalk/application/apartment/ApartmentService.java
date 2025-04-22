@@ -1,5 +1,7 @@
 package com.danjitalk.danjitalk.application.apartment;
 
+import com.danjitalk.danjitalk.common.exception.DataNotFoundException;
+import com.danjitalk.danjitalk.domain.apartment.dto.ApartmentInfoResponse;
 import com.danjitalk.danjitalk.domain.apartment.dto.ApartmentRegisterRequest;
 import com.danjitalk.danjitalk.domain.apartment.dto.ApartmentRegisterResponse;
 import com.danjitalk.danjitalk.domain.apartment.entity.Apartment;
@@ -77,6 +79,22 @@ public class ApartmentService {
                 .parkingCapacity(apartment.getParkingCapacity())
                 .buildingCount(apartment.getBuildingCount())
                 .fileUrl(apartment.getFileUrl())
+                .build();
+    }
+
+    public ApartmentInfoResponse getApartmentInfo(Long id) {
+        Apartment apartment = apartmentRepository.findById(id).orElseThrow(() -> new DataNotFoundException("존재하지 않는 아파트입니다."));
+
+        return ApartmentInfoResponse.builder()
+                .name(apartment.getName())
+                .region(apartment.getRegion())
+                .location(apartment.getLocation())
+                .totalUnit(apartment.getTotalUnit())
+                .parkingCapacity(apartment.getParkingCapacity())
+                .buildingCount(apartment.getBuildingCount())
+                .buildingRange(apartment.getBuildingRange())
+                .fileUrl(apartment.getFileUrl())
+                .chatroomId(apartment.getChatroomId())
                 .build();
     }
 }
