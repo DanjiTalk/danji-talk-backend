@@ -5,6 +5,7 @@ import com.danjitalk.danjitalk.common.util.SecurityContextHolderUtil;
 import com.danjitalk.danjitalk.domain.search.dto.ApartmentSearchResponse;
 import com.danjitalk.danjitalk.domain.search.dto.ApartmentSearchResultResponse;
 import com.danjitalk.danjitalk.domain.search.dto.PopularKeywordResponse;
+import com.danjitalk.danjitalk.domain.search.dto.SearchKeywordResponse;
 import com.danjitalk.danjitalk.infrastructure.repository.apartment.ApartmentRepository;
 import java.time.Duration;
 import java.util.Collections;
@@ -106,6 +107,27 @@ public class SearchService {
 
         return topKeywords.stream()
                 .map(PopularKeywordResponse::new)
+                .toList();
+    }
+
+    public List<SearchKeywordResponse> getUserRecentSearchHistory(Long limit) {
+        Long currentMemberId = SecurityContextHolderUtil.getMemberIdOptional().orElse(0L);
+
+        if (currentMemberId == 0) {
+            return Collections.emptyList();
+        }
+
+        String key = SEARCH_MEMBER_KEY + currentMemberId;
+
+        ListOperations<String, String> listOperations = redisTemplate.opsForList();
+        List<String> recentComplexes = listOperations.range(key, 0, limit - 1);
+
+        if(recentComplexes == null) {
+            return Collections.emptyList();
+        }
+
+        return recentComplexes.stream()
+                .map(SearchKeywordResponse::new)
                 .toList();
     }
 }

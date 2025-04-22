@@ -4,6 +4,7 @@ import com.danjitalk.danjitalk.application.search.SearchService;
 import com.danjitalk.danjitalk.common.response.ApiResponse;
 import com.danjitalk.danjitalk.domain.search.dto.ApartmentSearchResultResponse;
 import com.danjitalk.danjitalk.domain.search.dto.PopularKeywordResponse;
+import com.danjitalk.danjitalk.domain.search.dto.SearchKeywordResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -38,4 +39,11 @@ public class SearchController {
         return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), null, popularKeywordResponses));
     }
 
+    @GetMapping("/recent-keywords")
+    public ResponseEntity<ApiResponse<List<SearchKeywordResponse>>> getRecentSearchHistory(
+        @RequestParam(required = false, defaultValue = "5") Long limit
+    ) {
+        List<SearchKeywordResponse> searchKeywordResponses = searchService.getUserRecentSearchHistory(limit);
+        return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), null, searchKeywordResponses));
+    }
 }
