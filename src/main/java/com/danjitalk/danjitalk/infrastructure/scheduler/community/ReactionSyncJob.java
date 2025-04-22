@@ -21,6 +21,8 @@ public class ReactionSyncJob {
 
     private final DSLContext dslContext;
 
+    private static final int BATCH_SIZE = 500;
+
     // 30초마다 실행
     @Scheduled(cron = "0 45 0,3,6,9,12,15,18,21 * * *")
     public void run() {
@@ -35,6 +37,7 @@ public class ReactionSyncJob {
 
         List<Query> list = dslContext.select(REACTION.FEED_ID, reactionCount)
                 .from(REACTION)
+                .join(FEED).on(REACTION.FEED_ID.eq(FEED.ID))
                 .groupBy(REACTION.FEED_ID)
                 .stream()
                 .map(record ->
@@ -49,7 +52,6 @@ public class ReactionSyncJob {
 
         // 500건이 넘어가면 500개씩 끊어서 사용
         if (list.size() > 500) {
-            int BATCH_SIZE = 500;
 
             for (int i=0; i<list.size(); i += BATCH_SIZE) {
                 List<Query> queries = list.subList(i, Math.min(i + BATCH_SIZE, list.size()));
