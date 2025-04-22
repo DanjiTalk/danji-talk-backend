@@ -50,7 +50,7 @@ public class FeedViewCountScheduleJob {
         List<Query> list = viewCountMap.entrySet().stream().map( entry ->
             (Query) dslContext
                     .update(FEED)
-                    .set(FEED.VIEW_COUNT, entry.getValue().intValue())
+                    .set(FEED.VIEW_COUNT, FEED.VIEW_COUNT.plus(entry.getValue().intValue()))
                     .where(FEED.ID.eq(entry.getKey()))
         ).toList();
 
