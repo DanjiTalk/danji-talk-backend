@@ -1,12 +1,14 @@
 package com.danjitalk.danjitalk.application.apartment;
 
 import com.danjitalk.danjitalk.common.exception.DataNotFoundException;
+import com.danjitalk.danjitalk.common.util.SecurityContextHolderUtil;
 import com.danjitalk.danjitalk.domain.apartment.dto.ApartmentInfoResponse;
 import com.danjitalk.danjitalk.domain.apartment.dto.ApartmentRegisterRequest;
 import com.danjitalk.danjitalk.domain.apartment.dto.ApartmentRegisterResponse;
 import com.danjitalk.danjitalk.domain.apartment.entity.Apartment;
 import com.danjitalk.danjitalk.domain.s3.dto.response.S3FileUrlResponseDto;
 import com.danjitalk.danjitalk.domain.s3.enums.FileType;
+import com.danjitalk.danjitalk.event.dto.RecentComplexViewedEvent;
 import com.danjitalk.danjitalk.event.dto.GroupChatCreateEvent;
 import com.danjitalk.danjitalk.infrastructure.repository.apartment.ApartmentRepository;
 import com.danjitalk.danjitalk.infrastructure.s3.S3Service;
@@ -82,8 +84,26 @@ public class ApartmentService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
     public ApartmentInfoResponse getApartmentInfo(Long id) {
         Apartment apartment = apartmentRepository.findById(id).orElseThrow(() -> new DataNotFoundException("존재하지 않는 아파트입니다."));
+
+        Long currentMemberId = SecurityContextHolderUtil.getMemberIdOptional().orElse(0L);
+
+        if (currentMemberId != 0) {
+            applicationEventPublisher.publishEvent(
+                new RecentComplexViewedEvent(
+                    apartment.getId(),
+                    apartment.getName(),
+                    apartment.getRegion(),
+                    apartment.getLocation(),
+                    apartment.getTotalUnit(),
+                    apartment.getBuildingCount(),
+                    apartment.getThumbnailFileUrl(),
+                    currentMemberId
+                )
+            );
+        }
 
         return ApartmentInfoResponse.builder()
                 .name(apartment.getName())
