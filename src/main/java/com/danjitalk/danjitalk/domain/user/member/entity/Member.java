@@ -3,8 +3,9 @@ package com.danjitalk.danjitalk.domain.user.member.entity;
 import com.danjitalk.danjitalk.domain.chat.entity.ChatroomMemberMapping;
 import com.danjitalk.danjitalk.domain.common.entity.BaseEntity;
 import com.danjitalk.danjitalk.domain.community.feed.entity.Feed;
-import com.danjitalk.danjitalk.domain.user.report.entity.Report;
+import com.danjitalk.danjitalk.domain.user.member.dto.request.UpdateMemberRequestDto;
 import com.danjitalk.danjitalk.domain.user.member.enums.Gender;
+import com.danjitalk.danjitalk.domain.user.report.entity.Report;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -68,4 +69,24 @@ public class Member extends BaseEntity {
         this.fileId = fileId;
         this.gender = gender;
     }
+
+    /**
+     * 프로필 정보 업데이트
+     * 이름, 닉네임, 휴대폰번호
+     * */
+    public void changeProfile(UpdateMemberRequestDto requestDto) {
+        this.name = requestDto.name();
+        this.nickname = requestDto.nickname();
+        this.phoneNumber = requestDto.phoneNumber();
+    }
+
+    /**
+     * 프로필 사진 변경
+     * */
+    public void changeFileId(String fileId) {
+        if(fileId != null) {
+            this.fileId = fileId;
+        }
+    }
+
 }

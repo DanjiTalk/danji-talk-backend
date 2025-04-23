@@ -1,28 +1,31 @@
 package com.danjitalk.danjitalk.application.user.member;
 
-import static com.danjitalk.danjitalk.common.util.SecurityContextHolderUtil.getSystemUser;
-
+import com.danjitalk.danjitalk.common.exception.BadRequestException;
 import com.danjitalk.danjitalk.common.exception.ConflictException;
 import com.danjitalk.danjitalk.common.exception.DataNotFoundException;
-import com.danjitalk.danjitalk.domain.user.member.dto.request.CheckEmailDuplicationRequest;
-import com.danjitalk.danjitalk.domain.user.member.dto.request.DeleteAccountRequest;
-import com.danjitalk.danjitalk.domain.user.member.dto.request.FindIdRequest;
-import com.danjitalk.danjitalk.domain.user.member.dto.request.ResetPasswordRequest;
-import com.danjitalk.danjitalk.domain.user.member.dto.request.SignUpRequest;
+import com.danjitalk.danjitalk.common.util.SecurityContextHolderUtil;
+import com.danjitalk.danjitalk.domain.s3.dto.response.S3FileUrlResponseDto;
+import com.danjitalk.danjitalk.domain.s3.enums.FileType;
+import com.danjitalk.danjitalk.domain.user.member.dto.request.*;
 import com.danjitalk.danjitalk.domain.user.member.entity.Member;
 import com.danjitalk.danjitalk.domain.user.member.entity.SystemUser;
 import com.danjitalk.danjitalk.domain.user.member.enums.LoginMethod;
 import com.danjitalk.danjitalk.domain.user.member.enums.Role;
-import com.danjitalk.danjitalk.domain.user.member.service.MemberDomainService;
 import com.danjitalk.danjitalk.infrastructure.repository.user.member.MemberRepository;
 import com.danjitalk.danjitalk.infrastructure.repository.user.member.SystemUserRepository;
-import java.time.LocalDateTime;
-import java.util.Optional;
+import com.danjitalk.danjitalk.infrastructure.s3.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+import static com.danjitalk.danjitalk.common.util.SecurityContextHolderUtil.getSystemUser;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +34,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final SystemUserRepository systemUserRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final S3Service s3Service;
 
     @Transactional
     public void signUp(SignUpRequest request) {
@@ -110,5 +114,32 @@ public class MemberService {
         SystemUser systemUser = systemUserRepository.findByLoginId(request.email()).orElseThrow(DataNotFoundException::new);
         String encodedPassword = passwordEncoder.encode(request.password());
         systemUser.updatePassword(encodedPassword);
+    }
+
+    /**
+     * 프로필 변경
+     * */
+    @Transactional
+    public void updateProfile(Long memberId, UpdateMemberRequestDto requestDto, MultipartFile multipartFile) {
+
+        Long loginMemberId = SecurityContextHolderUtil.getMemberId();
+
+        Member member = memberRepository.findById(memberId).orElseThrow(DataNotFoundException::new);
+
+        if (!loginMemberId.equals(member.getId())) {
+            throw new BadRequestException("잘못된 요청입니다.");
+        }
+
+        // 비밀번호 변경
+        SystemUser systemUser = systemUserRepository.findByLoginId(member.getEmail()).orElseThrow(DataNotFoundException::new);
+        systemUser.updatePassword(passwordEncoder.encode(requestDto.password()));
+
+        if(multipartFile != null){
+            S3FileUrlResponseDto s3FileUrlResponseDto = s3Service.uploadFiles(FileType.MEMBER, List.of(multipartFile));
+
+            member.changeFileId(s3FileUrlResponseDto.fileUrl());
+        }
+
+        member.changeProfile(requestDto);
     }
 }

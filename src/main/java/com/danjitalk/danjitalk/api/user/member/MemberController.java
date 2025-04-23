@@ -2,19 +2,12 @@ package com.danjitalk.danjitalk.api.user.member;
 
 import com.danjitalk.danjitalk.application.user.member.MemberService;
 import com.danjitalk.danjitalk.common.response.ApiResponse;
-import com.danjitalk.danjitalk.domain.user.member.dto.request.CheckEmailDuplicationRequest;
-import com.danjitalk.danjitalk.domain.user.member.dto.request.DeleteAccountRequest;
-import com.danjitalk.danjitalk.domain.user.member.dto.request.FindIdRequest;
-import com.danjitalk.danjitalk.domain.user.member.dto.request.ResetPasswordRequest;
-import com.danjitalk.danjitalk.domain.user.member.dto.request.SignUpRequest;
+import com.danjitalk.danjitalk.domain.user.member.dto.request.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -50,6 +43,14 @@ public class MemberController {
     @PostMapping("/reset-password")
     public ResponseEntity<Void> resetPassword(@RequestBody ResetPasswordRequest request) {
         memberService.resetPassword(request);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{memberId}/profile")
+    public ResponseEntity<Void> updateProfile(@PathVariable Long memberId,
+                                              @RequestPart("requestDto") UpdateMemberRequestDto requestDto,
+                                              @RequestPart(value = "multipartFileList", required = false) MultipartFile multipartFile) {
+        memberService.updateProfile(memberId, requestDto, multipartFile);
         return ResponseEntity.ok().build();
     }
 }
