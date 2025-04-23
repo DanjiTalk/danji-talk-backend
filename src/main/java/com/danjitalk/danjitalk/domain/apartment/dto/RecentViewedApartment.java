@@ -1,6 +1,6 @@
 package com.danjitalk.danjitalk.domain.apartment.dto;
 
-public record RecentComplexViewedDTO(
+public record RecentViewedApartment(
     Long id,
     String name,
     String region,

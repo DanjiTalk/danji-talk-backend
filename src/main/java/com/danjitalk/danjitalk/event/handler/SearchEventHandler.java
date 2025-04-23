@@ -1,6 +1,6 @@
 package com.danjitalk.danjitalk.event.handler;
 
-import com.danjitalk.danjitalk.domain.apartment.dto.RecentComplexViewedDTO;
+import com.danjitalk.danjitalk.domain.apartment.dto.RecentViewedApartment;
 import com.danjitalk.danjitalk.event.dto.RecentComplexViewedEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -23,7 +23,7 @@ public class SearchEventHandler {
 
         String key = "recent:apartment:member:" + memberId;
 
-        RecentComplexViewedDTO recentComplexViewedDTO = new RecentComplexViewedDTO(
+        RecentViewedApartment recentViewedApartment = new RecentViewedApartment(
                 event.id(),
                 event.name(),
                 event.region(),
@@ -33,8 +33,8 @@ public class SearchEventHandler {
                 event.thumbnailFileUrl()
         );
 
-        redisTemplate.opsForList().remove(key, 0, recentComplexViewedDTO);
-        redisTemplate.opsForList().leftPush(key, recentComplexViewedDTO);
+        redisTemplate.opsForList().remove(key, 0, recentViewedApartment);
+        redisTemplate.opsForList().leftPush(key, recentViewedApartment);
         redisTemplate.opsForList().trim(key, 0, 4);
     }
 }
