@@ -23,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class SearchService {
 
     private static final int MAXIMUM_SAVED_VALUE = 5;
-    private static final String SEARCH_MEMBER_KEY = "search:member";
+    private static final String SEARCH_MEMBER_KEY = "search:member:";
     private static final String SEARCH_COUNT_KEY = "search:count:";
 
     private final ApartmentRepository apartmentRepository;
