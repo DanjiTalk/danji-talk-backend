@@ -2,6 +2,7 @@ package com.danjitalk.danjitalk.application.search;
 
 import com.danjitalk.danjitalk.common.exception.BadRequestException;
 import com.danjitalk.danjitalk.common.util.SecurityContextHolderUtil;
+import com.danjitalk.danjitalk.domain.apartment.dto.RecentViewedApartment;
 import com.danjitalk.danjitalk.domain.search.dto.ApartmentSearchResponse;
 import com.danjitalk.danjitalk.domain.search.dto.ApartmentSearchResultResponse;
 import com.danjitalk.danjitalk.domain.search.dto.PopularKeywordResponse;
@@ -27,6 +28,7 @@ public class SearchService {
 
     private final ApartmentRepository apartmentRepository;
     private final RedisTemplate<String, String> redisTemplate;
+    private final RedisTemplate<String, Object> objectRedisTemplate;
 
     /**
      * 아파트 단지 검색
@@ -129,5 +131,27 @@ public class SearchService {
         return recentComplexes.stream()
                 .map(SearchKeywordResponse::new)
                 .toList();
+    }
+
+    public List<RecentViewedApartment> getRecentApartments() {
+        Long currentMemberId = SecurityContextHolderUtil.getMemberIdOptional().orElse(0L);
+
+        if (currentMemberId == 0) {
+            return Collections.emptyList();
+        }
+
+        ListOperations<String, Object> listOperations = objectRedisTemplate.opsForList();
+
+        List<Object> rawList = listOperations.range("recent:apartment:member:" + currentMemberId, 0, MAXIMUM_SAVED_VALUE - 1);
+
+        if (rawList == null) {
+            return Collections.emptyList();
+        }
+
+        return rawList.stream()
+                .filter(RecentViewedApartment.class::isInstance)
+                .map(RecentViewedApartment.class::cast)
+                .toList();
+        // TODO: 북마크 추가
     }
 }

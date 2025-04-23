@@ -2,6 +2,7 @@ package com.danjitalk.danjitalk.api.search;
 
 import com.danjitalk.danjitalk.application.search.SearchService;
 import com.danjitalk.danjitalk.common.response.ApiResponse;
+import com.danjitalk.danjitalk.domain.apartment.dto.RecentViewedApartment;
 import com.danjitalk.danjitalk.domain.search.dto.ApartmentSearchResultResponse;
 import com.danjitalk.danjitalk.domain.search.dto.PopularKeywordResponse;
 import com.danjitalk.danjitalk.domain.search.dto.SearchKeywordResponse;
@@ -45,5 +46,11 @@ public class SearchController {
     ) {
         List<SearchKeywordResponse> searchKeywordResponses = searchService.getUserRecentSearchHistory(limit);
         return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), null, searchKeywordResponses));
+    }
+
+    @GetMapping("/recent-apartment")
+    public ResponseEntity<ApiResponse<List<RecentViewedApartment>>> getRecentApartments() {
+        List<RecentViewedApartment> recentViewedApartments = searchService.getRecentApartments();
+        return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), null, recentViewedApartments));
     }
 }
