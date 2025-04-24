@@ -116,6 +116,7 @@ public class SecurityConfig {
         return web -> {
             web.ignoring()
                 .requestMatchers("/api/oauth/exchange")
+                .requestMatchers("/api/search/popular-keywords")
                 .requestMatchers(HttpMethod.POST, "/api/member/signup")
                 .requestMatchers(HttpMethod.POST, "/api/member/check-email-duplication")
                 .requestMatchers(HttpMethod.POST, "/api/mail/certification-code/send")
