@@ -55,6 +55,9 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member")
     private List<ChatroomMemberMapping> chatroomMemberList = new ArrayList<>();
 
+    @OneToMany(mappedBy = "member")
+    private List<MemberApartment> apartmentList = new ArrayList<>();
+
     @Builder
     public Member(String email, String name, String phoneNumber,
         Boolean notificationEnabled, Boolean isRestricted, LocalDateTime restrictionTime, String fileId,
