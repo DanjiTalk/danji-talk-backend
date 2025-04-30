@@ -21,7 +21,7 @@ public class BookmarkService {
     public Boolean isBookmarked(Long typeId, BookmarkType bookmarkType) {
 
         Long validTypeId = this.validatedTypeId(typeId, bookmarkType);
-        Long memberId = SecurityContextHolderUtil.getMemberId();
+        Long memberId = SecurityContextHolderUtil.getMemberIdOptional().orElse(0L);
 
         return bookmarkRepository.existsByTypeIdAndTypeAndMemberId(validTypeId, bookmarkType, memberId);
 
