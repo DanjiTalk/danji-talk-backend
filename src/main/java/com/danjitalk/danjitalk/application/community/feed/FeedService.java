@@ -5,6 +5,7 @@ import com.danjitalk.danjitalk.common.exception.BadRequestException;
 import com.danjitalk.danjitalk.common.exception.DataNotFoundException;
 import com.danjitalk.danjitalk.common.util.SecurityContextHolderUtil;
 import com.danjitalk.danjitalk.domain.apartment.entity.Apartment;
+import com.danjitalk.danjitalk.domain.bookmark.entity.enums.BookmarkType;
 import com.danjitalk.danjitalk.domain.community.feed.dto.request.CreateFeedRequestDto;
 import com.danjitalk.danjitalk.domain.community.feed.dto.request.UpdateFeedRequestDto;
 import com.danjitalk.danjitalk.domain.community.feed.dto.response.*;
@@ -103,7 +104,7 @@ public class FeedService {
 
         List<S3ObjectResponseDto> s3ObjectResponseDtoList = Optional.ofNullable(feed.getFileUrl()).map(url -> s3Service.getS3Object(url)).orElseGet(Collections::emptyList);
 
-        Boolean bookmarked = bookmarkService.isBookmarked(feedId);
+        Boolean bookmarked = bookmarkService.isBookmarked(feedId, BookmarkType.FEED);
 
         Boolean isAuthor = SecurityContextHolderUtil.getMemberId().equals(feed.getMember().getId());
 

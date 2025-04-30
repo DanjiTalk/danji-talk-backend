@@ -1,13 +1,14 @@
 package com.danjitalk.danjitalk.infrastructure.repository.community.bookmark;
 
 import com.danjitalk.danjitalk.domain.bookmark.entity.Bookmark;
+import com.danjitalk.danjitalk.domain.bookmark.entity.enums.BookmarkType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
 
-    boolean existsByFeedIdAndMemberId(Long feedId, Long memberId);
+    boolean existsByTypeIdAndTypeAndMemberId(Long typeId, BookmarkType type, Long memberId);
 
-    void deleteByFeedIdAndMemberId(Long feedId, Long memberId);
+    void deleteByTypeIdAndTypeAndMemberId(Long typeId, BookmarkType type, Long memberId);
 }

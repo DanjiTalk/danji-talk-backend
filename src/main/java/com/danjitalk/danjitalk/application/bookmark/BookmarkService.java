@@ -18,12 +18,12 @@ public class BookmarkService {
     /**
      * 북마크 체크 
      */
-    public Boolean isBookmarked(Long feedId) {
+    public Boolean isBookmarked(Long typeId, BookmarkType bookmarkType) {
 
-        Long validFeedId = this.validatedFeedId(feedId);
+        Long validTypeId = this.validatedTypeId(typeId, bookmarkType);
         Long memberId = SecurityContextHolderUtil.getMemberId();
 
-        return bookmarkRepository.existsByFeedIdAndMemberId(validFeedId, memberId);
+        return bookmarkRepository.existsByTypeIdAndTypeAndMemberId(validTypeId, bookmarkType, memberId);
 
     }
     
@@ -31,19 +31,18 @@ public class BookmarkService {
      * 북마크 추가
      * */
     @Transactional
-    public void addBookmark(Long feedId) {
-
-        Long validFeedId = this.validatedFeedId(feedId);
+    public void addBookmark(Long typeId, BookmarkType bookmarkType) {
+        this.validatedTypeId(typeId, bookmarkType);
 
         Long memberId = SecurityContextHolderUtil.getMemberId();
 
-        boolean exists = bookmarkRepository.existsByFeedIdAndMemberId(feedId, memberId);
+        boolean exists = bookmarkRepository.existsByTypeIdAndTypeAndMemberId(typeId, bookmarkType, memberId);
 
         if(exists) {
             throw new IllegalArgumentException("Bookmark already exists");
         }
 
-        Bookmark bookmark = new Bookmark(memberId, feedId, BookmarkType.FEED);
+        Bookmark bookmark = new Bookmark(memberId, typeId, bookmarkType);
 
         bookmarkRepository.save(bookmark);
 
@@ -53,28 +52,34 @@ public class BookmarkService {
      * 북마크 제거
      * */
     @Transactional
-    public void deleteBookmark(Long feedId) {
-        Long validFeedId = this.validatedFeedId(feedId);
+    public void deleteBookmark(Long typeId, BookmarkType bookmarkType) {
+        this.validatedTypeId(typeId, bookmarkType);
+
         Long memberId = SecurityContextHolderUtil.getMemberId();
 
-        boolean exists = bookmarkRepository.existsByFeedIdAndMemberId(validFeedId, memberId);
+        boolean exists = bookmarkRepository.existsByTypeIdAndTypeAndMemberId(typeId, bookmarkType, memberId);
 
         if(!exists) {
             throw new IllegalArgumentException("Bookmark does not exist");
         }
 
-        bookmarkRepository.deleteByFeedIdAndMemberId(validFeedId, memberId);
+        bookmarkRepository.deleteByTypeIdAndTypeAndMemberId(typeId, bookmarkType, memberId);
     }
 
     /**
-     * feedId 체크
-     * */
-    private Long validatedFeedId(Long feedId) {
-        if(feedId == null) {
-            throw new BadRequestException("FeedId must not be null");
-        }
+     * typeId 체크
+     */
+    private Long validatedTypeId(Long typeId, BookmarkType bookmarkType) {
+        if (typeId == null) {
+            if (bookmarkType == BookmarkType.FEED) {
+                throw new BadRequestException("FeedId must not be null");
+            }
 
-        return feedId;
+            if (bookmarkType == BookmarkType.APARTMENT) {
+                throw new BadRequestException("apartmentId must not be null");
+            }
+        }
+        return typeId;
     }
     
 }

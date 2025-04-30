@@ -2,6 +2,7 @@ package com.danjitalk.danjitalk.api.community.bookmark;
 
 import com.danjitalk.danjitalk.application.bookmark.BookmarkService;
 import com.danjitalk.danjitalk.common.response.ApiResponse;
+import com.danjitalk.danjitalk.domain.bookmark.entity.enums.BookmarkType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,13 +17,13 @@ public class BookmarkController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<Void>> createBookmark(@PathVariable Long feedId) {
-        bookmarkService.addBookmark(feedId);
+        bookmarkService.addBookmark(feedId, BookmarkType.FEED);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(201, null, null));
     }
 
     @DeleteMapping
     public ResponseEntity<ApiResponse<Void>> deleteBookmark(@PathVariable Long feedId) {
-        bookmarkService.deleteBookmark(feedId);
+        bookmarkService.deleteBookmark(feedId, BookmarkType.FEED);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ApiResponse.success(204, null, null));
     }
 
