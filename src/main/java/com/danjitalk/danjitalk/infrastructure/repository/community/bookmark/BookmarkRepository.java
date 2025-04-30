@@ -1,6 +1,6 @@
 package com.danjitalk.danjitalk.infrastructure.repository.community.bookmark;
 
-import com.danjitalk.danjitalk.domain.community.bookmark.entity.Bookmark;
+import com.danjitalk.danjitalk.domain.bookmark.entity.Bookmark;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

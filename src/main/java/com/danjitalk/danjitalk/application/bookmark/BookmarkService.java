@@ -1,8 +1,9 @@
-package com.danjitalk.danjitalk.application.community.bookmark;
+package com.danjitalk.danjitalk.application.bookmark;
 
 import com.danjitalk.danjitalk.common.exception.BadRequestException;
 import com.danjitalk.danjitalk.common.util.SecurityContextHolderUtil;
-import com.danjitalk.danjitalk.domain.community.bookmark.entity.Bookmark;
+import com.danjitalk.danjitalk.domain.bookmark.entity.Bookmark;
+import com.danjitalk.danjitalk.domain.bookmark.entity.enums.BookmarkType;
 import com.danjitalk.danjitalk.infrastructure.repository.community.bookmark.BookmarkRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +43,7 @@ public class BookmarkService {
             throw new IllegalArgumentException("Bookmark already exists");
         }
 
-        Bookmark bookmark = new Bookmark(memberId, feedId);
+        Bookmark bookmark = new Bookmark(memberId, feedId, BookmarkType.FEED);
 
         bookmarkRepository.save(bookmark);
 

@@ -1,6 +1,6 @@
 package com.danjitalk.danjitalk.application.community.feed;
 
-import com.danjitalk.danjitalk.application.community.bookmark.BookmarkService;
+import com.danjitalk.danjitalk.application.bookmark.BookmarkService;
 import com.danjitalk.danjitalk.common.exception.BadRequestException;
 import com.danjitalk.danjitalk.common.exception.DataNotFoundException;
 import com.danjitalk.danjitalk.common.util.SecurityContextHolderUtil;

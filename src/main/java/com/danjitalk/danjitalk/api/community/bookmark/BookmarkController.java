@@ -1,6 +1,6 @@
 package com.danjitalk.danjitalk.api.community.bookmark;
 
-import com.danjitalk.danjitalk.application.community.bookmark.BookmarkService;
+import com.danjitalk.danjitalk.application.bookmark.BookmarkService;
 import com.danjitalk.danjitalk.common.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
