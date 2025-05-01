@@ -1,4 +1,4 @@
-package com.danjitalk.danjitalk.api.apartment.bookmark;
+package com.danjitalk.danjitalk.api.bookmark;
 
 import com.danjitalk.danjitalk.application.bookmark.BookmarkService;
 import com.danjitalk.danjitalk.common.response.ApiResponse;
@@ -13,20 +13,32 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/apartments/{apartmentId}/bookmarks")
 @RequiredArgsConstructor
+@RequestMapping("/api/bookmarks")
 public class BookmarkController {
 
     private final BookmarkService bookmarkService;
 
-    @PostMapping
-    public ResponseEntity<ApiResponse<Void>> createBookmark(@PathVariable Long apartmentId) {
+    @PostMapping("/feeds/{feedId}")
+    public ResponseEntity<ApiResponse<Void>> createFeedBookmark(@PathVariable Long feedId) {
+        bookmarkService.addBookmark(feedId, BookmarkType.FEED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(201, null, null));
+    }
+
+    @DeleteMapping("/feeds/{feedId}")
+    public ResponseEntity<ApiResponse<Void>> deleteFeedBookmark(@PathVariable Long feedId) {
+        bookmarkService.deleteBookmark(feedId, BookmarkType.FEED);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ApiResponse.success(204, null, null));
+    }
+
+    @PostMapping("/apartments/{apartmentId}")
+    public ResponseEntity<ApiResponse<Void>> createApartmentBookmark(@PathVariable Long apartmentId) {
         bookmarkService.addBookmark(apartmentId, BookmarkType.APARTMENT);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(201, null, null));
     }
 
-    @DeleteMapping
-    public ResponseEntity<ApiResponse<Void>> deleteBookmark(@PathVariable Long apartmentId) {
+    @DeleteMapping("/apartments/{apartmentId}")
+    public ResponseEntity<ApiResponse<Void>> deleteApartmentBookmark(@PathVariable Long apartmentId) {
         bookmarkService.deleteBookmark(apartmentId, BookmarkType.APARTMENT);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ApiResponse.success(204, null, null));
     }
