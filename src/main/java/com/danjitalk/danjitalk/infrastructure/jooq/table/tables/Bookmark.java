@@ -15,12 +15,12 @@ import java.util.function.Function;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function5;
+import org.jooq.Function7;
 import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
 import org.jooq.Records;
-import org.jooq.Row5;
+import org.jooq.Row7;
 import org.jooq.Schema;
 import org.jooq.SelectField;
 import org.jooq.Table;
@@ -78,6 +78,16 @@ public class Bookmark extends TableImpl<BookmarkRecord> {
      */
     public final TableField<BookmarkRecord, Long> MEMBER_ID = createField(DSL.name("member_id"), SQLDataType.BIGINT.nullable(false), this, "");
 
+    /**
+     * The column <code>danjitalk.bookmark.type</code>.
+     */
+    public final TableField<BookmarkRecord, String> TYPE = createField(DSL.name("type"), SQLDataType.VARCHAR(9).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
+
+    /**
+     * The column <code>danjitalk.bookmark.type_id</code>.
+     */
+    public final TableField<BookmarkRecord, Long> TYPE_ID = createField(DSL.name("type_id"), SQLDataType.BIGINT.nullable(false), this, "");
+
     private Bookmark(Name alias, Table<BookmarkRecord> aliased) {
         this(alias, aliased, null);
     }
@@ -128,7 +138,7 @@ public class Bookmark extends TableImpl<BookmarkRecord> {
 
     @Override
     public List<UniqueKey<BookmarkRecord>> getUniqueKeys() {
-        return Arrays.asList(Keys.KEY_BOOKMARK_UK5U0YIDGDJ1AYX5HXL0POD0JOV);
+        return Arrays.asList(Keys.KEY_BOOKMARK_UK2HD0JWK8J13FOGF5WGBJWQBBP, Keys.KEY_BOOKMARK_UK5U0YIDGDJ1AYX5HXL0POD0JOV);
     }
 
     @Override
@@ -171,18 +181,18 @@ public class Bookmark extends TableImpl<BookmarkRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row5 type methods
+    // Row7 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row5<Long, LocalDateTime, LocalDateTime, Long, Long> fieldsRow() {
-        return (Row5) super.fieldsRow();
+    public Row7<Long, LocalDateTime, LocalDateTime, Long, Long, String, Long> fieldsRow() {
+        return (Row7) super.fieldsRow();
     }
 
     /**
      * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
      */
-    public <U> SelectField<U> mapping(Function5<? super Long, ? super LocalDateTime, ? super LocalDateTime, ? super Long, ? super Long, ? extends U> from) {
+    public <U> SelectField<U> mapping(Function7<? super Long, ? super LocalDateTime, ? super LocalDateTime, ? super Long, ? super Long, ? super String, ? super Long, ? extends U> from) {
         return convertFrom(Records.mapping(from));
     }
 
@@ -190,7 +200,7 @@ public class Bookmark extends TableImpl<BookmarkRecord> {
      * Convenience mapping calling {@link SelectField#convertFrom(Class,
      * Function)}.
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function5<? super Long, ? super LocalDateTime, ? super LocalDateTime, ? super Long, ? super Long, ? extends U> from) {
+    public <U> SelectField<U> mapping(Class<U> toType, Function7<? super Long, ? super LocalDateTime, ? super LocalDateTime, ? super Long, ? super Long, ? super String, ? super Long, ? extends U> from) {
         return convertFrom(toType, Records.mapping(from));
     }
 }

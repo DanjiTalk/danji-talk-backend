@@ -30,9 +30,11 @@ public class Keys {
     // -------------------------------------------------------------------------
 
     public static final UniqueKey<BookmarkRecord> KEY_BOOKMARK_PRIMARY = Internal.createUniqueKey(Bookmark.BOOKMARK, DSL.name("KEY_bookmark_PRIMARY"), new TableField[] { Bookmark.BOOKMARK.ID }, true);
+    public static final UniqueKey<BookmarkRecord> KEY_BOOKMARK_UK2HD0JWK8J13FOGF5WGBJWQBBP = Internal.createUniqueKey(Bookmark.BOOKMARK, DSL.name("KEY_bookmark_UK2hd0jwk8j13fogf5wgbjwqbbp"), new TableField[] { Bookmark.BOOKMARK.MEMBER_ID, Bookmark.BOOKMARK.FEED_ID, Bookmark.BOOKMARK.TYPE }, true);
     public static final UniqueKey<BookmarkRecord> KEY_BOOKMARK_UK5U0YIDGDJ1AYX5HXL0POD0JOV = Internal.createUniqueKey(Bookmark.BOOKMARK, DSL.name("KEY_bookmark_UK5u0yidgdj1ayx5hxl0pod0jov"), new TableField[] { Bookmark.BOOKMARK.MEMBER_ID, Bookmark.BOOKMARK.FEED_ID }, true);
     public static final UniqueKey<FeedRecord> KEY_FEED_PRIMARY = Internal.createUniqueKey(Feed.FEED, DSL.name("KEY_feed_PRIMARY"), new TableField[] { Feed.FEED.ID }, true);
     public static final UniqueKey<ReactionRecord> KEY_REACTION_PRIMARY = Internal.createUniqueKey(Reaction.REACTION, DSL.name("KEY_reaction_PRIMARY"), new TableField[] { Reaction.REACTION.ID }, true);
+    public static final UniqueKey<ReactionRecord> KEY_REACTION_UQ_FEED_MEMBER = Internal.createUniqueKey(Reaction.REACTION, DSL.name("KEY_reaction_uq_feed_member"), new TableField[] { Reaction.REACTION.FEED_ID, Reaction.REACTION.MEMBER_ID }, true);
 
     // -------------------------------------------------------------------------
     // FOREIGN KEY definitions
