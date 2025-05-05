@@ -2,7 +2,7 @@ package com.danjitalk.danjitalk.api.bookmark;
 
 import com.danjitalk.danjitalk.application.bookmark.BookmarkService;
 import com.danjitalk.danjitalk.common.response.ApiResponse;
-import com.danjitalk.danjitalk.domain.bookmark.entity.enums.BookmarkType;
+import com.danjitalk.danjitalk.domain.bookmark.enums.BookmarkType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

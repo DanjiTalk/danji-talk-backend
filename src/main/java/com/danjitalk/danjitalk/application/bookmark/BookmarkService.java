@@ -5,6 +5,7 @@ import com.danjitalk.danjitalk.common.util.SecurityContextHolderUtil;
 import com.danjitalk.danjitalk.domain.bookmark.entity.Bookmark;
 import com.danjitalk.danjitalk.domain.bookmark.entity.enums.BookmarkType;
 import com.danjitalk.danjitalk.infrastructure.repository.community.bookmark.BookmarkRepository;
+import com.danjitalk.danjitalk.domain.bookmark.enums.BookmarkType;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

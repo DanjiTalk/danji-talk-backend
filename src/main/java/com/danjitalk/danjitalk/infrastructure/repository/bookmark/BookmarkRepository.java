@@ -2,6 +2,7 @@ package com.danjitalk.danjitalk.infrastructure.repository.community.bookmark;
 
 import com.danjitalk.danjitalk.domain.bookmark.entity.Bookmark;
 import com.danjitalk.danjitalk.domain.bookmark.entity.enums.BookmarkType;
+import com.danjitalk.danjitalk.domain.bookmark.enums.BookmarkType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

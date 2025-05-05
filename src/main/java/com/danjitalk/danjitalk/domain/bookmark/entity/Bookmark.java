@@ -1,6 +1,6 @@
 package com.danjitalk.danjitalk.domain.bookmark.entity;
 
-import com.danjitalk.danjitalk.domain.bookmark.entity.enums.BookmarkType;
+import com.danjitalk.danjitalk.domain.bookmark.enums.BookmarkType;
 import com.danjitalk.danjitalk.domain.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;

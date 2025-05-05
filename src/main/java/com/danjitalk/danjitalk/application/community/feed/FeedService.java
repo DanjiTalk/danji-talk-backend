@@ -5,7 +5,7 @@ import com.danjitalk.danjitalk.common.exception.BadRequestException;
 import com.danjitalk.danjitalk.common.exception.DataNotFoundException;
 import com.danjitalk.danjitalk.common.util.SecurityContextHolderUtil;
 import com.danjitalk.danjitalk.domain.apartment.entity.Apartment;
-import com.danjitalk.danjitalk.domain.bookmark.entity.enums.BookmarkType;
+import com.danjitalk.danjitalk.domain.bookmark.enums.BookmarkType;
 import com.danjitalk.danjitalk.domain.community.feed.dto.request.CreateFeedRequestDto;
 import com.danjitalk.danjitalk.domain.community.feed.dto.request.UpdateFeedRequestDto;
 import com.danjitalk.danjitalk.domain.community.feed.dto.response.*;
