@@ -1,5 +1,6 @@
 package com.danjitalk.danjitalk.infrastructure.scheduler.community;
 
+import com.danjitalk.danjitalk.domain.bookmark.enums.BookmarkType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.*;
@@ -38,8 +39,8 @@ public class BookmarkScheduleJob {
 
         Result<Record2<Long, Integer>> fetch = dslContext.select(FEED.ID, count)
                 .from(FEED)
-                .leftJoin(BOOKMARK).on(BOOKMARK.FEED_ID.eq(FEED.ID))
-                .groupBy(BOOKMARK.FEED_ID, FEED.BOOKMARK_COUNT)
+                .leftJoin(BOOKMARK).on(BOOKMARK.TYPE_ID.eq(FEED.ID).and(BOOKMARK.TYPE.eq(String.valueOf(BookmarkType.FEED))))
+                .groupBy(FEED.ID, FEED.BOOKMARK_COUNT)
                 .having(count(BOOKMARK.ID).ne(FEED.BOOKMARK_COUNT).or(FEED.BOOKMARK_COUNT.isNull()))
                 .fetch();
 

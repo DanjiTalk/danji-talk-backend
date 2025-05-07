@@ -1,5 +1,6 @@
-package com.danjitalk.danjitalk.domain.community.bookmark.entity;
+package com.danjitalk.danjitalk.domain.bookmark.entity;
 
+import com.danjitalk.danjitalk.domain.bookmark.enums.BookmarkType;
 import com.danjitalk.danjitalk.domain.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -11,7 +12,7 @@ import lombok.NoArgsConstructor;
  * */
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"member_id", "feed_id"}))
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"member_id", "feed_id", "type"}))
 public class Bookmark extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,12 +22,16 @@ public class Bookmark extends BaseEntity {
     private Long memberId;
 
     @Column(nullable = false)
-    private Long feedId;
+    private Long typeId;
+
+    @Enumerated(EnumType.STRING)
+    private BookmarkType type;
 
     @Builder
-    public Bookmark(Long memberId, Long feedId) {
+    public Bookmark(Long memberId, Long typeId, BookmarkType type) {
         this.id = null;
         this.memberId = memberId;
-        this.feedId = feedId;
+        this.typeId = typeId;
+        this.type = type;
     }
 }

@@ -123,6 +123,11 @@ public class Reaction extends TableImpl<ReactionRecord> {
     }
 
     @Override
+    public List<UniqueKey<ReactionRecord>> getUniqueKeys() {
+        return Arrays.asList(Keys.KEY_REACTION_UQ_FEED_MEMBER);
+    }
+
+    @Override
     public List<ForeignKey<ReactionRecord, ?>> getReferences() {
         return Arrays.asList(Keys.FKHGEKJDM7K2IAB2NLTI5P99EU9);
     }
