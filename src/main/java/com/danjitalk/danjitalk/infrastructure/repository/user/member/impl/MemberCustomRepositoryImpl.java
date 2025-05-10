@@ -1,12 +1,40 @@
 package com.danjitalk.danjitalk.infrastructure.repository.user.member.impl;
 
+import com.danjitalk.danjitalk.domain.user.member.dto.response.MypageResponse;
 import com.danjitalk.danjitalk.infrastructure.repository.user.member.MemberCustomRepository;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+
+import static com.danjitalk.danjitalk.domain.user.member.entity.QMember.member;
+import static com.danjitalk.danjitalk.domain.apartment.entity.QApartment.apartment;
+import static com.danjitalk.danjitalk.domain.user.member.entity.QMemberApartment.memberApartment;
 
 @RequiredArgsConstructor
 public class MemberCustomRepositoryImpl implements MemberCustomRepository {
 
     private final JPAQueryFactory queryFactory;
 
+    @Override
+    public MypageResponse getMemberInfoById(Long memberId) {
+        return queryFactory
+                .select(Projections.constructor(MypageResponse.class,
+                    member.fileId,
+                    member.name,
+                    member.nickname,
+                    member.email,
+
+                    memberApartment.id,
+                    apartment.name,
+                    apartment.region,
+                    apartment.location,
+                    memberApartment.building,
+                    memberApartment.unit
+                ))
+                .from(member)
+                .leftJoin(memberApartment).on(member.id.eq(memberApartment.member.id))
+                .leftJoin(apartment).on(memberApartment.apartment.id.eq(apartment.id))
+                .where(member.id.eq(memberId))
+                .fetchOne();
+    }
 }

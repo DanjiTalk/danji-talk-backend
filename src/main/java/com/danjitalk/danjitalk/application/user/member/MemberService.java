@@ -4,16 +4,17 @@ import static com.danjitalk.danjitalk.common.util.SecurityContextHolderUtil.getS
 
 import com.danjitalk.danjitalk.common.exception.ConflictException;
 import com.danjitalk.danjitalk.common.exception.DataNotFoundException;
+import com.danjitalk.danjitalk.common.util.SecurityContextHolderUtil;
 import com.danjitalk.danjitalk.domain.user.member.dto.request.CheckEmailDuplicationRequest;
 import com.danjitalk.danjitalk.domain.user.member.dto.request.DeleteAccountRequest;
 import com.danjitalk.danjitalk.domain.user.member.dto.request.FindIdRequest;
 import com.danjitalk.danjitalk.domain.user.member.dto.request.ResetPasswordRequest;
 import com.danjitalk.danjitalk.domain.user.member.dto.request.SignUpRequest;
+import com.danjitalk.danjitalk.domain.user.member.dto.response.MypageResponse;
 import com.danjitalk.danjitalk.domain.user.member.entity.Member;
 import com.danjitalk.danjitalk.domain.user.member.entity.SystemUser;
 import com.danjitalk.danjitalk.domain.user.member.enums.LoginMethod;
 import com.danjitalk.danjitalk.domain.user.member.enums.Role;
-import com.danjitalk.danjitalk.domain.user.member.service.MemberDomainService;
 import com.danjitalk.danjitalk.infrastructure.repository.user.member.MemberRepository;
 import com.danjitalk.danjitalk.infrastructure.repository.user.member.SystemUserRepository;
 import java.time.LocalDateTime;
@@ -110,5 +111,10 @@ public class MemberService {
         SystemUser systemUser = systemUserRepository.findByLoginId(request.email()).orElseThrow(DataNotFoundException::new);
         String encodedPassword = passwordEncoder.encode(request.password());
         systemUser.updatePassword(encodedPassword);
+    }
+
+    public MypageResponse getMyPageInfo() {
+        Long currentMemberId = SecurityContextHolderUtil.getMemberId();
+        return memberRepository.getMemberInfoById(currentMemberId);
     }
 }
