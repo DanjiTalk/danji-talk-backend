@@ -46,4 +46,20 @@ public class MemberApartment extends BaseEntity {
         this.numberOfResidents = numberOfResidents;
         this.carNumbers = carNumbers;
     }
+
+    public void updateResidenceInfo(
+        Apartment apartment,
+        String building,
+        String unit,
+        LocalDate moveInDate,
+        Integer numberOfResidents,
+        String carNumbers
+    ) {
+        this.apartment = apartment;
+        this.building = building;
+        this.unit = unit;
+        this.moveInDate = moveInDate;
+        this.numberOfResidents = numberOfResidents;
+        this.carNumbers = carNumbers;
+    }
 }

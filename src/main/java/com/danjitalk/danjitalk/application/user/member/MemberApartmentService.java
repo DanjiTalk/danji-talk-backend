@@ -6,6 +6,7 @@ import com.danjitalk.danjitalk.common.exception.ForbiddenException;
 import com.danjitalk.danjitalk.common.util.SecurityContextHolderUtil;
 import com.danjitalk.danjitalk.domain.apartment.entity.Apartment;
 import com.danjitalk.danjitalk.domain.user.member.dto.request.CreateMemberApartmentRequest;
+import com.danjitalk.danjitalk.domain.user.member.dto.request.UpdateMemberApartmentRequest;
 import com.danjitalk.danjitalk.domain.user.member.entity.Member;
 import com.danjitalk.danjitalk.domain.user.member.entity.MemberApartment;
 import com.danjitalk.danjitalk.infrastructure.repository.apartment.ApartmentRepository;
@@ -65,5 +66,35 @@ public class MemberApartmentService {
         }
 
         memberApartmentRepository.deleteById(memberApartmentId);
+    }
+
+    @Transactional
+    public void updateMemberApartment(Long memberApartmentId, UpdateMemberApartmentRequest request) {
+        Long currentMemberId = SecurityContextHolderUtil.getMemberId();
+        MemberApartment memberApartment = memberApartmentRepository.findById(memberApartmentId).orElseThrow(DataNotFoundException::new);
+
+        if(!currentMemberId.equals(memberApartment.getMember().getId())) {
+            throw new ForbiddenException(403, "다른 사용자의 정보에 접근할 수 없습니다.");
+        }
+
+        Apartment apartment = apartmentRepository.findById(request.apartmentId()).orElseThrow(DataNotFoundException::new);
+
+        List<String> carNumbers = request.carNumbers();
+
+        String carNumbersToString =
+            (carNumbers != null && !carNumbers.isEmpty())
+                ? String.join(",", carNumbers)
+                : "";
+
+        memberApartment.updateResidenceInfo(
+            apartment,
+            request.building(),
+            request.unit(),
+            request.moveInDate(),
+            request.numberOfResidents(),
+            carNumbersToString
+        );
+
+        memberApartmentRepository.save(memberApartment);
     }
 }
