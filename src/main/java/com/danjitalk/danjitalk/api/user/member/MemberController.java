@@ -7,7 +7,7 @@ import com.danjitalk.danjitalk.domain.user.member.dto.request.DeleteAccountReque
 import com.danjitalk.danjitalk.domain.user.member.dto.request.FindIdRequest;
 import com.danjitalk.danjitalk.domain.user.member.dto.request.ResetPasswordRequest;
 import com.danjitalk.danjitalk.domain.user.member.dto.request.SignUpRequest;
-import com.danjitalk.danjitalk.domain.user.member.dto.response.MypageResponse;
+import com.danjitalk.danjitalk.domain.user.member.dto.response.MyPageResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -56,8 +56,8 @@ public class MemberController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<MypageResponse>> getMyPage() {
-        MypageResponse mypageResponse = memberService.getMyPageInfo();
+    public ResponseEntity<ApiResponse<MyPageResponse>> getMyPage() {
+        MyPageResponse mypageResponse = memberService.getMyPageInfo();
         return ResponseEntity.ok(ApiResponse.success(200, null, mypageResponse));
     }
 

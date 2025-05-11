@@ -1,6 +1,6 @@
 package com.danjitalk.danjitalk.infrastructure.repository.user.member.impl;
 
-import com.danjitalk.danjitalk.domain.user.member.dto.response.MypageResponse;
+import com.danjitalk.danjitalk.domain.user.member.dto.response.MyPageResponse;
 import com.danjitalk.danjitalk.infrastructure.repository.user.member.MemberCustomRepository;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -16,15 +16,16 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public MypageResponse getMemberInfoById(Long memberId) {
+    public MyPageResponse getMemberInfoById(Long memberId) {
         return queryFactory
-                .select(Projections.constructor(MypageResponse.class,
+                .select(Projections.constructor(MyPageResponse.class,
                     member.fileId,
                     member.name,
                     member.nickname,
                     member.email,
 
                     memberApartment.id,
+                    apartment.id,
                     apartment.name,
                     apartment.region,
                     apartment.location,

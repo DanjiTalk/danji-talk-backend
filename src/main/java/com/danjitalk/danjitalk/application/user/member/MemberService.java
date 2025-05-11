@@ -10,7 +10,7 @@ import com.danjitalk.danjitalk.domain.user.member.dto.request.DeleteAccountReque
 import com.danjitalk.danjitalk.domain.user.member.dto.request.FindIdRequest;
 import com.danjitalk.danjitalk.domain.user.member.dto.request.ResetPasswordRequest;
 import com.danjitalk.danjitalk.domain.user.member.dto.request.SignUpRequest;
-import com.danjitalk.danjitalk.domain.user.member.dto.response.MypageResponse;
+import com.danjitalk.danjitalk.domain.user.member.dto.response.MyPageResponse;
 import com.danjitalk.danjitalk.domain.user.member.entity.Member;
 import com.danjitalk.danjitalk.domain.user.member.entity.SystemUser;
 import com.danjitalk.danjitalk.domain.user.member.enums.LoginMethod;
@@ -113,7 +113,7 @@ public class MemberService {
         systemUser.updatePassword(encodedPassword);
     }
 
-    public MypageResponse getMyPageInfo() {
+    public MyPageResponse getMyPageInfo() {
         Long currentMemberId = SecurityContextHolderUtil.getMemberId();
         return memberRepository.getMemberInfoById(currentMemberId);
     }
