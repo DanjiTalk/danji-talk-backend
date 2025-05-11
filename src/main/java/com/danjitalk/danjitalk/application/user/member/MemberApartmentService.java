@@ -2,6 +2,7 @@ package com.danjitalk.danjitalk.application.user.member;
 
 import com.danjitalk.danjitalk.common.exception.ConflictException;
 import com.danjitalk.danjitalk.common.exception.DataNotFoundException;
+import com.danjitalk.danjitalk.common.exception.ForbiddenException;
 import com.danjitalk.danjitalk.common.util.SecurityContextHolderUtil;
 import com.danjitalk.danjitalk.domain.apartment.entity.Apartment;
 import com.danjitalk.danjitalk.domain.user.member.dto.request.CreateMemberApartmentRequest;
@@ -52,5 +53,17 @@ public class MemberApartmentService {
                 .build();
 
         memberApartmentRepository.save(memberApartment);
+    }
+
+    @Transactional
+    public void deleteMemberApartment(Long memberApartmentId) {
+        Long currentMemberId = SecurityContextHolderUtil.getMemberId();
+        MemberApartment memberApartment = memberApartmentRepository.findById(memberApartmentId).orElseThrow(DataNotFoundException::new);
+
+        if(!currentMemberId.equals(memberApartment.getMember().getId())) {
+            throw new ForbiddenException(403, "다른 사용자의 정보에 접근할 수 없습니다.");
+        }
+
+        memberApartmentRepository.deleteById(memberApartmentId);
     }
 }
