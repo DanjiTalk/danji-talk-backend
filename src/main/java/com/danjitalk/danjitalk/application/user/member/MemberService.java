@@ -10,6 +10,7 @@ import com.danjitalk.danjitalk.domain.user.member.dto.request.DeleteAccountReque
 import com.danjitalk.danjitalk.domain.user.member.dto.request.FindIdRequest;
 import com.danjitalk.danjitalk.domain.user.member.dto.request.ResetPasswordRequest;
 import com.danjitalk.danjitalk.domain.user.member.dto.request.SignUpRequest;
+import com.danjitalk.danjitalk.domain.user.member.dto.request.UpdateProfileRequest;
 import com.danjitalk.danjitalk.domain.user.member.dto.response.MyPageResponse;
 import com.danjitalk.danjitalk.domain.user.member.entity.Member;
 import com.danjitalk.danjitalk.domain.user.member.entity.SystemUser;
@@ -116,5 +117,20 @@ public class MemberService {
     public MyPageResponse getMyPageInfo() {
         Long currentMemberId = SecurityContextHolderUtil.getMemberId();
         return memberRepository.getMemberInfoById(currentMemberId);
+    }
+
+    @Transactional
+    public void updateProfile(UpdateProfileRequest request) {
+        Long currentMemberId = SecurityContextHolderUtil.getMemberId();
+
+        Member member = memberRepository.findById(currentMemberId).orElseThrow(DataNotFoundException::new);
+        SystemUser systemUser = systemUserRepository.findByLoginId(member.getEmail()).orElseThrow(DataNotFoundException::new);
+
+        member.updateProfile(request.name(), request.nickname(), request.phoneNumber());
+        String encodedPassword = passwordEncoder.encode(request.password());
+        systemUser.updatePassword(encodedPassword);
+
+        memberRepository.save(member);
+        systemUserRepository.save(systemUser);
     }
 }

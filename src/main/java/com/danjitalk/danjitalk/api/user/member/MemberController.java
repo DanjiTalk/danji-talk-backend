@@ -7,6 +7,7 @@ import com.danjitalk.danjitalk.domain.user.member.dto.request.DeleteAccountReque
 import com.danjitalk.danjitalk.domain.user.member.dto.request.FindIdRequest;
 import com.danjitalk.danjitalk.domain.user.member.dto.request.ResetPasswordRequest;
 import com.danjitalk.danjitalk.domain.user.member.dto.request.SignUpRequest;
+import com.danjitalk.danjitalk.domain.user.member.dto.request.UpdateProfileRequest;
 import com.danjitalk.danjitalk.domain.user.member.dto.response.MyPageResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -59,6 +61,12 @@ public class MemberController {
     public ResponseEntity<ApiResponse<MyPageResponse>> getMyPage() {
         MyPageResponse mypageResponse = memberService.getMyPageInfo();
         return ResponseEntity.ok(ApiResponse.success(200, null, mypageResponse));
+    }
+
+    @PutMapping("/profile")
+    public ResponseEntity<ApiResponse<Void>> updateProfile(@RequestBody UpdateProfileRequest request) {
+        memberService.updateProfile(request);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ApiResponse.success(204, null, null));
     }
 
 }

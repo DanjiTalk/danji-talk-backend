@@ -68,4 +68,10 @@ public class Member extends BaseEntity {
         this.fileId = fileId;
         this.gender = gender;
     }
+
+    public void updateProfile(String name, String nickname, String phoneNumber) {
+        this.name = name;
+        this.nickname = nickname;
+        this.phoneNumber = phoneNumber;
+    }
 }
