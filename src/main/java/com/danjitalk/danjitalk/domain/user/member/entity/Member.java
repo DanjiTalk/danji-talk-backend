@@ -74,4 +74,8 @@ public class Member extends BaseEntity {
         this.nickname = nickname;
         this.phoneNumber = phoneNumber;
     }
+
+    public void updateFileId(String fileId) {
+        this.fileId = fileId;
+    }
 }
