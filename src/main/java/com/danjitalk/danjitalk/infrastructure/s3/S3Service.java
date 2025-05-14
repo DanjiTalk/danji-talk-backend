@@ -103,7 +103,7 @@ public class S3Service {
                             throw new IllegalArgumentException("Not allowed image signature, Only JPG, JPEG and PNG");
                         }
 
-                        String formattedKey = String.format("feed/%s/%s%s", id, UUID.randomUUID(), fileExtension);
+                        String formattedKey = String.format("%s/%s/%s%s", fileType.toString().toLowerCase(), id, UUID.randomUUID(), fileExtension);
                         fileUrls.add(formattedKey);
 
                         try ( ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes)) {
