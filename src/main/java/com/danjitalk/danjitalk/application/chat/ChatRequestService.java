@@ -3,6 +3,7 @@ package com.danjitalk.danjitalk.application.chat;
 import com.danjitalk.danjitalk.common.exception.BadRequestException;
 import com.danjitalk.danjitalk.common.exception.ConflictException;
 import com.danjitalk.danjitalk.common.exception.DataNotFoundException;
+import com.danjitalk.danjitalk.common.exception.ForbiddenException;
 import com.danjitalk.danjitalk.common.util.SecurityContextHolderUtil;
 import com.danjitalk.danjitalk.domain.chat.dto.ChatRequestResponse;
 import com.danjitalk.danjitalk.domain.chat.dto.CreateChatRequest;
@@ -178,5 +179,24 @@ public class ChatRequestService {
                         chatRequest.getCreatedAt()
                     )
                 ).toList();
+    }
+
+    /**
+     * 보낸 채팅 요청 삭제
+     */
+    @Transactional
+    public void cancelRequest(Long requestId) {
+        Long currentId = SecurityContextHolderUtil.getMemberId();
+        ChatRequest chatRequest = chatRequestRepository.findById(requestId).orElseThrow(DataNotFoundException::new);
+
+        if (!chatRequest.getRequester().getId().equals(currentId)) {
+            throw new ForbiddenException(403, "내가 보낸 요청이 아닙니다.");
+        }
+
+        if (chatRequest.getStatus() == ChatRequestStatus.APPROVED) {
+            throw new BadRequestException("이미 수락된 요청은 취소할 수 없습니다.");
+        }
+
+        chatRequestRepository.delete(chatRequest);
     }
 }

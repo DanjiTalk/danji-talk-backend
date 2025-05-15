@@ -9,6 +9,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -51,5 +52,11 @@ public class ChatRequestController {
     public ResponseEntity<ApiResponse<List<ChatRequestResponse>>> getSentChatRequests() {
         List<ChatRequestResponse> chatRequestResponses = chatRequestService.sentRequests();
         return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), null, chatRequestResponses));
+    }
+
+    @DeleteMapping("/{requestId}")
+    public ResponseEntity<ApiResponse<Void>> deleteChatRequest(@PathVariable Long requestId) {
+        chatRequestService.cancelRequest(requestId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ApiResponse.success(204, null, null));
     }
 }
