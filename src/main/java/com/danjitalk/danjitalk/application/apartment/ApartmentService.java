@@ -12,10 +12,12 @@ import com.danjitalk.danjitalk.event.dto.RecentComplexViewedEvent;
 import com.danjitalk.danjitalk.event.dto.GroupChatCreateEvent;
 import com.danjitalk.danjitalk.infrastructure.repository.apartment.ApartmentRepository;
 import com.danjitalk.danjitalk.infrastructure.s3.S3Service;
+import java.time.Duration;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,6 +30,7 @@ public class ApartmentService {
     private final ApartmentRepository apartmentRepository;
     private final S3Service s3Service;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     /**
      * 아파트 단지 등록
@@ -86,10 +89,18 @@ public class ApartmentService {
 
     @Transactional(readOnly = true)
     public ApartmentInfoResponse getApartmentInfo(Long id) {
-        Apartment apartment = apartmentRepository.findById(id).orElseThrow(() -> new DataNotFoundException("존재하지 않는 아파트입니다."));
+        String key = "apartment:detail:" + id;
+        Object object = redisTemplate.opsForValue().get(key);
 
+        if(object instanceof ApartmentInfoResponse response) {
+            log.info("response {}", response);
+            return response;
+        }
+
+        Apartment apartment = apartmentRepository.findById(id).orElseThrow(() -> new DataNotFoundException("존재하지 않는 아파트입니다."));
         Long currentMemberId = SecurityContextHolderUtil.getMemberIdOptional().orElse(0L);
 
+        // 최근 본 단지 저장 이벤트
         if (currentMemberId != 0) {
             applicationEventPublisher.publishEvent(
                 new RecentComplexViewedEvent(
@@ -105,7 +116,7 @@ public class ApartmentService {
             );
         }
 
-        return ApartmentInfoResponse.builder()
+        ApartmentInfoResponse apartmentInfoResponse = ApartmentInfoResponse.builder()
                 .name(apartment.getName())
                 .region(apartment.getRegion())
                 .location(apartment.getLocation())
@@ -116,5 +127,9 @@ public class ApartmentService {
                 .fileUrl(apartment.getFileUrl())
                 .chatroomId(apartment.getChatroomId())
                 .build();
+
+        redisTemplate.opsForValue().set(key, apartmentInfoResponse, Duration.ofHours(1));
+
+        return apartmentInfoResponse;
     }
 }
