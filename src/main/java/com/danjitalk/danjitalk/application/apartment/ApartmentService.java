@@ -2,6 +2,7 @@ package com.danjitalk.danjitalk.application.apartment;
 
 import com.danjitalk.danjitalk.common.exception.DataNotFoundException;
 import com.danjitalk.danjitalk.common.util.SecurityContextHolderUtil;
+import com.danjitalk.danjitalk.domain.apartment.dto.ApartmentCache;
 import com.danjitalk.danjitalk.domain.apartment.dto.ApartmentInfoResponse;
 import com.danjitalk.danjitalk.domain.apartment.dto.ApartmentRegisterRequest;
 import com.danjitalk.danjitalk.domain.apartment.dto.ApartmentRegisterResponse;
@@ -10,6 +11,7 @@ import com.danjitalk.danjitalk.domain.s3.dto.response.S3FileUrlResponseDto;
 import com.danjitalk.danjitalk.domain.s3.enums.FileType;
 import com.danjitalk.danjitalk.event.dto.RecentComplexViewedEvent;
 import com.danjitalk.danjitalk.event.dto.GroupChatCreateEvent;
+import com.danjitalk.danjitalk.event.handler.SearchEventHandler;
 import com.danjitalk.danjitalk.infrastructure.repository.apartment.ApartmentRepository;
 import com.danjitalk.danjitalk.infrastructure.s3.S3Service;
 import java.time.Duration;
@@ -92,44 +94,51 @@ public class ApartmentService {
         String key = "apartment:detail:" + id;
         Object object = redisTemplate.opsForValue().get(key);
 
-        if(object instanceof ApartmentInfoResponse response) {
-            log.info("response {}", response);
-            return response;
+        Long currentMemberId = SecurityContextHolderUtil.getMemberIdOptional().orElse(0L);
+
+        if(object instanceof ApartmentCache apartmentCache) {
+            log.info("Cache hit for apartment id={}, apartmentCache={}", id, apartmentCache);
+            if (currentMemberId != 0) {
+                publishRecentComplexViewedEvent(apartmentCache.toEvent(currentMemberId));
+            }
+            return apartmentCache.toResponse();
         }
 
         Apartment apartment = apartmentRepository.findById(id).orElseThrow(() -> new DataNotFoundException("존재하지 않는 아파트입니다."));
-        Long currentMemberId = SecurityContextHolderUtil.getMemberIdOptional().orElse(0L);
 
-        // 최근 본 단지 저장 이벤트
         if (currentMemberId != 0) {
-            applicationEventPublisher.publishEvent(
-                new RecentComplexViewedEvent(
-                    apartment.getId(),
-                    apartment.getName(),
-                    apartment.getRegion(),
-                    apartment.getLocation(),
-                    apartment.getTotalUnit(),
-                    apartment.getBuildingCount(),
-                    apartment.getThumbnailFileUrl(),
-                    currentMemberId
-                )
-            );
+            publishRecentComplexViewedEvent(apartment, currentMemberId);
         }
 
-        ApartmentInfoResponse apartmentInfoResponse = ApartmentInfoResponse.builder()
-                .name(apartment.getName())
-                .region(apartment.getRegion())
-                .location(apartment.getLocation())
-                .totalUnit(apartment.getTotalUnit())
-                .parkingCapacity(apartment.getParkingCapacity())
-                .buildingCount(apartment.getBuildingCount())
-                .buildingRange(apartment.getBuildingRange())
-                .fileUrl(apartment.getFileUrl())
-                .chatroomId(apartment.getChatroomId())
-                .build();
+        ApartmentInfoResponse apartmentInfoResponse = ApartmentInfoResponse.from(apartment);
 
-        redisTemplate.opsForValue().set(key, apartmentInfoResponse, Duration.ofHours(1));
+        ApartmentCache apartmentCache = ApartmentCache.from(apartment);
+        redisTemplate.opsForValue().set(key, apartmentCache, Duration.ofHours(1));
 
         return apartmentInfoResponse;
+    }
+
+    /**
+     * <p>최근 본 단지 저장 이벤트를 발행합니다.</p>
+     * {@link SearchEventHandler} 에서 이벤트를 처리합니다.
+     * @see SearchEventHandler
+     */
+    private void publishRecentComplexViewedEvent(Apartment apartment, Long currentMemberId) {
+        applicationEventPublisher.publishEvent(
+            new RecentComplexViewedEvent(
+                apartment.getId(),
+                apartment.getName(),
+                apartment.getRegion(),
+                apartment.getLocation(),
+                apartment.getTotalUnit(),
+                apartment.getBuildingCount(),
+                apartment.getThumbnailFileUrl(),
+                currentMemberId
+            )
+        );
+    }
+
+    private void publishRecentComplexViewedEvent(RecentComplexViewedEvent event) {
+        applicationEventPublisher.publishEvent(event);
     }
 }
