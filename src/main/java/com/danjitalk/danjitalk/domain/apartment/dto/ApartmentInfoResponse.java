@@ -1,8 +1,7 @@
 package com.danjitalk.danjitalk.domain.apartment.dto;
 
-import lombok.Builder;
+import com.danjitalk.danjitalk.domain.apartment.entity.Apartment;
 
-@Builder
 public record ApartmentInfoResponse(
     String name,
     String region,
@@ -14,4 +13,18 @@ public record ApartmentInfoResponse(
     String fileUrl,
     Long chatroomId
 ) {
+    public static ApartmentInfoResponse from(Apartment apartment){
+        return new ApartmentInfoResponse(
+            apartment.getName(),
+            apartment.getRegion(),
+            apartment.getLocation(),
+            apartment.getTotalUnit(),
+            apartment.getParkingCapacity(),
+            apartment.getBuildingCount(),
+            apartment.getBuildingRange(),
+            apartment.getFileUrl(),
+            apartment.getChatroomId()
+        );
+    }
+
 }

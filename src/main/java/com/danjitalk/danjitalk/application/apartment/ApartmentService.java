@@ -2,6 +2,7 @@ package com.danjitalk.danjitalk.application.apartment;
 
 import com.danjitalk.danjitalk.common.exception.DataNotFoundException;
 import com.danjitalk.danjitalk.common.util.SecurityContextHolderUtil;
+import com.danjitalk.danjitalk.domain.apartment.dto.ApartmentCache;
 import com.danjitalk.danjitalk.domain.apartment.dto.ApartmentInfoResponse;
 import com.danjitalk.danjitalk.domain.apartment.dto.ApartmentRegisterRequest;
 import com.danjitalk.danjitalk.domain.apartment.dto.ApartmentRegisterResponse;
@@ -10,12 +11,15 @@ import com.danjitalk.danjitalk.domain.s3.dto.response.S3FileUrlResponseDto;
 import com.danjitalk.danjitalk.domain.s3.enums.FileType;
 import com.danjitalk.danjitalk.event.dto.RecentComplexViewedEvent;
 import com.danjitalk.danjitalk.event.dto.GroupChatCreateEvent;
+import com.danjitalk.danjitalk.event.handler.SearchEventHandler;
 import com.danjitalk.danjitalk.infrastructure.repository.apartment.ApartmentRepository;
 import com.danjitalk.danjitalk.infrastructure.s3.S3Service;
+import java.time.Duration;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,6 +32,7 @@ public class ApartmentService {
     private final ApartmentRepository apartmentRepository;
     private final S3Service s3Service;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     /**
      * 아파트 단지 등록
@@ -86,35 +91,54 @@ public class ApartmentService {
 
     @Transactional(readOnly = true)
     public ApartmentInfoResponse getApartmentInfo(Long id) {
-        Apartment apartment = apartmentRepository.findById(id).orElseThrow(() -> new DataNotFoundException("존재하지 않는 아파트입니다."));
+        String key = "apartment:detail:" + id;
+        Object object = redisTemplate.opsForValue().get(key);
 
         Long currentMemberId = SecurityContextHolderUtil.getMemberIdOptional().orElse(0L);
 
-        if (currentMemberId != 0) {
-            applicationEventPublisher.publishEvent(
-                new RecentComplexViewedEvent(
-                    apartment.getId(),
-                    apartment.getName(),
-                    apartment.getRegion(),
-                    apartment.getLocation(),
-                    apartment.getTotalUnit(),
-                    apartment.getBuildingCount(),
-                    apartment.getThumbnailFileUrl(),
-                    currentMemberId
-                )
-            );
+        if(object instanceof ApartmentCache apartmentCache) {
+            log.info("Cache hit for apartment id={}, apartmentCache={}", id, apartmentCache);
+            if (currentMemberId != 0) {
+                publishRecentComplexViewedEvent(apartmentCache.toEvent(currentMemberId));
+            }
+            return apartmentCache.toResponse();
         }
 
-        return ApartmentInfoResponse.builder()
-                .name(apartment.getName())
-                .region(apartment.getRegion())
-                .location(apartment.getLocation())
-                .totalUnit(apartment.getTotalUnit())
-                .parkingCapacity(apartment.getParkingCapacity())
-                .buildingCount(apartment.getBuildingCount())
-                .buildingRange(apartment.getBuildingRange())
-                .fileUrl(apartment.getFileUrl())
-                .chatroomId(apartment.getChatroomId())
-                .build();
+        Apartment apartment = apartmentRepository.findById(id).orElseThrow(() -> new DataNotFoundException("존재하지 않는 아파트입니다."));
+
+        if (currentMemberId != 0) {
+            publishRecentComplexViewedEvent(apartment, currentMemberId);
+        }
+
+        ApartmentInfoResponse apartmentInfoResponse = ApartmentInfoResponse.from(apartment);
+
+        ApartmentCache apartmentCache = ApartmentCache.from(apartment);
+        redisTemplate.opsForValue().set(key, apartmentCache, Duration.ofHours(1));
+
+        return apartmentInfoResponse;
+    }
+
+    /**
+     * <p>최근 본 단지 저장 이벤트를 발행합니다.</p>
+     * {@link SearchEventHandler} 에서 이벤트를 처리합니다.
+     * @see SearchEventHandler
+     */
+    private void publishRecentComplexViewedEvent(Apartment apartment, Long currentMemberId) {
+        applicationEventPublisher.publishEvent(
+            new RecentComplexViewedEvent(
+                apartment.getId(),
+                apartment.getName(),
+                apartment.getRegion(),
+                apartment.getLocation(),
+                apartment.getTotalUnit(),
+                apartment.getBuildingCount(),
+                apartment.getThumbnailFileUrl(),
+                currentMemberId
+            )
+        );
+    }
+
+    private void publishRecentComplexViewedEvent(RecentComplexViewedEvent event) {
+        applicationEventPublisher.publishEvent(event);
     }
 }
