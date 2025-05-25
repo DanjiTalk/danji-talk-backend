@@ -63,7 +63,7 @@ public class SearchService {
             }
         }
 
-        List<ApartmentSearchResponse> apartmentSearchResponses = apartmentRepository.findByKeywordWithCursor(keyword, cursor, limit + 1);
+        List<ApartmentSearchResponse> apartmentSearchResponses = apartmentRepository.findByKeywordWithCursor(keyword, cursor, limit + 1, memberId);
         boolean lastPage = apartmentSearchResponses.size() <= limit; // true => 이후 데이터 없음
         if (!lastPage) {
             apartmentSearchResponses.remove((int) limit); // 초과분 제거
