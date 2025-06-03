@@ -42,11 +42,14 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
             .where(member.id.eq(memberId))
             .fetchOne();
 
-        String carNumbers = queryFactory
-            .select(memberApartment.carNumbers)
-            .from(memberApartment)
-            .where(memberApartment.id.eq(myPageResponse.getMemberApartmentId()))
-            .fetchOne();
+        String carNumbers = null;
+        if (myPageResponse.getMemberApartmentId() != null) {
+            carNumbers = queryFactory
+                .select(memberApartment.carNumbers)
+                .from(memberApartment)
+                .where(memberApartment.id.eq(myPageResponse.getMemberApartmentId()))
+                .fetchOne();
+        }
 
         if(carNumbers != null){
             myPageResponse.setCarNumbers(carNumbers);
