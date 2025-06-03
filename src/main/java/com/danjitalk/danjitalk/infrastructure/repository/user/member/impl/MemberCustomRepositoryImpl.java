@@ -45,7 +45,11 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
         String carNumbers = queryFactory
             .select(memberApartment.carNumbers)
             .from(memberApartment)
-            .where(memberApartment.id.eq(myPageResponse.getMemberApartmentId()))
+            .where(
+                myPageResponse.getMemberApartmentId() != null ?
+                    memberApartment.id.eq(myPageResponse.getMemberApartmentId()) :
+                    memberApartment.id.isNull()
+            )
             .fetchOne();
 
         if(carNumbers != null){
