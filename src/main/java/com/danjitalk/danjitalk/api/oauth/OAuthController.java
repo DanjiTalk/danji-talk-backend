@@ -1,10 +1,14 @@
 package com.danjitalk.danjitalk.api.oauth;
 
+import com.danjitalk.danjitalk.common.response.ApiResponse;
 import com.danjitalk.danjitalk.common.security.CustomMemberDetails;
 import com.danjitalk.danjitalk.common.util.JwtUtil;
+import com.danjitalk.danjitalk.domain.user.member.entity.SystemUser;
 import jakarta.servlet.http.HttpServletResponse;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -13,6 +17,7 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -55,5 +60,22 @@ public class OAuthController {
         response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
 
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/api/ws/token")
+    public ResponseEntity<ApiResponse<String>> beforeHandshakeTempUUIDToken(@AuthenticationPrincipal CustomMemberDetails memberDetails) {
+        SystemUser user = memberDetails.getUser();
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("memberId", user.getMember().getId());
+        map.put("memberEmail", user.getLoginId());
+        map.put("provider", user.getLastLoginMethod());
+        map.put("userId", user.getSystemUserId());
+
+        String uuid = UUID.randomUUID().toString();
+        String key = "ws:temp:claim:" + uuid;
+
+        redisTemplate.opsForValue().set(key, map, Duration.ofMinutes(3));
+        return ResponseEntity.ok(ApiResponse.success(200, null, uuid));
     }
 }
