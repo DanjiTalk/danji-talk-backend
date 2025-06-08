@@ -46,18 +46,18 @@ public class StompEventHandler { //StompSubProtocolHandler 에서 이벤트 처�
     @EventListener
     public void handleConnectEventListener(SessionConnectEvent event) { // StompCommand.CONNECT or StompCommand.STOMP 일 때 실행
         log.info("사용자 연결 전 소켓 연결, 헤더에 기본값 세팅");
-
-        MessageHeaders headers = event.getMessage().getHeaders();
-        log.info("headers {}", headers);
-
-        Map<String, Object> sessionAttributes = (Map<String, Object>) headers.get("simpSessionAttributes");
-        UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) headers.get("simpUser");
-        String email = token.getName();
-        CustomMemberDetails customMemberDetails = (CustomMemberDetails) token.getPrincipal();
-        sessionAttributes.put("email", email);
-        sessionAttributes.put("memberId", customMemberDetails.getUser().getMember().getId());
-
-        log.info("After setting the headers: {}", headers);
+//        기본값 세팅은 핸드셰이크에서 하는게 맞으나 참고용으로 남김
+//        MessageHeaders headers = event.getMessage().getHeaders();
+//        log.info("headers {}", headers);
+//
+//        Map<String, Object> sessionAttributes = (Map<String, Object>) headers.get("simpSessionAttributes");
+//        UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) headers.get("simpUser");
+//        String email = token.getName();
+//        CustomMemberDetails customMemberDetails = (CustomMemberDetails) token.getPrincipal();
+//        sessionAttributes.put("email", email);
+//        sessionAttributes.put("memberId", customMemberDetails.getUser().getMember().getId());
+//
+//        log.info("After setting the headers: {}", headers);
     }
 
     @EventListener
