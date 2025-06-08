@@ -13,7 +13,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:5174", "http://localhost:5173", "https://danji-talk-frontend.vercel.app")
+                .allowedOrigins("http://localhost:5174", "http://localhost:5173", "https://danji-talk-frontend.vercel.app", "https://danji-talk-frontend-rosy.vercel.app")
                 .allowedMethods("*")
                 .allowedHeaders("*")
                 .maxAge(3600)
