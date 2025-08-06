@@ -139,7 +139,7 @@ public class ChatRequestService {
         }
 
         // 거절 처리
-        chatRequest.changeStatus(ChatRequestStatus.APPROVED);
+        chatRequest.changeStatus(ChatRequestStatus.REJECTED);
         chatRequestRepository.save(chatRequest);
     }
 
