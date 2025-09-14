@@ -1,7 +1,7 @@
 package com.danjitalk.danjitalk.domain.apartment.dto.openapi.apartment.basic;
 
+import com.danjitalk.danjitalk.domain.apartment.dto.openapi.common.Response;
 import lombok.Getter;
-import software.amazon.awssdk.core.Response;
 
 @Getter
 public class ApartmentBasicInfo<T> {
