@@ -3,6 +3,8 @@ package com.danjitalk.danjitalk.application.apartment;
 import com.danjitalk.danjitalk.domain.apartment.dto.openapi.apartment.Body;
 import com.danjitalk.danjitalk.domain.apartment.dto.openapi.apartment.basic.ApartmentBasicInfo;
 import com.danjitalk.danjitalk.domain.apartment.dto.openapi.apartment.basic.BasicItem;
+import com.danjitalk.danjitalk.domain.apartment.dto.openapi.apartment.detail.ApartmentDetailInfo;
+import com.danjitalk.danjitalk.domain.apartment.dto.openapi.apartment.detail.DetailItem;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,5 +42,24 @@ public class ApartmentInfoService {
                 .body(new ParameterizedTypeReference<ApartmentBasicInfo<Body<BasicItem>>>() {});
 
         return basicInfo;
+    }
+
+    public ApartmentDetailInfo<Body<DetailItem>> getAptDetailInfo(String kaptCode) {
+        URI uri = UriComponentsBuilder
+            .fromUriString("https://apis.data.go.kr/1613000/AptBasisInfoServiceV4/getAphusDtlInfoV4") // 상세정보 주소
+            .queryParam("serviceKey", serviceKey)
+            .queryParam("kaptCode", kaptCode) // 단지코드
+            .build(true) // 이미 인코딩된 키 인코딩 방지
+            .toUri();
+
+        log.info("최종 URI: {}", uri);
+
+        ApartmentDetailInfo<Body<DetailItem>> detailInfo = restClient.get()
+                .uri(uri)
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .body(new ParameterizedTypeReference<ApartmentDetailInfo<Body<DetailItem>>>() {});
+
+        return detailInfo;
     }
 }
