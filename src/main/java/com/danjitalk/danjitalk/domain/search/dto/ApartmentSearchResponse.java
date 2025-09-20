@@ -8,7 +8,8 @@ public record ApartmentSearchResponse(
     Integer totalUnit,
     Integer buildingCount,
     String thumbnailFileUrl,
-    Boolean isBookmarked
+    Boolean isBookmarked,
+    String kaptCode
 ) {
 
 }
