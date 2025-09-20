@@ -29,7 +29,7 @@ public class LocationService {
     // 행정안전부_행정표준코드_법정동코드
     // 법정동코드 정보의 지역코드, 시도코드, 읍면동코드, 리코드, 지역주소명 등을 조회한다.
     // location 검색을 통해 시군구 코드 리스트 반환
-    public List<String> getLegalDongCode(String location, Integer pageNo, Integer numOfRows) {
+    public List<String> getLegalDongCodeByLocation(String location, Integer pageNo, Integer numOfRows) {
         if (location == null || location.isEmpty()) {
             throw new IllegalArgumentException("location is null or empty");
         }

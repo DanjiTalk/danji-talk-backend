@@ -29,7 +29,7 @@ public class DanjiListService {
     // 시군구 사용하려면 5자리
     // 국토교통부_시군구 아파트 목록, 국토교통부_법정동 아파트 목록 둘 중 하나 쓸 듯
     // 우선 시군구로 진행
-    public SigunguAptList3<Body> getApts(Integer sigunguCode, Integer pageNo, Integer numOfRows) {
+    public SigunguAptList3<Body> getAptsBySigunguCode(Integer sigunguCode, Integer pageNo, Integer numOfRows) {
         if (sigunguCode == null) {
             throw new IllegalArgumentException("sigunguCode must not be null");
         }
