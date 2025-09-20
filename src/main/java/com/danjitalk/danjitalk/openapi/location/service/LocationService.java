@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -63,6 +64,11 @@ public class LocationService {
         } catch (Exception e) {
             log.error("파싱 실패 에러 메시지 {}", e.getMessage());
             throw new BaseException(502, "LegalDongCode JSON 파싱 실패");
+        }
+
+        if (stanReginCdResponse.getStanReginCd() == null) {
+            log.info("검색어가 지역명이 아닙니다.: {}", location);
+            return Collections.emptyList();
         }
 
         List<String> sigunguCodes = stanReginCdResponse.getStanReginCd().get(1).getRow().stream()
