@@ -2,10 +2,14 @@ package com.danjitalk.danjitalk.application.apartment;
 
 import com.danjitalk.danjitalk.common.exception.DataNotFoundException;
 import com.danjitalk.danjitalk.common.util.SecurityContextHolderUtil;
-import com.danjitalk.danjitalk.domain.apartment.dto.ApartmentCache;
 import com.danjitalk.danjitalk.domain.apartment.dto.ApartmentInfoResponse;
 import com.danjitalk.danjitalk.domain.apartment.dto.ApartmentRegisterRequest;
 import com.danjitalk.danjitalk.domain.apartment.dto.ApartmentRegisterResponse;
+import com.danjitalk.danjitalk.domain.apartment.dto.openapi.apartment.Body;
+import com.danjitalk.danjitalk.domain.apartment.dto.openapi.apartment.basic.ApartmentBasicInfo;
+import com.danjitalk.danjitalk.domain.apartment.dto.openapi.apartment.basic.BasicItem;
+import com.danjitalk.danjitalk.domain.apartment.dto.openapi.apartment.detail.ApartmentDetailInfo;
+import com.danjitalk.danjitalk.domain.apartment.dto.openapi.apartment.detail.DetailItem;
 import com.danjitalk.danjitalk.domain.apartment.entity.Apartment;
 import com.danjitalk.danjitalk.domain.s3.dto.response.S3FileUrlResponseDto;
 import com.danjitalk.danjitalk.domain.s3.enums.FileType;
@@ -33,6 +37,7 @@ public class ApartmentService {
     private final S3Service s3Service;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final ApartmentInfoService apartmentInfoService;
 
     /**
      * 아파트 단지 등록
@@ -90,30 +95,35 @@ public class ApartmentService {
     }
 
     @Transactional(readOnly = true)
-    public ApartmentInfoResponse getApartmentInfo(Long id) {
-        String key = "apartment:detail:" + id;
-        Object object = redisTemplate.opsForValue().get(key);
+    public ApartmentInfoResponse getApartmentInfo(Long id) { // 기능 추가 중 캐싱 비활성화 // id 랑 kaptCode 둘다 쓰는게 좋을듯? 아직 등록안된건 kaptCode 아니면 id
+//        String key = "apartment:detail:" + id;                // 어차피 kaptCode db에서 가져오든지 해야함
+//        Object object = redisTemplate.opsForValue().get(key);
 
         Long currentMemberId = SecurityContextHolderUtil.getMemberIdOptional().orElse(0L);
 
-        if(object instanceof ApartmentCache apartmentCache) {
-            log.info("Cache hit for apartment id={}, apartmentCache={}", id, apartmentCache);
-            if (currentMemberId != 0) {
-                publishRecentComplexViewedEvent(apartmentCache.toEvent(currentMemberId));
-            }
-            return apartmentCache.toResponse();
-        }
+//        if(object instanceof ApartmentCache apartmentCache) { // 아파트 단지 상세 캐싱
+//            log.info("Cache hit for apartment id={}, apartmentCache={}", id, apartmentCache);
+//            if (currentMemberId != 0) {
+//                publishRecentComplexViewedEvent(apartmentCache.toEvent(currentMemberId));
+//            }
+//            return apartmentCache.toResponse();
+//        }
 
         Apartment apartment = apartmentRepository.findById(id).orElseThrow(() -> new DataNotFoundException("존재하지 않는 아파트입니다."));
 
         if (currentMemberId != 0) {
-            publishRecentComplexViewedEvent(apartment, currentMemberId);
+            publishRecentComplexViewedEvent(apartment, currentMemberId); // 검색기록 남김
         }
 
-        ApartmentInfoResponse apartmentInfoResponse = ApartmentInfoResponse.from(apartment);
+        String kaptCode = apartment.getKaptCode();
 
-        ApartmentCache apartmentCache = ApartmentCache.from(apartment);
-        redisTemplate.opsForValue().set(key, apartmentCache, Duration.ofHours(1));
+        ApartmentBasicInfo<Body<BasicItem>> basic = apartmentInfoService.getAptBasicInfo(kaptCode);
+        ApartmentDetailInfo<Body<DetailItem>> detail = apartmentInfoService.getAptDetailInfo(kaptCode);
+
+        ApartmentInfoResponse apartmentInfoResponse = ApartmentInfoResponse.from(basic, detail, apartment);
+
+//        ApartmentCache apartmentCache = ApartmentCache.from(apartment); // 캐싱하는부분
+//        redisTemplate.opsForValue().set(key, apartmentCache, Duration.ofHours(1));
 
         return apartmentInfoResponse;
     }

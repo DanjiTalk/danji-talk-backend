@@ -17,10 +17,17 @@ public record ApartmentCache(
     Long chatroomId
 ) {
     public ApartmentInfoResponse toResponse() {
-        return new ApartmentInfoResponse(
-            name, region, location, totalUnit, parkingCapacity,
-            buildingCount, buildingRange, fileUrl, chatroomId
-        );
+        return ApartmentInfoResponse.builder()
+                .name(name)
+                .region(region)
+                .location(location)
+                .totalUnit(totalUnit)
+                .parkingCapacity(parkingCapacity)
+                .buildingCount(buildingCount)
+                .buildingRange(buildingRange)
+                .fileUrl(fileUrl)
+                .chatroomId(chatroomId)
+                .build();
     }
 
     public RecentComplexViewedEvent toEvent(Long memberId) {
