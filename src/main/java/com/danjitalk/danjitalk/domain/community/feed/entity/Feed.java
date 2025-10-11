@@ -103,4 +103,8 @@ public class Feed extends BaseEntity {
         this.contents = contents;
     }
 
+    public void addComment(Comment comment) {
+        commentList.add(comment);
+        this.commentCount = commentList.size(); // 혹은 this.commentCount++  <- 이후에 이렇게 수정하고 배치돌려서 검증하는게 나을 듯?
+    }
 }
