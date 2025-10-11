@@ -7,6 +7,10 @@ spring:
   datasource:
     hikari:
       maximum-pool-size: 50 # HikariCP 연결 풀 크기 설정
+  servlet:
+    multipart:
+      max-file-size: 3MB # 파일 최대 크기
+      max-request-size: 50MB # 요청 최대 크기
 
   security:
     oauth2:
