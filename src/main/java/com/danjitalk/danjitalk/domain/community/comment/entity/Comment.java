@@ -73,7 +73,8 @@ public class Comment extends BaseEntity {
         }
 
         this.feed = feed;
-        feed.getCommentList().add(this);
+//        feed.getCommentList().add(this);
+        feed.addComment(this);
     }
 
     private void associateMember(Member member) {
