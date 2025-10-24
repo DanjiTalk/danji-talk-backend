@@ -101,3 +101,6 @@ jwt:
   secret:
     access: ${ACCESS_SECRET:test}
     refresh: ${REFRESH_SECRET:test}
+
+openapi:
+  secretkey: ${SECRET_KEY:test}
