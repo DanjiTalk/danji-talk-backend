@@ -5,6 +5,7 @@ import com.danjitalk.danjitalk.domain.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 /**
@@ -13,6 +14,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"member_id", "type_id", "type"}))
+@Getter
 public class Bookmark extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,6 +28,8 @@ public class Bookmark extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private BookmarkType type;
+
+    private String kaptCode;
 
     @Builder
     public Bookmark(Long memberId, Long typeId, BookmarkType type) {

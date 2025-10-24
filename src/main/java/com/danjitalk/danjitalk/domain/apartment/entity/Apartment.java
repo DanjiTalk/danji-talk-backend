@@ -38,12 +38,14 @@ public class Apartment {
 
     private Long chatroomId;
 
+    private String kaptCode;  // 단지코드
+
     @OneToMany(mappedBy = "apartment")
     private List<Feed> feedList = new ArrayList<>();
 
     @Builder
     public Apartment(String name, String region, String location, Integer totalUnit, Integer parkingCapacity,
-        Integer buildingCount, String buildingRange, String fileUrl, String thumbnailFileUrl) {
+        Integer buildingCount, String buildingRange, String fileUrl, String thumbnailFileUrl, String kaptCode) {
         this.name = name;
         this.region = region;
         this.location = location;
@@ -53,6 +55,7 @@ public class Apartment {
         this.buildingRange = buildingRange;
         this.fileUrl = fileUrl;
         this.thumbnailFileUrl = thumbnailFileUrl;
+        this.kaptCode = kaptCode;
     }
 
     public void addChatroom(Long chatroomId) {

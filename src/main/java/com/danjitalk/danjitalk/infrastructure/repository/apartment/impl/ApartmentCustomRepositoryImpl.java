@@ -30,7 +30,8 @@ public class ApartmentCustomRepositoryImpl implements ApartmentCustomRepository 
                 apartment.buildingCount,
                 apartment.thumbnailFileUrl,
                 // TODO 북마크 여부 체크
-                bookmark.id.isNotNull() // CASE WHEN bookmark.id IS NOT NULL THEN true ELSE false END
+                bookmark.id.isNotNull(), // CASE WHEN bookmark.id IS NOT NULL THEN true ELSE false END
+                apartment.kaptCode
             ))
             .from(apartment)
             .leftJoin(bookmark).on(apartment.id.eq(bookmark.typeId).and(bookmark.type.eq(BookmarkType.APARTMENT)).and(bookmark.memberId.eq(currentMemberId)))

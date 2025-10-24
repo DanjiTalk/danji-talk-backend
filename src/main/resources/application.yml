@@ -104,3 +104,6 @@ jwt:
 # 스케줄러 on / off
 scheduler:
   enabled: false
+
+openapi:
+  secretkey: ${SECRET_KEY:test}

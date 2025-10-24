@@ -3,16 +3,29 @@ package com.danjitalk.danjitalk.application.search;
 import com.danjitalk.danjitalk.common.exception.BadRequestException;
 import com.danjitalk.danjitalk.common.util.SecurityContextHolderUtil;
 import com.danjitalk.danjitalk.domain.apartment.dto.RecentViewedApartment;
+import com.danjitalk.danjitalk.domain.apartment.entity.Apartment;
+import com.danjitalk.danjitalk.domain.bookmark.entity.Bookmark;
 import com.danjitalk.danjitalk.domain.search.dto.ApartmentSearchResponse;
 import com.danjitalk.danjitalk.domain.search.dto.ApartmentSearchResultResponse;
 import com.danjitalk.danjitalk.domain.search.dto.PopularKeywordResponse;
 import com.danjitalk.danjitalk.domain.search.dto.SearchKeywordResponse;
 import com.danjitalk.danjitalk.infrastructure.repository.apartment.ApartmentRepository;
+import com.danjitalk.danjitalk.infrastructure.repository.bookmark.BookmarkRepository;
+import com.danjitalk.danjitalk.openapi.danjilist.dto.Body;
+import com.danjitalk.danjitalk.openapi.danjilist.dto.Item;
+import com.danjitalk.danjitalk.openapi.danjilist.dto.SigunguAptList3;
+import com.danjitalk.danjitalk.openapi.danjilist.service.DanjiListService;
+import com.danjitalk.danjitalk.openapi.location.service.LocationService;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -20,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class SearchService {
 
     private static final int MAXIMUM_SAVED_VALUE = 5;
@@ -27,9 +41,14 @@ public class SearchService {
     private static final String SEARCH_COUNT_KEY = "search:count:";
 
     private final ApartmentRepository apartmentRepository;
+    private final BookmarkRepository bookmarkRepository;
     private final RedisTemplate<String, String> redisTemplate;
     private final RedisTemplate<String, Object> objectRedisTemplate;
 
+    private final LocationService locationService;
+    private final DanjiListService danjiListService;
+
+    // 지역으로 검색하는건 그렇다 치는데 아파트 이름으로 검색하는건 검색이 안되는데..?
     /**
      * 아파트 단지 검색
      * @param keyword
@@ -42,6 +61,57 @@ public class SearchService {
         }
 
         Long memberId = SecurityContextHolderUtil.getMemberIdOptional().orElse(0L);
+
+        // 검색을 지역으로 하면..
+        List<String> locationCodes = locationService.getLegalDongCodeByLocation(keyword, 1, 1000); // 지역명인지 확인, 지역명 아니면 빈배열 받음
+        log.info("locationCodeSize: {}", locationCodes.size());
+
+        if (!locationCodes.isEmpty()) { // 지역명이라 결과있으면
+            List<SigunguAptList3<Body>> SigunguAptList3s = new ArrayList<>();
+
+            locationCodes.forEach(locationCode -> {
+                SigunguAptList3<Body> list = danjiListService.getAptsBySigunguCode(Integer.parseInt(locationCode), 1, 1000);
+                SigunguAptList3s.add(list);
+                int RemainingPageCount = danjiListService.getRemainingPageCount(list); // 추가로 호출해야 하는 페이지 수 e.g. 1나오면 한페이지 더(2페이지 까지) 필요한 것
+
+                for (int i = 2; i <= 1 + RemainingPageCount; i++) { // 추가로 호출해야 하는 페이지 호출 후 리스트에 추가
+                    SigunguAptList3s.add(danjiListService.getAptsBySigunguCode(Integer.parseInt(locationCode), i, 1000));
+                }
+            });
+            List<ApartmentSearchResponse> apartmentSearchResponses = new ArrayList<>();
+
+            List<Item> allItems = SigunguAptList3s.stream()
+                    .flatMap(e -> e.getResponse().getBody().getItems().stream())
+                    .toList();
+
+            List<String> kaptCodes = allItems.stream().map(Item::getKaptCode).toList();
+
+            Map<String, Apartment> map = apartmentRepository.findByKaptCodeIn(kaptCodes).stream()
+                    .collect(Collectors.toMap(Apartment::getKaptCode, Function.identity()));
+
+            // 유저 북마크 조회
+            Set<String> bookmarkedCodes = bookmarkRepository.findByMemberId(memberId)
+                    .stream()
+                    .map(Bookmark::getKaptCode)
+                    .collect(Collectors.toSet());
+
+            allItems.forEach(e -> {
+                Apartment apartment = map.get(e.getKaptCode());
+                if (apartment == null) {
+                    apartmentSearchResponses.add(
+                        new ApartmentSearchResponse(
+                            null, e.getKaptName(), safeConcat(e.getAs1(), e.getAs2()),
+                            safeConcat(e.getAs3(), e.getAs4()),
+                            null, null, null, bookmarkedCodes.contains(e.getKaptCode()), e.getKaptCode()));
+                } else {
+                    apartmentSearchResponses.add(
+                        new ApartmentSearchResponse(
+                            apartment.getId(), e.getKaptName(), safeConcat(e.getAs1(), e.getAs2()), safeConcat(e.getAs3(), e.getAs4()),
+                            apartment.getTotalUnit(), apartment.getBuildingCount(), apartment.getThumbnailFileUrl(), bookmarkedCodes.contains(e.getKaptCode()), e.getKaptCode()));
+                }
+            });
+            return new ApartmentSearchResultResponse(apartmentSearchResponses, (long)allItems.size(), true);
+        }
 
         // TODO: 북마크 여부 추가하기
         // 아파트 검색 결과 수 저장 키
@@ -153,5 +223,9 @@ public class SearchService {
                 .map(RecentViewedApartment.class::cast)
                 .toList();
         // TODO: 북마크 추가
+    }
+
+    private String safeConcat(String s1, String s2) {
+        return (s1 == null ? "" : s1)  + " " + (s2 == null ? "" : s2);
     }
 }
