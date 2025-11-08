@@ -10,4 +10,5 @@ import org.springframework.stereotype.Repository;
 public interface ApartmentRepository extends JpaRepository<Apartment, Long>, ApartmentCustomRepository {
     Optional<Apartment> findByName(String name);
     List<Apartment> findByKaptCodeIn(List<String> codes);
+    boolean existsByKaptCode(String kaptCode);
 }

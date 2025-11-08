@@ -1,5 +1,6 @@
 package com.danjitalk.danjitalk.application.apartment;
 
+import com.danjitalk.danjitalk.common.exception.ConflictException;
 import com.danjitalk.danjitalk.common.exception.DataNotFoundException;
 import com.danjitalk.danjitalk.common.util.SecurityContextHolderUtil;
 import com.danjitalk.danjitalk.domain.apartment.dto.ApartmentInfoResponse;
@@ -11,6 +12,8 @@ import com.danjitalk.danjitalk.domain.apartment.dto.openapi.apartment.basic.Basi
 import com.danjitalk.danjitalk.domain.apartment.dto.openapi.apartment.detail.ApartmentDetailInfo;
 import com.danjitalk.danjitalk.domain.apartment.dto.openapi.apartment.detail.DetailItem;
 import com.danjitalk.danjitalk.domain.apartment.entity.Apartment;
+import com.danjitalk.danjitalk.domain.apartment.entity.BasicInfo;
+import com.danjitalk.danjitalk.domain.apartment.entity.DetailInfo;
 import com.danjitalk.danjitalk.domain.s3.dto.response.S3FileUrlResponseDto;
 import com.danjitalk.danjitalk.domain.s3.enums.FileType;
 import com.danjitalk.danjitalk.event.dto.RecentComplexViewedEvent;
@@ -47,6 +50,11 @@ public class ApartmentService {
      */
     @Transactional
     public ApartmentRegisterResponse registerApartment(ApartmentRegisterRequest request, List<MultipartFile> multipartFileList) {
+        String kaptCode = request.kaptCode();
+        if (apartmentRepository.existsByKaptCode(kaptCode)) {
+            throw new ConflictException("이미 등록된 단지입니다.");
+        }
+
         // 파일이 10개 이상이면 Exception
         if(multipartFileList != null && multipartFileList.size() > 10) {
             throw new IllegalArgumentException("More than 10 Files");
@@ -59,12 +67,22 @@ public class ApartmentService {
             s3FileUrlResponseDto = s3Service.uploadFiles(FileType.APARTMENT, multipartFileList);
         }
 
-        // 동 범위, 동 수 분리
-        String[] parts = request.buildingRange().split(" \\(");
-        String buildingRange = parts[0];
+        BasicItem basicItem = apartmentInfoService.getAptBasicInfo(kaptCode).getResponse().getBody().getItem();
+        DetailItem detailItem = apartmentInfoService.getAptDetailInfo(kaptCode).getResponse().getBody().getItem();
 
-        String buildingCountText = parts[1].replaceAll("[^0-9]", ""); // 숫자만 남김
-        int buildingCount = Integer.parseInt(buildingCountText);
+        BasicInfo basicInfo = new BasicInfo(basicItem);
+        DetailInfo detailInfo = new DetailInfo(detailItem);
+
+        // 동 범위, 동 수 분리
+        int buildingCount = 0;
+        String buildingRange = null;
+
+        if (request.buildingRange() != null) {
+            String[] parts = request.buildingRange().split(" \\(");
+            buildingRange = parts[0];
+            String buildingCountText = parts[1].replaceAll("[^0-9]", ""); // 숫자만 남김
+            buildingCount = Integer.parseInt(buildingCountText);
+        }
 
         Apartment apartment = Apartment.builder()
                 .name(request.name())
@@ -76,6 +94,10 @@ public class ApartmentService {
                 .buildingRange(buildingRange)
                 .fileUrl(s3FileUrlResponseDto != null ? s3FileUrlResponseDto.fileUrl() : null)
                 .thumbnailFileUrl(s3FileUrlResponseDto != null ? s3FileUrlResponseDto.thumbnailFileUrl() : null)
+                .kaptName(basicItem.getKaptName())
+                .kaptCode(kaptCode)
+                .basicInfo(basicInfo)
+                .detailInfo(detailInfo)
                 .build();
 
         apartmentRepository.save(apartment);
