@@ -59,7 +59,8 @@ public class ApartmentCustomRepositoryImpl implements ApartmentCustomRepository 
 
         return apartment.name.containsIgnoreCase(keyword)
             .or(apartment.region.containsIgnoreCase(keyword))
-            .or(apartment.location.containsIgnoreCase(keyword));
+            .or(apartment.location.containsIgnoreCase(keyword))
+            .or(apartment.kaptName.containsIgnoreCase(keyword)); // 검색 지역, 아파트 이름으로 검색하도록 추가
     }
 
     @Override
