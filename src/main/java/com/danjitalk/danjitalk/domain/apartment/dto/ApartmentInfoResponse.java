@@ -10,6 +10,8 @@ import lombok.Builder;
 
 @Builder
 public record ApartmentInfoResponse(
+    String kaptCode,
+    String kaptName,
     String kaptUsedate,     // 사용 승인일
     Integer kaptdaCnt,   // 세대 수
     String kaptDongCnt,     // 동 수
@@ -63,6 +65,8 @@ public record ApartmentInfoResponse(
         DetailItem detailItem = detail.getResponse().getBody().getItem();
 
         return ApartmentInfoResponse.builder()
+                .kaptCode(basicItem.getKaptCode())
+                .kaptName(basicItem.getKaptName())
                 .kaptUsedate(basicItem.getKaptUsedate())
                 .kaptdaCnt(basicItem.getKaptdaCnt())
                 .kaptDongCnt(basicItem.getKaptDongCnt())
