@@ -173,7 +173,7 @@ public class ChatRequestService {
                 .map(chatRequest ->
                     new ChatRequestResponse(
                         chatRequest.getMessage(),
-                        MemberInformation.from(chatRequest.getRequester()),
+                        MemberInformation.from(chatRequest.getReceiver()),
                         chatRequest.getId(),
                         chatRequest.getStatus(),
                         chatRequest.getCreatedAt()
