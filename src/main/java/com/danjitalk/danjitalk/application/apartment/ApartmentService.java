@@ -4,6 +4,7 @@ import com.danjitalk.danjitalk.common.exception.ConflictException;
 import com.danjitalk.danjitalk.common.exception.DataNotFoundException;
 import com.danjitalk.danjitalk.common.util.SecurityContextHolderUtil;
 import com.danjitalk.danjitalk.domain.apartment.dto.ApartmentInfoResponse;
+import com.danjitalk.danjitalk.domain.apartment.dto.ApartmentQueryParam;
 import com.danjitalk.danjitalk.domain.apartment.dto.ApartmentRegisterRequest;
 import com.danjitalk.danjitalk.domain.apartment.dto.ApartmentRegisterResponse;
 import com.danjitalk.danjitalk.domain.apartment.dto.openapi.apartment.Body;
@@ -21,7 +22,6 @@ import com.danjitalk.danjitalk.event.dto.GroupChatCreateEvent;
 import com.danjitalk.danjitalk.event.handler.SearchEventHandler;
 import com.danjitalk.danjitalk.infrastructure.repository.apartment.ApartmentRepository;
 import com.danjitalk.danjitalk.infrastructure.s3.S3Service;
-import java.time.Duration;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -116,10 +116,13 @@ public class ApartmentService {
                 .build();
     }
 
+    // TODO: 검색 기록 남기는 부분  DB에 없어도 동작하도록 수정 필요
     @Transactional(readOnly = true)
-    public ApartmentInfoResponse getApartmentInfo(Long id) { // 기능 추가 중 캐싱 비활성화 // id 랑 kaptCode 둘다 쓰는게 좋을듯? 아직 등록안된건 kaptCode 아니면 id
+    public ApartmentInfoResponse getApartmentInfo(ApartmentQueryParam query) { // 기능 추가 중 캐싱 비활성화 // id 랑 kaptCode 둘다 쓰는게 좋을듯? 아직 등록안된건 kaptCode 아니면 id
 //        String key = "apartment:detail:" + id;                // 어차피 kaptCode db에서 가져오든지 해야함
 //        Object object = redisTemplate.opsForValue().get(key);
+
+        query.validate();
 
         Long currentMemberId = SecurityContextHolderUtil.getMemberIdOptional().orElse(0L);
 
@@ -131,13 +134,19 @@ public class ApartmentService {
 //            return apartmentCache.toResponse();
 //        }
 
-        Apartment apartment = apartmentRepository.findById(id).orElseThrow(() -> new DataNotFoundException("존재하지 않는 아파트입니다."));
+        String kaptCode = query.kaptCode();
+        Long apartmentId = query.id();
 
-        if (currentMemberId != 0) {
-            publishRecentComplexViewedEvent(apartment, currentMemberId); // 검색기록 남김
+        Apartment apartment = null;
+
+        if (apartmentId != null) { // id가 있으면
+            apartment = apartmentRepository.findById(query.id()).orElseThrow(() -> new DataNotFoundException("존재하지 않는 아파트입니다."));
+            if (currentMemberId != 0) {
+                publishRecentComplexViewedEvent(apartment, currentMemberId); // 검색기록 남김
+            }
+
+            kaptCode = apartment.getKaptCode();
         }
-
-        String kaptCode = apartment.getKaptCode();
 
         ApartmentBasicInfo<Body<BasicItem>> basic = apartmentInfoService.getAptBasicInfo(kaptCode);
         ApartmentDetailInfo<Body<DetailItem>> detail = apartmentInfoService.getAptDetailInfo(kaptCode);

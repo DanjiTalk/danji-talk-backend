@@ -3,6 +3,7 @@ package com.danjitalk.danjitalk.api.apartment;
 import com.danjitalk.danjitalk.application.apartment.ApartmentService;
 import com.danjitalk.danjitalk.common.response.ApiResponse;
 import com.danjitalk.danjitalk.domain.apartment.dto.ApartmentInfoResponse;
+import com.danjitalk.danjitalk.domain.apartment.dto.ApartmentQueryParam;
 import com.danjitalk.danjitalk.domain.apartment.dto.ApartmentRegisterRequest;
 import com.danjitalk.danjitalk.domain.apartment.dto.ApartmentRegisterResponse;
 import jakarta.validation.Valid;
@@ -11,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -34,9 +34,9 @@ public class ApartmentController {
         return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), null, response));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<ApartmentInfoResponse>> getApartment(@PathVariable Long id) {
-        ApartmentInfoResponse apartmentInfoResponse = apartmentService.getApartmentInfo(id);
+    @GetMapping
+    public ResponseEntity<ApiResponse<ApartmentInfoResponse>> getApartment(ApartmentQueryParam query) {
+        ApartmentInfoResponse apartmentInfoResponse = apartmentService.getApartmentInfo(query);
         return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), null, apartmentInfoResponse));
     }
 }
