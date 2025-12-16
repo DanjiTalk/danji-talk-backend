@@ -12,6 +12,7 @@ import lombok.Builder;
 public record ApartmentInfoResponse(
     String kaptCode,
     String kaptName,
+    String kaptAddr,       // 주소
     String kaptUsedate,     // 사용 승인일
     Integer kaptdaCnt,   // 세대 수
     String kaptDongCnt,     // 동 수
@@ -64,9 +65,10 @@ public record ApartmentInfoResponse(
         BasicItem basicItem = basic.getResponse().getBody().getItem();
         DetailItem detailItem = detail.getResponse().getBody().getItem();
 
-        return ApartmentInfoResponse.builder()
+        ApartmentInfoResponse.ApartmentInfoResponseBuilder builder = ApartmentInfoResponse.builder()
                 .kaptCode(basicItem.getKaptCode())
                 .kaptName(basicItem.getKaptName())
+                .kaptAddr(basicItem.getKaptAddr())
                 .kaptUsedate(basicItem.getKaptUsedate())
                 .kaptdaCnt(basicItem.getKaptdaCnt())
                 .kaptDongCnt(basicItem.getKaptDongCnt())
@@ -89,18 +91,22 @@ public record ApartmentInfoResponse(
                 .groundElChargerCnt(detailItem.getGroundElChargerCnt())
                 .undergroundElChargerCnt(detailItem.getUndergroundElChargerCnt())
                 .welfareFacility(detailItem.getWelfareFacility())
-                .kaptdCccnt(detailItem.getKaptdCccnt())
+                .kaptdCccnt(detailItem.getKaptdCccnt());
 
-                .name(apartment.getName())
-                .region(apartment.getRegion())
-                .location(apartment.getLocation())
-                .totalUnit(apartment.getTotalUnit())
-                .parkingCapacity(apartment.getParkingCapacity())
-                .buildingCount(apartment.getBuildingCount())
-                .buildingRange(apartment.getBuildingRange())
-                .fileUrl(apartment.getFileUrl())
-                .chatroomId(apartment.getChatroomId())
-                .build();
+        if (apartment != null) {
+            builder.name(apartment.getName())
+                    .region(apartment.getRegion())
+                    .location(apartment.getLocation())
+                    .totalUnit(apartment.getTotalUnit())
+                    .parkingCapacity(apartment.getParkingCapacity())
+                    .buildingCount(apartment.getBuildingCount())
+                    .buildingRange(apartment.getBuildingRange())
+                    .fileUrl(apartment.getFileUrl())
+                    .chatroomId(apartment.getChatroomId());
+        }
+
+        return builder.build();
+
     }
 
 }
