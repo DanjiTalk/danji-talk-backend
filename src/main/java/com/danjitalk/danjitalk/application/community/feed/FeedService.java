@@ -100,13 +100,16 @@ public class FeedService {
         }
 
         Feed feed = feedRepository.findFeedFetchJoinMemberByFeedId((feedId)).orElseThrow(DataNotFoundException::new);
-        Boolean reacted = this.isReacted(feed.getId(), feed.getMember().getId());
+
+        Optional<Long> currentMemberId = SecurityContextHolderUtil.getMemberIdOptional();
+
+        Boolean reacted = currentMemberId.map(memberId -> isReacted(feed.getId(), memberId)).orElse(false); // 자기글에 자기가 좋아요 눌렀는지만 확인하고 있었음
 
         List<S3ObjectResponseDto> s3ObjectResponseDtoList = Optional.ofNullable(feed.getFileUrl()).map(url -> s3Service.getS3Object(url)).orElseGet(Collections::emptyList);
 
         Boolean bookmarked = bookmarkService.isBookmarked(feedId, BookmarkType.FEED);
 
-        Boolean isAuthor = SecurityContextHolderUtil.getMemberId().equals(feed.getMember().getId());
+        Boolean isAuthor = currentMemberId.map(memberId -> memberId.equals(feed.getMember().getId())).orElse(false);
 
         return new FeedDetailResponseDto(
                 feed.getId(),
